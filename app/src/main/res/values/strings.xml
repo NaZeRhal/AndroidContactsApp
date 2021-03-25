@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ContactsApp</string>
+    <string name="fab_add_description_button_add">button_add</string>
+    <string name="toolbar_search_hint">"Type name, email or phone number…"</string>
+    <string name="menu_item_search_title">Search</string>
+    <string name="item_contact_iv_description">image</string>
 </resources>

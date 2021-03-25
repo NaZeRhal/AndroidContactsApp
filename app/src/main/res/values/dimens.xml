@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fab_add_marginEnd">48dp</dimen>
+    <dimen name="fab_add_marginBottom">16dp</dimen>
+    <dimen name="item_contact_cv_marginStart">4dp</dimen>
+    <dimen name="item_contact_cv_marginTop">4dp</dimen>
+    <dimen name="item_contact_cv_marginEnd">4dp</dimen>
+    <dimen name="item_contact_cv_elevation">2dp</dimen>
+    <dimen name="item_contact_tv_name_textSize">18sp</dimen>
+    <dimen name="item_contact_iv_padding">4dp</dimen>
+    <dimen name="item_contact_iv_height">48dp</dimen>
+</resources>
