@@ -33,24 +33,18 @@ class ContactAdapter(private val context: Context, private val contacts: ArrayLi
 
             Glide
                 .with(context)
-                .load(getDrawableIdByName(contact.image))
+                .load(contact.image)
                 .placeholder(R.drawable.person_placeholder)
                 .circleCrop()
                 .into(ivContactImage)
 
-            if (onContactClickListener != null) {
-                root.setOnClickListener {
-                    onContactClickListener!!.onClick(position, contact)
-                }
+            root.setOnClickListener {
+                onContactClickListener?.onClick(position, contact)
             }
         }
     }
 
     override fun getItemCount(): Int = contacts.size
-
-    private fun getDrawableIdByName(drawableName: String): Int {
-        return context.resources.getIdentifier(drawableName, "drawable", context.packageName)
-    }
 
     fun setOnContactClickListener(onContactClickListener: OnContactClickListener) {
         this.onContactClickListener = onContactClickListener
@@ -62,18 +56,12 @@ class ContactAdapter(private val context: Context, private val contacts: ArrayLi
 
     override fun getFilter(): Filter = object : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
-            val filteredContacts = ArrayList<Contact>()
-
-            if (constraint == null || constraint.isEmpty()) {
-                contactsFull?.let { filteredContacts.addAll(it) }
+            val filteredContacts = if (constraint == null || constraint.isEmpty()) {
+                contactsFull.orEmpty()
             } else {
                 val filterPattern: String =
                     constraint.toString().toLowerCase(Locale.getDefault()).trim()
-                contactsFull?.forEach {
-                    if (anyMatches(it, filterPattern)) {
-                        filteredContacts.add(it)
-                    }
-                }
+                contactsFull?.filter { anyMatches(it, filterPattern) }
             }
 
             return FilterResults().apply {
@@ -83,7 +71,7 @@ class ContactAdapter(private val context: Context, private val contacts: ArrayLi
 
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
             contacts.clear()
-            contacts.addAll((results?.values) as List<Contact>)
+            contacts.addAll(((results?.values) as? List<Contact>)!!)
             notifyDataSetChanged()
         }
 

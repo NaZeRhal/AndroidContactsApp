@@ -25,26 +25,24 @@ class ContactsListActivity : AppCompatActivity() {
 
         binding = ActivityListContactsBinding.inflate(layoutInflater)
 
-        with(binding) {
-            setContentView(root)
+        setContentView(binding.root)
 
-            setSupportActionBar(tbMain)
-            title = null
+        setSupportActionBar(binding.tbMain)
+        title = null
 
-            val contacts = DummyData.load()
+        val contacts = DummyData.load()
 
-            rvContacts.apply {
-                layoutManager = LinearLayoutManager(this@ContactsListActivity)
-                setHasFixedSize(true)
-                contactAdapter = ContactAdapter(this@ContactsListActivity, contacts)
-                contactAdapter!!.setOnContactClickListener(object :
-                    ContactAdapter.OnContactClickListener {
-                    override fun onClick(position: Int, contact: Contact) {
-                        //go to info activity
-                    }
-                })
-                adapter = contactAdapter
-            }
+        binding.rvContacts.apply {
+            layoutManager = LinearLayoutManager(this@ContactsListActivity)
+            setHasFixedSize(true)
+            contactAdapter = ContactAdapter(this@ContactsListActivity, contacts)
+            contactAdapter?.setOnContactClickListener(object :
+                ContactAdapter.OnContactClickListener {
+                override fun onClick(position: Int, contact: Contact) {
+                    //go to info activity
+                }
+            })
+            adapter = contactAdapter
         }
     }
 
@@ -68,31 +66,22 @@ class ContactsListActivity : AppCompatActivity() {
                     R.color.search_view_hint_color
                 )
             )
-
-            setHintTextColor(
-                ContextCompat.getColor(
-                    this@ContactsListActivity,
-                    R.color.search_view_hint_color
-                )
-            )
         }
 
         searchView.apply {
             imeOptions = EditorInfo.IME_ACTION_DONE
             queryHint = resources.getString(R.string.toolbar_search_hint)
 
-            setOnQueryTextListener(
-                object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        return false
-                    }
+            object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return false
+                }
 
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        contactAdapter!!.filter.filter(newText)
-                        return false
-                    }
-
-                })
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    contactAdapter?.filter?.filter(newText)
+                    return false
+                }
+            }
         }
 
         return true
