@@ -13,10 +13,13 @@ import com.maxrzhe.contactsapp.model.Contact
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ContactAdapter(private val context: Context, private val contacts: ArrayList<Contact>) :
+class ContactAdapter(
+    private val context: Context,
+    private val contacts: ArrayList<Contact>,
+    private val onContactClickListener: OnContactClickListener
+) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
 
-    private var onContactClickListener: OnContactClickListener? = null
     private var contactsFull: List<Contact>? = ArrayList(contacts)
 
     inner class ViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
@@ -39,20 +42,12 @@ class ContactAdapter(private val context: Context, private val contacts: ArrayLi
                 .into(ivContactImage)
 
             root.setOnClickListener {
-                onContactClickListener?.onClick(position, contact)
+                onContactClickListener.onClick(position, contact)
             }
         }
     }
 
     override fun getItemCount(): Int = contacts.size
-
-    fun setOnContactClickListener(onContactClickListener: OnContactClickListener) {
-        this.onContactClickListener = onContactClickListener
-    }
-
-    interface OnContactClickListener {
-        fun onClick(position: Int, contact: Contact)
-    }
 
     override fun getFilter(): Filter = object : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
@@ -82,6 +77,10 @@ class ContactAdapter(private val context: Context, private val contacts: ArrayLi
                         phone.toLowerCase(Locale.getDefault()).contains(pattern)
             }
         }
+    }
+
+    interface OnContactClickListener {
+        fun onClick(position: Int, contact: Contact)
     }
 
 }

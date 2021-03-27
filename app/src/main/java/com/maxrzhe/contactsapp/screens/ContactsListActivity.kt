@@ -35,13 +35,14 @@ class ContactsListActivity : AppCompatActivity() {
         binding.rvContacts.apply {
             layoutManager = LinearLayoutManager(this@ContactsListActivity)
             setHasFixedSize(true)
-            contactAdapter = ContactAdapter(this@ContactsListActivity, contacts)
-            contactAdapter?.setOnContactClickListener(object :
-                ContactAdapter.OnContactClickListener {
-                override fun onClick(position: Int, contact: Contact) {
-                    //go to info activity
-                }
-            })
+            contactAdapter = ContactAdapter(
+                this@ContactsListActivity,
+                contacts,
+                object : ContactAdapter.OnContactClickListener {
+                    override fun onClick(position: Int, contact: Contact) {
+                        //go to info activity
+                    }
+                })
             adapter = contactAdapter
         }
     }
@@ -72,18 +73,19 @@ class ContactsListActivity : AppCompatActivity() {
             imeOptions = EditorInfo.IME_ACTION_DONE
             queryHint = resources.getString(R.string.toolbar_search_hint)
 
-            object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    return false
-                }
+            setOnQueryTextListener(
+                object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        return false
+                    }
 
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    contactAdapter?.filter?.filter(newText)
-                    return false
-                }
-            }
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        contactAdapter?.filter?.filter(newText)
+                        return false
+                    }
+                })
         }
-
         return true
     }
+
 }
