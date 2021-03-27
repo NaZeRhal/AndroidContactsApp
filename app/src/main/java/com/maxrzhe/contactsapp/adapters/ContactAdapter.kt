@@ -15,12 +15,16 @@ import kotlin.collections.ArrayList
 
 class ContactAdapter(
     private val context: Context,
-    private val contacts: ArrayList<Contact>,
+    private val fullContactsList: ArrayList<Contact>,
     private val onContactClickListener: OnContactClickListener
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
 
-    private var contactsFull: List<Contact>? = ArrayList(contacts)
+    private var filteredList: List<Contact> = ArrayList(fullContactsList)
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     inner class ViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -30,7 +34,7 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contact = contacts[position]
+        val contact = fullContactsList[position]
         with(holder.binding) {
             tvContactName.text = contact.name
 
@@ -47,16 +51,16 @@ class ContactAdapter(
         }
     }
 
-    override fun getItemCount(): Int = contacts.size
+    override fun getItemCount(): Int = fullContactsList.size
 
     override fun getFilter(): Filter = object : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
             val filteredContacts = if (constraint == null || constraint.isEmpty()) {
-                contactsFull.orEmpty()
+                filteredList
             } else {
                 val filterPattern: String =
                     constraint.toString().toLowerCase(Locale.getDefault()).trim()
-                contactsFull?.filter { anyMatches(it, filterPattern) }
+                filteredList.filter { anyMatches(it, filterPattern) }
             }
 
             return FilterResults().apply {
@@ -65,8 +69,8 @@ class ContactAdapter(
         }
 
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            contacts.clear()
-            contacts.addAll(((results?.values) as? List<Contact>)!!)
+            fullContactsList.clear()
+            fullContactsList.addAll(((results?.values) as? List<Contact>)!!)
             notifyDataSetChanged()
         }
 
