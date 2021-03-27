@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="toolbar_color_control_normal">#FFFFFF</color>
+    <color name="toolbar_title_text_color">#FFFFFF</color>
+    <color name="toolbar_background_color">#FF6200EE</color>
+
+    <color name="search_view_text_color">#FFFFFF</color>
+    <color name="search_view_hint_color">#DADADA</color>
 </resources>
