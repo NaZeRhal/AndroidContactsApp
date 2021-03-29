@@ -13,7 +13,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
-import com.maxrzhe.contactsapp.data.DummyData
 import com.maxrzhe.contactsapp.databinding.ActivityListContactsBinding
 import com.maxrzhe.contactsapp.model.Contact
 
@@ -33,18 +32,14 @@ class ContactsListActivity : AppCompatActivity() {
         setSupportActionBar(binding.tbMain)
         title = null
 
-        val contacts = DummyData.load()
         val savedContacts = readContactsFromSharedPreferences()
-        if (savedContacts.isNotEmpty()) {
-            contacts.addAll(savedContacts)
-        }
 
         binding.rvContacts.apply {
             layoutManager = LinearLayoutManager(this@ContactsListActivity)
             setHasFixedSize(true)
             contactAdapter = ContactAdapter(
                 this@ContactsListActivity,
-                contacts,
+                savedContacts,
                 object : ContactAdapter.OnContactClickListener {
                     override fun onClick(position: Int, contact: Contact) {
                         //go to info activity
@@ -113,7 +108,7 @@ class ContactsListActivity : AppCompatActivity() {
         }
     }
 
-    private fun readContactsFromSharedPreferences(): List<Contact> {
+    private fun readContactsFromSharedPreferences(): ArrayList<Contact> {
         val sp = this.getSharedPreferences(SHARED_STORAGE_NAME, MODE_PRIVATE)
         val savedContacts = sp.getString(CONTACT_LIST, null)
         val type = object : TypeToken<ArrayList<Contact>>() {}.type

@@ -3,10 +3,10 @@ package com.maxrzhe.contactsapp.screens
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -18,14 +18,11 @@ import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.maxrzhe.contactsapp.databinding.ActivityDetailAddBinding
 import com.maxrzhe.contactsapp.model.Contact
 import java.io.File
@@ -35,7 +32,7 @@ import java.io.OutputStream
 import java.util.*
 import kotlin.random.Random
 
-class AddDetailActivity : AppCompatActivity(), View.OnClickListener {
+class AddDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailAddBinding
 
     private var contactId: Int = -1
@@ -57,21 +54,19 @@ class AddDetailActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         contactId = Random.nextInt(until = Int.MAX_VALUE)
-        binding.btnDetailsAdd.setOnClickListener(this@AddDetailActivity)
-        binding.tvAddImage.setOnClickListener(this@AddDetailActivity)
+        binding.btnDetailsAdd.setOnClickListener(saveContact())
+
+        binding.tvAddImage.setOnClickListener(
+            checkForStoragePermission(
+                arrayOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ), EXTERNAL_STORAGE_REQUEST_CODE
+            )
+        )
     }
 
-
-    override fun onClick(v: View?) {
-        if (v != null) {
-            when (v) {
-                binding.btnDetailsAdd -> saveContact()
-                binding.tvAddImage -> choosePhotoFromGallery()
-            }
-        }
-    }
-
-    private fun saveContact() {
+    private fun saveContact() = View.OnClickListener {
         if (validateInput()) {
             val contact = Contact(
                 id = contactId,
@@ -123,64 +118,12 @@ class AddDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun choosePhotoFromGallery() {
-        Dexter.withContext(this)
-            .withPermissions(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        val galleryIntent =
+            Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             )
-            .withListener(object : MultiplePermissionsListener {
-
-                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                    report?.let {
-                        if (report.areAllPermissionsGranted()) {
-                            val galleryIntent =
-                                Intent(
-                                    Intent.ACTION_PICK,
-                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                                )
-                            startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
-                        }
-                        if (report.isAnyPermissionPermanentlyDenied) {
-                            showSettingsDialog()
-                        }
-                    }
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    request: MutableList<PermissionRequest>?,
-                    token: PermissionToken?
-                ) {
-                    token?.continuePermissionRequest()
-                }
-            })
-            .onSameThread()
-            .check()
-    }
-
-    private fun showSettingsDialog() {
-        AlertDialog.Builder(this)
-            .setMessage(
-                "It looks like you have turned off permission required for this feature. " +
-                        "It can be enabled under the Application Settings"
-            )
-            .setPositiveButton("GO TO SETTINGS") { _, _ ->
-                try {
-                    openSettings()
-                } catch (e: ActivityNotFoundException) {
-                    e.printStackTrace()
-                }
-            }
-            .setNegativeButton("CANCEL") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }
-
-    private fun openSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", packageName, null)
-        intent.data = uri
-        startActivity(intent)
+        startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -246,7 +189,68 @@ class AddDetailActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun checkForStoragePermission(storagePermissions: Array<String>, requestCode: Int) =
+        View.OnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(
+                        applicationContext,
+                        storagePermissions[0]
+                    ) + ContextCompat.checkSelfPermission(
+                        applicationContext,
+                        storagePermissions[1]
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+
+                    if (shouldShowRequestPermissionRationale(storagePermissions[0]) ||
+                        shouldShowRequestPermissionRationale(storagePermissions[1])
+                    ) {
+                        showDialog(storagePermissions, requestCode)
+                    } else {
+                        ActivityCompat.requestPermissions(
+                            this@AddDetailActivity,
+                            storagePermissions,
+                            requestCode
+                        )
+                    }
+                } else {
+                    choosePhotoFromGallery()
+                }
+            }
+        }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            EXTERNAL_STORAGE_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] + grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    choosePhotoFromGallery()
+                } else {
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun showDialog(permissions: Array<String>, requestCode: Int) {
+        AlertDialog.Builder(this).apply {
+            setMessage("Permission to access your STORAGE is required to use this app")
+            setTitle("Permission required")
+            setPositiveButton("OK") { _, _ ->
+                ActivityCompat.requestPermissions(
+                    this@AddDetailActivity,
+                    permissions,
+                    requestCode
+                )
+            }
+        }
+            .show()
+    }
+
     companion object {
+        private const val EXTERNAL_STORAGE_REQUEST_CODE = 222
         private const val GALLERY_REQUEST_CODE = 111
         const val NEW_CONTACT = "changed_contact"
         const val IMAGE_DIRECTORY = "imageDir"

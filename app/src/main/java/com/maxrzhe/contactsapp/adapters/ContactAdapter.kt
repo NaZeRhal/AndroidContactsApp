@@ -1,7 +1,6 @@
 package com.maxrzhe.contactsapp.adapters
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -83,9 +82,9 @@ class ContactAdapter(
 
         private fun anyMatches(contact: Contact, pattern: String): Boolean {
             return with(contact) {
-                name.toLowerCase(Locale.getDefault()).contains(pattern) ||
-                        email.toLowerCase(Locale.getDefault()).contains(pattern) ||
-                        phone.toLowerCase(Locale.getDefault()).contains(pattern)
+                name?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
+                        email?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
+                        phone?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false
             }
         }
     }
