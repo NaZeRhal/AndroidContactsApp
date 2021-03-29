@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
@@ -234,7 +233,7 @@ class AddDetailActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun saveToSharedPreferences(contact: Contact) {
         val sp = this.getSharedPreferences(ContactsListActivity.SHARED_STORAGE_NAME, MODE_PRIVATE)
-        val savedJsonContacts = sp.getString(ContactsListActivity.CONTACT_MAP, null)
+        val savedJsonContacts = sp.getString(ContactsListActivity.CONTACT_LIST, null)
         val type = object : TypeToken<ArrayList<Contact>>() {}.type
         val savedContacts =
             Gson().fromJson<ArrayList<Contact>>(savedJsonContacts, type) ?: ArrayList()
@@ -242,7 +241,7 @@ class AddDetailActivity : AppCompatActivity(), View.OnClickListener {
         savedContacts.add(contact)
         val jsonMap = Gson().toJson(savedContacts)
         sp.edit {
-            putString(ContactsListActivity.CONTACT_MAP, jsonMap)
+            putString(ContactsListActivity.CONTACT_LIST, jsonMap)
             apply()
         }
     }

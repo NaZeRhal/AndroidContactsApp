@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
 
 class ContactAdapter(
     private val context: Context,
-    val fullContactsList: ArrayList<Contact>,
+    private val fullContactsList: ArrayList<Contact>,
     private val onContactClickListener: OnContactClickListener
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
