@@ -1,5 +1,6 @@
 package com.maxrzhe.contactsapp.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.inputmethod.EditorInfo
@@ -8,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.data.DummyData
@@ -31,6 +34,10 @@ class ContactsListActivity : AppCompatActivity() {
         title = null
 
         val contacts = DummyData.load()
+        val savedContacts = readContactsFromSharedPreferences()
+        if (savedContacts.isNotEmpty()) {
+            contacts.addAll(savedContacts)
+        }
 
         binding.rvContacts.apply {
             layoutManager = LinearLayoutManager(this@ContactsListActivity)
@@ -44,6 +51,13 @@ class ContactsListActivity : AppCompatActivity() {
                     }
                 })
             adapter = contactAdapter
+        }
+
+        binding.fabAdd.setOnClickListener {
+            startActivityForResult(
+                Intent(this, AddDetailActivity::class.java),
+                DETAIL_ACTIVITY_REQUEST_CODE
+            )
         }
     }
 
@@ -86,6 +100,31 @@ class ContactsListActivity : AppCompatActivity() {
                 })
         }
         return true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DETAIL_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                val contact = data?.extras?.get(AddDetailActivity.NEW_CONTACT) as Contact
+                contactAdapter?.addContact(contact)
+                binding.rvContacts.scrollToPosition(0)
+            }
+        }
+    }
+
+    private fun readContactsFromSharedPreferences(): List<Contact> {
+        val sp = this.getSharedPreferences(SHARED_STORAGE_NAME, MODE_PRIVATE)
+        val savedJsonContacts = sp.getString(CONTACT_MAP, null)
+        val type = object : TypeToken<ArrayList<Contact>>() {}.type
+        return Gson().fromJson<ArrayList<Contact>>(savedJsonContacts, type) ?: ArrayList()
+    }
+
+    companion object {
+        const val DETAIL_ACTIVITY_REQUEST_CODE = 111
+
+        const val SHARED_STORAGE_NAME = "storage"
+        const val CONTACT_MAP = "contact_list"
     }
 
 }

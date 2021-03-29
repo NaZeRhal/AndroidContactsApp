@@ -9,4 +9,20 @@
     <dimen name="item_contact_tv_name_textSize">18sp</dimen>
     <dimen name="item_contact_iv_padding">4dp</dimen>
     <dimen name="item_contact_iv_height">48dp</dimen>
+    <dimen name="detail_iv_avatar_width">150dp</dimen>
+    <dimen name="detail_iv_avatar_height">200dp</dimen>
+    <dimen name="detail_iv_avatar_marginTop">25dp</dimen>
+    <dimen name="detail_ll_edit_marginStart">16dp</dimen>
+    <dimen name="detail_ll_edit_marginTop">25dp</dimen>
+    <dimen name="detail_ll_edit_marginEnd">16dp</dimen>
+    <dimen name="detail_ll_edit_padding">8dp</dimen>
+    <dimen name="detail_et_marginBottom">16dp</dimen>
+    <dimen name="detail_et_name_textSize">22sp</dimen>
+    <dimen name="detail_et_phone_textSize">20sp</dimen>
+    <dimen name="detail_et_email_textSize">18sp</dimen>
+    <dimen name="detail_btn_add_marginStart">48dp</dimen>
+    <dimen name="detail_btn_add_marginTop">16dp</dimen>
+    <dimen name="detail_btn_add_marginEnd">48dp</dimen>
+    <dimen name="detail_btn_add_padding">8dp</dimen>
+    <dimen name="detail_btn_add_textSize">16sp</dimen>
 </resources>

@@ -1,6 +1,7 @@
 package com.maxrzhe.contactsapp.adapters
 
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -15,12 +16,12 @@ import kotlin.collections.ArrayList
 
 class ContactAdapter(
     private val context: Context,
-    private val fullContactsList: ArrayList<Contact>,
+    val fullContactsList: ArrayList<Contact>,
     private val onContactClickListener: OnContactClickListener
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
 
-    private var filteredList: List<Contact> = ArrayList(fullContactsList)
+    private var filteredList: ArrayList<Contact> = ArrayList(fullContactsList)
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -49,6 +50,12 @@ class ContactAdapter(
                 onContactClickListener.onClick(position, contact)
             }
         }
+    }
+
+    fun addContact(contact: Contact) {
+        fullContactsList.add(0, contact)
+        filteredList.add(0, contact)
+        notifyItemInserted(0)
     }
 
     override fun getItemCount(): Int = fullContactsList.size
