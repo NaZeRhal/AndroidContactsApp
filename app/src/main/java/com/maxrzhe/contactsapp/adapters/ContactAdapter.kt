@@ -32,9 +32,12 @@ class ContactAdapter(
     private val sortedList = SortedList(
         Contact::class.java,
         object : SortedList.Callback<Contact>() {
+
             override fun compare(contact1: Contact?, contact2: Contact?): Int {
-                return if (contact1?.name != null && contact2?.name != null) {
-                    contact1.name!!.compareTo(contact2.name!!)
+                val name1 = contact1?.name
+                val name2 = contact2?.name
+                return if (name1 != null && name2 != null) {
+                    name1.compareTo(name2)
                 } else -1
             }
 
