@@ -13,15 +13,14 @@ import kotlin.collections.ArrayList
 
 class ContactAdapter(
     private val context: Context,
-    private val originalContactsList: ArrayList<Contact>,
     private val onContactClickListener: OnContactClickListener
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
-    private var fullCopyContactList: ArrayList<Contact> = ArrayList(originalContactsList)
+    var itemList: ArrayList<Contact> = ArrayList()
         set(value) {
             field = value
-            notifyDataSetChanged()
+            performFiltering(filter)
         }
 
     var filter: String? = null
@@ -29,6 +28,8 @@ class ContactAdapter(
             field = value
             performFiltering(value)
         }
+
+    private var filteredList: List<Contact> = itemList
 
     inner class ViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -38,7 +39,7 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contact = originalContactsList[position]
+        val contact = filteredList[position]
         with(holder.binding) {
             tvContactName.text = contact.name
 
@@ -56,23 +57,21 @@ class ContactAdapter(
     }
 
     fun addContact(contact: Contact) {
-        fullCopyContactList.add(0, contact)
+        (filteredList as ArrayList).add(0, contact)
         performFiltering(this.filter)
     }
 
-    override fun getItemCount(): Int = originalContactsList.size
+    override fun getItemCount(): Int = filteredList.size
 
     private fun performFiltering(query: String?) {
         val filteredContacts = if (query == null || query.isEmpty()) {
-            fullCopyContactList
+            itemList
         } else {
             val filterPattern: String = query.toLowerCase(Locale.getDefault()).trim()
-            fullCopyContactList.filter { anyMatches(it, filterPattern) }
+            itemList.filter { anyMatches(it, filterPattern) }
         }
-        originalContactsList.clear()
-        originalContactsList.addAll(filteredContacts)
+        filteredList = filteredContacts
         notifyDataSetChanged()
-
     }
 
     private fun anyMatches(contact: Contact, pattern: String): Boolean {

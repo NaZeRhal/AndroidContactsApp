@@ -39,12 +39,12 @@ class ContactsListActivity : AppCompatActivity() {
             setHasFixedSize(true)
             contactAdapter = ContactAdapter(
                 this@ContactsListActivity,
-                savedContacts,
                 object : ContactAdapter.OnContactClickListener {
                     override fun onClick(position: Int, contact: Contact) {
                         //go to info activity
                     }
                 })
+            contactAdapter?.itemList = savedContacts
             adapter = contactAdapter
         }
 
