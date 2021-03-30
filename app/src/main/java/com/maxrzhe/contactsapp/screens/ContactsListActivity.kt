@@ -89,8 +89,8 @@ class ContactsListActivity : AppCompatActivity() {
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        contactAdapter?.filter?.filter(newText)
-                        return false
+                        contactAdapter?.filter = newText
+                        return true
                     }
                 })
         }

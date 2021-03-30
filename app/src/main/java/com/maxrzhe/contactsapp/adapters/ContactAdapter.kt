@@ -3,8 +3,6 @@ package com.maxrzhe.contactsapp.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.maxrzhe.contactsapp.R
@@ -15,15 +13,21 @@ import kotlin.collections.ArrayList
 
 class ContactAdapter(
     private val context: Context,
-    private val fullContactsList: ArrayList<Contact>,
+    private val originalContactsList: ArrayList<Contact>,
     private val onContactClickListener: OnContactClickListener
 ) :
-    RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
+    RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
-    private var filteredList: ArrayList<Contact> = ArrayList(fullContactsList)
+    private var fullCopyContactList: ArrayList<Contact> = ArrayList(originalContactsList)
         set(value) {
             field = value
             notifyDataSetChanged()
+        }
+
+    var filter: String? = null
+        set(value) {
+            field = value
+            performFiltering(value)
         }
 
     inner class ViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
@@ -34,7 +38,7 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contact = fullContactsList[position]
+        val contact = originalContactsList[position]
         with(holder.binding) {
             tvContactName.text = contact.name
 
@@ -52,42 +56,33 @@ class ContactAdapter(
     }
 
     fun addContact(contact: Contact) {
-        fullContactsList.add(0, contact)
-        filteredList.add(0, contact)
-        notifyItemInserted(0)
+        fullCopyContactList.add(0, contact)
+        performFiltering(this.filter)
     }
 
-    override fun getItemCount(): Int = fullContactsList.size
+    override fun getItemCount(): Int = originalContactsList.size
 
-    override fun getFilter(): Filter = object : Filter() {
-        override fun performFiltering(constraint: CharSequence?): FilterResults {
-            val filteredContacts = if (constraint == null || constraint.isEmpty()) {
-                filteredList
-            } else {
-                val filterPattern: String =
-                    constraint.toString().toLowerCase(Locale.getDefault()).trim()
-                filteredList.filter { anyMatches(it, filterPattern) }
-            }
-
-            return FilterResults().apply {
-                values = filteredContacts
-            }
+    private fun performFiltering(query: String?) {
+        val filteredContacts = if (query == null || query.isEmpty()) {
+            fullCopyContactList
+        } else {
+            val filterPattern: String = query.toLowerCase(Locale.getDefault()).trim()
+            fullCopyContactList.filter { anyMatches(it, filterPattern) }
         }
+        originalContactsList.clear()
+        originalContactsList.addAll(filteredContacts)
+        notifyDataSetChanged()
 
-        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            fullContactsList.clear()
-            fullContactsList.addAll(((results?.values) as? List<Contact>)!!)
-            notifyDataSetChanged()
-        }
+    }
 
-        private fun anyMatches(contact: Contact, pattern: String): Boolean {
-            return with(contact) {
-                name?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
-                        email?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
-                        phone?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false
-            }
+    private fun anyMatches(contact: Contact, pattern: String): Boolean {
+        return with(contact) {
+            name?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
+                    email?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
+                    phone?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false
         }
     }
+
 
     interface OnContactClickListener {
         fun onClick(position: Int, contact: Contact)
