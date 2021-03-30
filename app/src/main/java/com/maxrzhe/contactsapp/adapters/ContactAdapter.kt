@@ -57,7 +57,6 @@ class ContactAdapter(
 
     fun addContact(contact: Contact) {
         itemList = listOf(contact) + itemList
-        performFiltering(this.filter)
     }
 
     override fun getItemCount(): Int = filteredList.size
