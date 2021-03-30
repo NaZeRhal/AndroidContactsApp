@@ -9,7 +9,6 @@ import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.databinding.ItemContactBinding
 import com.maxrzhe.contactsapp.model.Contact
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ContactAdapter(
     private val context: Context,
@@ -17,7 +16,7 @@ class ContactAdapter(
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
-    var itemList: ArrayList<Contact> = ArrayList()
+    var itemList: List<Contact> = emptyList()
         set(value) {
             field = value
             performFiltering(filter)
@@ -57,7 +56,7 @@ class ContactAdapter(
     }
 
     fun addContact(contact: Contact) {
-        (filteredList as ArrayList).add(0, contact)
+        itemList = listOf(contact) + itemList
         performFiltering(this.filter)
     }
 

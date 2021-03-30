@@ -108,11 +108,11 @@ class ContactsListActivity : AppCompatActivity() {
         }
     }
 
-    private fun readContactsFromSharedPreferences(): ArrayList<Contact> {
+    private fun readContactsFromSharedPreferences(): List<Contact> {
         val sp = this.getSharedPreferences(SHARED_STORAGE_NAME, MODE_PRIVATE)
         val savedContacts = sp.getString(CONTACT_LIST, null)
-        val type = object : TypeToken<ArrayList<Contact>>() {}.type
-        return Gson().fromJson<ArrayList<Contact>>(savedContacts, type) ?: ArrayList()
+        val type = object : TypeToken<List<Contact>>() {}.type
+        return Gson().fromJson<List<Contact>>(savedContacts, type) ?: emptyList()
     }
 
     companion object {
