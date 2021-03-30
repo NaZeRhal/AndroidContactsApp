@@ -3,28 +3,32 @@ package com.maxrzhe.contactsapp.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.databinding.ItemContactBinding
 import com.maxrzhe.contactsapp.model.Contact
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ContactAdapter(
     private val context: Context,
-    private val fullContactsList: ArrayList<Contact>,
     private val onContactClickListener: OnContactClickListener
 ) :
-    RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
+    RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
-    private var filteredList: List<Contact> = ArrayList(fullContactsList)
+    var itemList: List<Contact> = emptyList()
         set(value) {
             field = value
-            notifyDataSetChanged()
+            performFiltering(filter)
         }
+
+    var filter: String? = null
+        set(value) {
+            field = value
+            performFiltering(value)
+        }
+
+    private var filteredList: List<Contact> = itemList
 
     inner class ViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -34,7 +38,7 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contact = fullContactsList[position]
+        val contact = filteredList[position]
         with(holder.binding) {
             tvContactName.text = contact.name
 
@@ -51,37 +55,31 @@ class ContactAdapter(
         }
     }
 
-    override fun getItemCount(): Int = fullContactsList.size
+    fun addContact(contact: Contact) {
+        itemList = listOf(contact) + itemList
+    }
 
-    override fun getFilter(): Filter = object : Filter() {
-        override fun performFiltering(constraint: CharSequence?): FilterResults {
-            val filteredContacts = if (constraint == null || constraint.isEmpty()) {
-                filteredList
-            } else {
-                val filterPattern: String =
-                    constraint.toString().toLowerCase(Locale.getDefault()).trim()
-                filteredList.filter { anyMatches(it, filterPattern) }
-            }
+    override fun getItemCount(): Int = filteredList.size
 
-            return FilterResults().apply {
-                values = filteredContacts
-            }
+    private fun performFiltering(query: String?) {
+        val filteredContacts = if (query == null || query.isEmpty()) {
+            itemList
+        } else {
+            val filterPattern: String = query.toLowerCase(Locale.getDefault()).trim()
+            itemList.filter { anyMatches(it, filterPattern) }
         }
+        filteredList = filteredContacts
+        notifyDataSetChanged()
+    }
 
-        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            fullContactsList.clear()
-            fullContactsList.addAll(((results?.values) as? List<Contact>)!!)
-            notifyDataSetChanged()
-        }
-
-        private fun anyMatches(contact: Contact, pattern: String): Boolean {
-            return with(contact) {
-                name.toLowerCase(Locale.getDefault()).contains(pattern) ||
-                        email.toLowerCase(Locale.getDefault()).contains(pattern) ||
-                        phone.toLowerCase(Locale.getDefault()).contains(pattern)
-            }
+    private fun anyMatches(contact: Contact, pattern: String): Boolean {
+        return with(contact) {
+            name?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
+                    email?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
+                    phone?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false
         }
     }
+
 
     interface OnContactClickListener {
         fun onClick(position: Int, contact: Contact)
