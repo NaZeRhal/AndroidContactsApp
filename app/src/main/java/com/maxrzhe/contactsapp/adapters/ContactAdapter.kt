@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SortedList
 import com.bumptech.glide.Glide
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.databinding.ItemContactBinding
@@ -28,7 +29,44 @@ class ContactAdapter(
             performFiltering(value)
         }
 
-    private var filteredList: List<Contact> = itemList
+    private val sortedList = SortedList(
+        Contact::class.java,
+        object : SortedList.Callback<Contact>() {
+            override fun compare(contact1: Contact?, contact2: Contact?): Int {
+                return if (contact1?.name != null && contact2?.name != null) {
+                    contact1.name!!.compareTo(contact2.name!!)
+                } else -1
+            }
+
+            override fun onInserted(position: Int, count: Int) {
+                notifyItemRangeInserted(position, count)
+            }
+
+            override fun onRemoved(position: Int, count: Int) {
+                notifyItemRangeRemoved(position, count)
+            }
+
+            override fun onMoved(fromPosition: Int, toPosition: Int) {
+                notifyItemMoved(fromPosition, toPosition)
+            }
+
+            override fun onChanged(position: Int, count: Int) {
+                notifyItemRangeChanged(position, count)
+            }
+
+            override fun areContentsTheSame(oldContact: Contact?, newContact: Contact?): Boolean {
+                return if (oldContact != null && newContact != null) {
+                    oldContact == newContact
+                } else false
+            }
+
+            override fun areItemsTheSame(contact1: Contact?, contact2: Contact?): Boolean {
+                return if (contact1 != null && contact2 != null) {
+                    contact1.id == contact2.id
+                } else false
+            }
+
+        })
 
     inner class ViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -38,7 +76,7 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contact = filteredList[position]
+        val contact = sortedList[position]
         with(holder.binding) {
             tvContactName.text = contact.name
 
@@ -59,7 +97,7 @@ class ContactAdapter(
         itemList = listOf(contact) + itemList
     }
 
-    override fun getItemCount(): Int = filteredList.size
+    override fun getItemCount(): Int = sortedList.size()
 
     private fun performFiltering(query: String?) {
         val filteredContacts = if (query == null || query.isEmpty()) {
@@ -68,8 +106,19 @@ class ContactAdapter(
             val filterPattern: String = query.toLowerCase(Locale.getDefault()).trim()
             itemList.filter { anyMatches(it, filterPattern) }
         }
-        filteredList = filteredContacts
-        notifyDataSetChanged()
+        replaceAll(filteredContacts)
+    }
+
+    private fun replaceAll(contacts: List<Contact>) {
+        sortedList.beginBatchedUpdates()
+        (sortedList.size() - 1 downTo 0 step 1).forEach { i ->
+            val contact = sortedList[i]
+            if (!contacts.contains(contact)) {
+                sortedList.remove(contact)
+            }
+        }
+        sortedList.addAll(contacts)
+        sortedList.endBatchedUpdates()
     }
 
     private fun anyMatches(contact: Contact, pattern: String): Boolean {
