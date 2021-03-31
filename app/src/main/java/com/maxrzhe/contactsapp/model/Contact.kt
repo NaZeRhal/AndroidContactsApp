@@ -5,10 +5,10 @@ import android.os.Parcelable
 
 data class Contact(
     val id: Int,
-    var name: String?,
-    var phone: String?,
-    var email: String?,
-    var image: String?
+    val name: String?,
+    val phone: String?,
+    val email: String?,
+    val image: String?
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -16,8 +16,7 @@ data class Contact(
         parcel.readString(),
         parcel.readString(),
         parcel.readString()
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
