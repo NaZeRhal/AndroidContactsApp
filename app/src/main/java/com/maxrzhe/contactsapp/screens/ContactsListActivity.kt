@@ -1,10 +1,16 @@
 package com.maxrzhe.contactsapp.screens
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.wifi.WifiManager
+import android.os.BatteryManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -15,7 +21,6 @@ import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.ActivityListContactsBinding
 import com.maxrzhe.contactsapp.model.Contact
-
 
 class ContactsListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListContactsBinding
@@ -56,9 +61,49 @@ class ContactsListActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let {
+            this.registerReceiver(batteryBroadcastReceiver, it)
+        }
+
+        IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION).let {
+            this.registerReceiver(wifiBroadcastReceiver, it)
+        }
+        super.onStart()
+    }
+
+    override fun onStop() {
+        unregisterReceiver(batteryBroadcastReceiver)
+        unregisterReceiver(wifiBroadcastReceiver)
+        super.onStop()
+    }
+
+    private val batteryBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val level: Int = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+            val scale: Int = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+            val percentage: Float = level * 100 / scale.toFloat()
+
+            if (level > 0 && scale > 0) {
+                title = "Contacts ${percentage.toInt()}%"
+            }
+        }
+
+    }
+
+    private val wifiBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val wifiState =
+                intent?.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN)
+            if (wifiState == WifiManager.WIFI_STATE_DISABLING) {
+                Toast.makeText(context, "WiFi disconnected. Please turn on WiFi", Toast.LENGTH_LONG)
+                    .show()
+            }
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-
         val searchView = (menu.findItem(R.id.menu_item_search)).actionView as SearchView
         val searchEditText = searchView.findViewById<EditText>(R.id.search_src_text)
 
