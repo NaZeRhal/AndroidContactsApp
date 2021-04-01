@@ -27,6 +27,30 @@ class ContactsListActivity : AppCompatActivity() {
 
     private var contactAdapter: ContactAdapter? = null
 
+    private val batteryBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val level: Int = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+            val scale: Int = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+            val percentage: Float = level * 100 / scale.toFloat()
+
+            if (level > 0 && scale > 0) {
+                title = "Contacts ${percentage.toInt()}%"
+            }
+        }
+
+    }
+
+    private val wifiBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val wifiState =
+                intent?.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN)
+            if (wifiState == WifiManager.WIFI_STATE_DISABLING) {
+                Toast.makeText(context, "WiFi disconnected. Please turn on WiFi", Toast.LENGTH_LONG)
+                    .show()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -62,44 +86,15 @@ class ContactsListActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
-        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let {
-            this.registerReceiver(batteryBroadcastReceiver, it)
-        }
-
-        IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION).let {
-            this.registerReceiver(wifiBroadcastReceiver, it)
-        }
         super.onStart()
+        registerReceiver(batteryBroadcastReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        registerReceiver(wifiBroadcastReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
     }
 
     override fun onStop() {
+        super.onStop()
         unregisterReceiver(batteryBroadcastReceiver)
         unregisterReceiver(wifiBroadcastReceiver)
-        super.onStop()
-    }
-
-    private val batteryBroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val level: Int = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
-            val scale: Int = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
-            val percentage: Float = level * 100 / scale.toFloat()
-
-            if (level > 0 && scale > 0) {
-                title = "Contacts ${percentage.toInt()}%"
-            }
-        }
-
-    }
-
-    private val wifiBroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val wifiState =
-                intent?.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN)
-            if (wifiState == WifiManager.WIFI_STATE_DISABLING) {
-                Toast.makeText(context, "WiFi disconnected. Please turn on WiFi", Toast.LENGTH_LONG)
-                    .show()
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
