@@ -35,7 +35,8 @@ class ContactAdapter(
 
             override fun compare(contact1: Contact?, contact2: Contact?): Int {
                 return if (contact1?.name != null && contact2?.name != null) {
-                    contact1.name.compareTo(contact2.name)
+                    contact1.name.toLowerCase(Locale.getDefault())
+                        .compareTo(contact2.name.toLowerCase(Locale.getDefault()))
                 } else -1
             }
 
@@ -89,7 +90,7 @@ class ContactAdapter(
                 .into(ivContactImage)
 
             root.setOnClickListener {
-                onContactClickListener.onClick(position, contact)
+                onContactClickListener.onClick(contact)
             }
         }
     }
@@ -132,7 +133,7 @@ class ContactAdapter(
 
 
     interface OnContactClickListener {
-        fun onClick(position: Int, contact: Contact)
+        fun onClick(contact: Contact)
     }
 
 }

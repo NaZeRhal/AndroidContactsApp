@@ -3,19 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".screens.AddDetailActivity">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tb_details"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/toolbar_background_color"
-        android:theme="@style/ToolbarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@color/white" />
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/iv_avatar"
@@ -26,7 +14,7 @@
         android:src="@drawable/person_placeholder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tb_details" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_add_image"
@@ -59,6 +47,8 @@
             android:layout_marginBottom="@dimen/detail_et_marginBottom"
             android:hint="@string/detail_hint_enter_name"
             android:inputType="text"
+            android:visibility="visible"
+            tools:visibility="visible"
             android:textSize="@dimen/detail_et_name_textSize"
             android:textStyle="bold" />
 
@@ -69,6 +59,8 @@
             android:layout_marginBottom="@dimen/detail_et_marginBottom"
             android:hint="@string/detail_hint_enter_phone_number"
             android:inputType="phone"
+            android:visibility="visible"
+            tools:visibility="visible"
             android:textSize="@dimen/detail_et_phone_textSize" />
 
         <EditText
@@ -78,6 +70,8 @@
             android:layout_marginBottom="@dimen/detail_et_marginBottom"
             android:hint="@string/detail_hint_enter_email"
             android:inputType="textEmailAddress"
+            android:visibility="visible"
+            tools:visibility="visible"
             android:textSize="@dimen/detail_et_email_textSize" />
     </LinearLayout>
 
