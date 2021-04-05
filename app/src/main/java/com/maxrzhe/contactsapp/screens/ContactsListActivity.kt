@@ -7,21 +7,10 @@ import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Bundle
-import android.view.Menu
-import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.maxrzhe.contactsapp.R
-import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.ActivityListContactsBinding
-import com.maxrzhe.contactsapp.model.Contact
 
 class ContactsListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListContactsBinding
@@ -77,11 +66,6 @@ class ContactsListActivity : AppCompatActivity() {
         super.onStop()
         unregisterReceiver(batteryBroadcastReceiver)
         unregisterReceiver(wifiBroadcastReceiver)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
     }
 
     companion object {

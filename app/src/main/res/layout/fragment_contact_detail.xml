@@ -47,8 +47,6 @@
             android:layout_marginBottom="@dimen/detail_et_marginBottom"
             android:hint="@string/detail_hint_enter_name"
             android:inputType="text"
-            android:visibility="visible"
-            tools:visibility="visible"
             android:textSize="@dimen/detail_et_name_textSize"
             android:textStyle="bold" />
 
@@ -59,8 +57,6 @@
             android:layout_marginBottom="@dimen/detail_et_marginBottom"
             android:hint="@string/detail_hint_enter_phone_number"
             android:inputType="phone"
-            android:visibility="visible"
-            tools:visibility="visible"
             android:textSize="@dimen/detail_et_phone_textSize" />
 
         <EditText
@@ -70,8 +66,6 @@
             android:layout_marginBottom="@dimen/detail_et_marginBottom"
             android:hint="@string/detail_hint_enter_email"
             android:inputType="textEmailAddress"
-            android:visibility="visible"
-            tools:visibility="visible"
             android:textSize="@dimen/detail_et_email_textSize" />
     </LinearLayout>
 

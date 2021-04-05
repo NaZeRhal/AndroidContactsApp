@@ -6,7 +6,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -37,9 +36,7 @@ import kotlin.random.Random
 
 class ContactDetailFragment : Fragment() {
     private var _binding: FragmentContactDetailBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var contactsListActivity: ContactsListActivity
+    private val binding get() = _binding
 
     private var contact: Contact? = null
     private var isNew: Boolean = false
@@ -49,13 +46,12 @@ class ContactDetailFragment : Fragment() {
     private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                data?.let {
-                    val contentUri = data.data as Uri
+                result.data?.let {
+                    val contentUri = it.data as Uri
                     try {
                         val selectedImage = getCapturedImage(contentUri)
                         imageUri = saveImageToInternalStorage(selectedImage).toString()
-                        binding.ivAvatar.setImageBitmap(selectedImage)
+                        binding?.ivAvatar?.setImageBitmap(selectedImage)
                     } catch (e: IOException) {
                         Toast.makeText(
                             requireContext(),
@@ -78,15 +74,6 @@ class ContactDetailFragment : Fragment() {
             }
         }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        sharedPreferences = context.getSharedPreferences(
-            ContactsListActivity.SHARED_STORAGE_NAME,
-            AppCompatActivity.MODE_PRIVATE
-        )
-        contactsListActivity = context as ContactsListActivity
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -107,40 +94,38 @@ class ContactDetailFragment : Fragment() {
     ): View? {
         _binding = FragmentContactDetailBinding.inflate(inflater, container, false)
 
-        val view = binding.root
+        return binding?.let {
+            val view = it.root
 
-        with(binding) {
-            if (!isNew) {
-                tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
-                btnDetailsAdd.text = resources.getString(R.string.detail_button_save_changes_text)
-                contact?.let {
-                    etName.setText(it.name)
-                    etPhone.setText(it.phone)
-                    etEmail.setText(it.email)
-                    ivAvatar.setImageURI(Uri.parse(it.image))
+            with(it) {
+                if (!isNew) {
+                    tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
+                    btnDetailsAdd.text =
+                        resources.getString(R.string.detail_button_save_changes_text)
+                    contact?.let {
+                        etName.setText(it.name)
+                        etPhone.setText(it.phone)
+                        etEmail.setText(it.email)
+                        ivAvatar.setImageURI(Uri.parse(it.image))
+                    }
+                } else {
+                    ivAvatar.setImageResource(R.drawable.person_placeholder)
                 }
-            } else {
-                ivAvatar.setImageResource(R.drawable.person_placeholder)
-            }
 
-            btnDetailsAdd.setOnClickListener(saveContact())
-            binding.tvAddImage.setOnClickListener(
-                checkForStoragePermission(
-                    arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    ), EXTERNAL_STORAGE_REQUEST_CODE
+                btnDetailsAdd.setOnClickListener(saveContact())
+                tvAddImage.setOnClickListener(
+                    checkForStoragePermission(EXTERNAL_STORAGE_REQUEST_CODE)
                 )
-            )
+            }
+            view
         }
-        return view
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.main_menu, menu)
         val searchIcon = menu.findItem(R.id.menu_item_search)
         searchIcon.isVisible = false
-        contactsListActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        (context as? ContactsListActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -152,30 +137,32 @@ class ContactDetailFragment : Fragment() {
 
     private fun saveContact() = View.OnClickListener {
         if (validateInput()) {
-            val contact = Contact(
-                id = contactId,
-                name = binding.etName.text.toString(),
-                phone = binding.etPhone.text.toString(),
-                email = binding.etEmail.text.toString(),
-                image = imageUri
-            )
-
-            if (contactId >= 0) {
-                saveToSharedPreferences(contact)
-                setFragmentResult(
-                    ContactListFragment.CONTACTS_FRAGMENT_LISTENER_KEY,
-                    bundleOf(CONTACT_TO_SAVE to contact)
+            binding?.let {
+                val contact = Contact(
+                    id = contactId,
+                    name = it.etName.text.toString(),
+                    phone = it.etPhone.text.toString(),
+                    email = it.etEmail.text.toString(),
+                    image = imageUri
                 )
-            }
 
-            parentFragmentManager.popBackStackImmediate()
+                if (contactId >= 0) {
+                    saveToSharedPreferences(contact)
+                    setFragmentResult(
+                        ContactListFragment.CONTACTS_FRAGMENT_LISTENER_KEY,
+                        bundleOf(CONTACT_TO_SAVE to contact)
+                    )
+                }
+
+                parentFragmentManager.popBackStackImmediate()
+            }
         }
     }
 
     private fun validateInput(): Boolean {
-        return with(binding) {
+        return binding?.let {
             when {
-                etName.text.isNullOrEmpty() -> {
+                it.etName.text.isNullOrEmpty() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter a name",
@@ -183,7 +170,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.PHONE.matcher(etPhone.text).matches() -> {
+                !Patterns.PHONE.matcher(it.etPhone.text).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct phone number",
@@ -191,7 +178,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.EMAIL_ADDRESS.matcher(etEmail.text).matches() -> {
+                !Patterns.EMAIL_ADDRESS.matcher(it.etEmail.text).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct email",
@@ -201,11 +188,16 @@ class ContactDetailFragment : Fragment() {
                 }
                 else -> true
             }
-        }
+        } ?: true
     }
 
-    private fun checkForStoragePermission(storagePermissions: Array<String>, requestCode: Int) =
+    private fun checkForStoragePermission(requestCode: Int) =
         View.OnClickListener {
+            val storagePermissions = arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(
                         requireContext(),
@@ -284,20 +276,26 @@ class ContactDetailFragment : Fragment() {
     }
 
     private fun saveToSharedPreferences(contact: Contact) {
-        val savedJsonContacts = sharedPreferences.getString(ContactsListActivity.CONTACT_LIST, null)
-        val type = object : TypeToken<List<Contact>>() {}.type
-        var savedContacts =
-            Gson().fromJson<List<Contact>>(savedJsonContacts, type) ?: emptyList()
+        val sharedPreferences = context?.getSharedPreferences(
+            ContactsListActivity.SHARED_STORAGE_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
+        sharedPreferences?.let {
+            val savedJsonContacts =
+                sharedPreferences.getString(ContactsListActivity.CONTACT_LIST, null)
+            val type = object : TypeToken<List<Contact>>() {}.type
+            var savedContacts =
+                Gson().fromJson<List<Contact>>(savedJsonContacts, type) ?: emptyList()
 
-        val oldContact: Contact? = savedContacts.firstOrNull { it.id == contact.id }
-        if (oldContact != null) {
-            savedContacts = savedContacts - listOf(oldContact)
+            val oldContact: Contact? = savedContacts.firstOrNull { it.id == contact.id }
+            if (oldContact != null) {
+                savedContacts = savedContacts - listOf(oldContact)
+            }
+            savedContacts = listOf(contact) + savedContacts
+            val json = Gson().toJson(savedContacts)
+            sharedPreferences.edit()?.putString(ContactsListActivity.CONTACT_LIST, json)?.apply()
         }
-        savedContacts = listOf(contact) + savedContacts
-        val json = Gson().toJson(savedContacts)
-        sharedPreferences.edit().putString(ContactsListActivity.CONTACT_LIST, json).apply()
     }
-
 
     companion object {
         private const val EXTERNAL_STORAGE_REQUEST_CODE = 222
