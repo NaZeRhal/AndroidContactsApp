@@ -41,7 +41,7 @@ class ContactListFragment : Fragment() {
 
         return binding?.let {
             val view = it.root
-            it.flContainer.apply {
+            it.rvContactList.apply {
                 layoutManager = LinearLayoutManager(view.context)
                 setHasFixedSize(true)
                 contactAdapter = ContactAdapter(
@@ -54,25 +54,22 @@ class ContactListFragment : Fragment() {
                                     putBoolean(ContactDetailFragment.IS_NEW_CONTACT, false)
                                 }
                             }
-                            parentFragmentManager.commit {
-                                replace(id, detailFragment)
-                                setReorderingAllowed(true)
-                                addToBackStack(null)
+                            container?.let {
+                                parentFragmentManager.commit {
+                                    replace(it.id, detailFragment)
+                                    setReorderingAllowed(true)
+                                    addToBackStack(null)
+                                }
                             }
                         }
                     }
                 )
                 contactAdapter?.itemList = readContactsFromSharedPreferences()
                 adapter = contactAdapter
-
+                it.fabAdd.setOnClickListener(addContact(container))
             }
             view
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding?.fabAdd?.setOnClickListener(addContact())
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -122,15 +119,15 @@ class ContactListFragment : Fragment() {
         _binding = null
     }
 
-    private fun addContact() = View.OnClickListener {
+    private fun addContact(container: ViewGroup?) = View.OnClickListener {
         parentFragmentManager.commit {
             val detailFragment = ContactDetailFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(ContactDetailFragment.IS_NEW_CONTACT, true)
                 }
             }
-            binding?.let {
-                replace(it.flContainer.id, detailFragment)
+            container?.let {
+                replace(it.id, detailFragment)
                 setReorderingAllowed(true)
                 addToBackStack(null)
             }

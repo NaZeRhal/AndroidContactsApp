@@ -1,87 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/iv_avatar"
-        android:layout_width="@dimen/detail_iv_avatar_width"
-        android:layout_height="@dimen/detail_iv_avatar_height"
-        android:layout_marginTop="@dimen/detail_iv_avatar_marginTop"
-        android:contentDescription="@string/detail_description_avatar"
-        android:src="@drawable/person_placeholder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_add_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/detail_tv_add_image_text"
-        android:textColor="@color/purple_500"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_avatar" />
-
-    <LinearLayout
-        android:id="@+id/ll_detail_edit"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/detail_ll_edit_marginStart"
-        android:layout_marginTop="@dimen/detail_ll_edit_marginTop"
-        android:layout_marginEnd="@dimen/detail_ll_edit_marginEnd"
-        android:orientation="vertical"
-        android:padding="@dimen/detail_ll_edit_padding"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_avatar">
+        android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/detail_iv_avatar_width"
+            android:layout_height="@dimen/detail_iv_avatar_height"
+            android:layout_marginTop="@dimen/detail_iv_avatar_marginTop"
+            android:contentDescription="@string/detail_description_avatar"
+            android:src="@drawable/person_placeholder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/et_name"
+        <TextView
+            android:id="@+id/tv_add_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/detail_tv_add_image_text"
+            android:textColor="@color/purple_500"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_avatar" />
+
+        <LinearLayout
+            android:id="@+id/ll_detail_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/detail_et_marginBottom"
-            android:hint="@string/detail_hint_enter_name"
-            android:inputType="text"
-            android:textSize="@dimen/detail_et_name_textSize"
-            android:textStyle="bold" />
+            android:layout_marginStart="@dimen/detail_ll_edit_marginStart"
+            android:layout_marginTop="@dimen/detail_ll_edit_marginTop"
+            android:layout_marginEnd="@dimen/detail_ll_edit_marginEnd"
+            android:orientation="vertical"
+            android:padding="@dimen/detail_ll_edit_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_avatar">
 
-        <EditText
-            android:id="@+id/et_phone"
-            android:layout_width="match_parent"
+
+            <EditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/detail_et_marginBottom"
+                android:hint="@string/detail_hint_enter_name"
+                android:inputType="text"
+                android:textSize="@dimen/detail_et_name_textSize"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/detail_et_marginBottom"
+                android:hint="@string/detail_hint_enter_phone_number"
+                android:inputType="phone"
+                android:textSize="@dimen/detail_et_phone_textSize" />
+
+            <EditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/detail_et_marginBottom"
+                android:hint="@string/detail_hint_enter_email"
+                android:inputType="textEmailAddress"
+                android:textSize="@dimen/detail_et_email_textSize" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_details_add"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/detail_et_marginBottom"
-            android:hint="@string/detail_hint_enter_phone_number"
-            android:inputType="phone"
-            android:textSize="@dimen/detail_et_phone_textSize" />
+            android:layout_marginStart="@dimen/detail_btn_add_marginStart"
+            android:layout_marginTop="@dimen/detail_btn_add_marginTop"
+            android:layout_marginEnd="@dimen/detail_btn_add_marginEnd"
+            android:layout_marginBottom="@dimen/detail_btn_add_marginBottom"
+            android:padding="@dimen/detail_btn_add_padding"
+            android:text="@string/detail_button_add_text"
+            android:textSize="@dimen/detail_btn_add_textSize"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_detail_edit" />
 
-        <EditText
-            android:id="@+id/et_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/detail_et_marginBottom"
-            android:hint="@string/detail_hint_enter_email"
-            android:inputType="textEmailAddress"
-            android:textSize="@dimen/detail_et_email_textSize" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/btn_details_add"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/detail_btn_add_marginStart"
-        android:layout_marginTop="@dimen/detail_btn_add_marginTop"
-        android:layout_marginEnd="@dimen/detail_btn_add_marginEnd"
-        android:padding="@dimen/detail_btn_add_padding"
-        android:text="@string/detail_button_add_text"
-        android:textSize="@dimen/detail_btn_add_textSize"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll_detail_edit" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
