@@ -1,6 +1,7 @@
 package com.maxrzhe.contactsapp.screens
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -37,6 +38,11 @@ class ContactListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        var isLandscape = false
+        arguments?.let {
+            isLandscape = it.getBoolean(ContactsListActivity.IS_LANDSCAPE, false)
+        }
         _binding = FragmentContactListBinding.inflate(inflater, container, false)
 
         return binding?.let {
@@ -52,13 +58,27 @@ class ContactListFragment : Fragment() {
                                 arguments = Bundle().apply {
                                     putParcelable(ContactDetailFragment.CONTACT, contact)
                                     putBoolean(ContactDetailFragment.IS_NEW_CONTACT, false)
+                                    putBoolean(ContactsListActivity.IS_LANDSCAPE, isLandscape)
                                 }
                             }
-                            container?.let {
+                            if (!isLandscape) {
                                 parentFragmentManager.commit {
-                                    replace(it.id, detailFragment)
+                                    replace(
+                                        R.id.fl_container,
+                                        detailFragment,
+                                        ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
+                                    )
                                     setReorderingAllowed(true)
                                     addToBackStack(null)
+                                }
+                            } else {
+                                parentFragmentManager.commit {
+                                    replace(
+                                        R.id.fl_details,
+                                        detailFragment,
+                                        ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
+                                    )
+                                    setReorderingAllowed(true)
                                 }
                             }
                         }
@@ -66,7 +86,7 @@ class ContactListFragment : Fragment() {
                 )
                 contactAdapter?.itemList = readContactsFromSharedPreferences()
                 adapter = contactAdapter
-                it.fabAdd.setOnClickListener(addContact(container))
+                it.fabAdd.setOnClickListener(addContact(isLandscape))
             }
             view
         }
@@ -114,22 +134,59 @@ class ContactListFragment : Fragment() {
         }
     }
 
+//    override fun onStart() {
+//        super.onStart()
+//        Log.i(ContactsListActivity.TAG, "onStart: list")
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//        Log.i(ContactsListActivity.TAG, "onResume: list")
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        Log.i(ContactsListActivity.TAG, "onPause: list")
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        Log.i(ContactsListActivity.TAG, "onStop: list")
+//    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    private fun addContact(container: ViewGroup?) = View.OnClickListener {
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        Log.i(ContactsListActivity.TAG, "onDestroy: list")
+//    }
+
+    private fun addContact(isLandscape: Boolean) = View.OnClickListener {
         parentFragmentManager.commit {
             val detailFragment = ContactDetailFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(ContactDetailFragment.IS_NEW_CONTACT, true)
+                    putBoolean(ContactsListActivity.IS_LANDSCAPE, isLandscape)
                 }
             }
-            container?.let {
-                replace(it.id, detailFragment)
+            if (!isLandscape) {
+                replace(
+                    R.id.fl_container,
+                    detailFragment,
+                    ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
+                )
                 setReorderingAllowed(true)
                 addToBackStack(null)
+            } else {
+                replace(
+                    R.id.fl_details,
+                    detailFragment,
+                    ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
+                )
+                setReorderingAllowed(true)
             }
         }
     }
@@ -146,5 +203,10 @@ class ContactListFragment : Fragment() {
 
     companion object {
         const val CONTACTS_FRAGMENT_LISTENER_KEY = "contact_fragment_listener_key"
+        const val CONTACTS_FRAGMENT_TAG_KEY = "CONTACTS_FRAGMENT_TAG_KEY"
+    }
+
+    interface OnContactSaveListener {
+        fun onSave()
     }
 }

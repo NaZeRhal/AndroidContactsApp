@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.util.Patterns
 import android.view.*
 import android.widget.Toast
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.setFragmentResult
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -40,10 +42,11 @@ class ContactDetailFragment : Fragment() {
 
     private var contact: Contact? = null
     private var isNew: Boolean = false
-    private var imageUri: String = ""
     private var contactId: Int = -1
+    private var imageUri: String = ""
+    private var isLandscape: Boolean = false
 
-    private val resultLauncher =
+    private val imageResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.let {
@@ -69,6 +72,7 @@ class ContactDetailFragment : Fragment() {
             val isAllowed = permissions.entries.all { it.value != false }
             if (isAllowed) {
                 choosePhotoFromGallery()
+
             } else {
                 Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
             }
@@ -79,11 +83,16 @@ class ContactDetailFragment : Fragment() {
         arguments?.let {
             contact = it.getParcelable(CONTACT)
             isNew = it.getBoolean(IS_NEW_CONTACT, false)
+            isLandscape = it.getBoolean(ContactsListActivity.IS_LANDSCAPE, false)
         }
         contactId = if (isNew) Random.nextInt(until = Int.MAX_VALUE) else contact?.id ?: -1
-        imageUri = if (isNew) resources.getString(R.string.placeholder_uri) else contact?.image
-            ?: resources.getString(R.string.placeholder_uri)
 
+        imageUri = if (savedInstanceState != null) {
+            savedInstanceState.getString(IMAGE, resources.getString(R.string.placeholder_uri))
+        } else {
+            if (isNew) resources.getString(R.string.placeholder_uri) else contact?.image
+                ?: resources.getString(R.string.placeholder_uri)
+        }
         setHasOptionsMenu(true)
     }
 
@@ -102,19 +111,16 @@ class ContactDetailFragment : Fragment() {
                     tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
                     btnDetailsAdd.text =
                         resources.getString(R.string.detail_button_save_changes_text)
-                    contact?.let {
-                        etName.setText(it.name)
-                        etPhone.setText(it.phone)
-                        etEmail.setText(it.email)
-                        ivAvatar.setImageURI(Uri.parse(it.image))
+                    contact?.let { cont ->
+                        etName.setText(cont.name)
+                        etPhone.setText(cont.phone)
+                        etEmail.setText(cont.email)
                     }
-                } else {
-                    ivAvatar.setImageResource(R.drawable.person_placeholder)
                 }
 
                 btnDetailsAdd.setOnClickListener(saveContact())
                 tvAddImage.setOnClickListener(
-                    checkForStoragePermission(EXTERNAL_STORAGE_REQUEST_CODE)
+                    checkForStoragePermission()
                 )
             }
             view
@@ -122,10 +128,14 @@ class ContactDetailFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-        val searchIcon = menu.findItem(R.id.menu_item_search)
-        searchIcon.isVisible = false
-        (context as? ContactsListActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        if (!isLandscape) {
+            inflater.inflate(R.menu.main_menu, menu)
+            val searchIcon = menu.findItem(R.id.menu_item_search)
+            searchIcon.isVisible = false
+            (context as? ContactsListActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        } else {
+            super.onCreateOptionsMenu(menu, inflater)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -152,9 +162,16 @@ class ContactDetailFragment : Fragment() {
                         ContactListFragment.CONTACTS_FRAGMENT_LISTENER_KEY,
                         bundleOf(CONTACT_TO_SAVE to contact)
                     )
+                    Toast.makeText(requireContext(), "Contact saved", Toast.LENGTH_SHORT).show()
                 }
+                if (!isLandscape) {
+                    parentFragmentManager.popBackStackImmediate()
 
-                parentFragmentManager.popBackStackImmediate()
+                } else {
+                    parentFragmentManager.commit {
+                        replace(R.id.fl_container, ContactListFragment())
+                    }
+                }
             }
         }
     }
@@ -191,7 +208,7 @@ class ContactDetailFragment : Fragment() {
         } ?: true
     }
 
-    private fun checkForStoragePermission(requestCode: Int) =
+    private fun checkForStoragePermission() =
         View.OnClickListener {
             val storagePermissions = arrayOf(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -210,7 +227,7 @@ class ContactDetailFragment : Fragment() {
                     if (shouldShowRequestPermissionRationale(storagePermissions[0]) ||
                         shouldShowRequestPermissionRationale(storagePermissions[1])
                     ) {
-                        showDialog(storagePermissions, requestCode)
+                        showDialog(storagePermissions)
                     } else {
                         permissionRequestLauncher.launch(storagePermissions)
                     }
@@ -220,7 +237,7 @@ class ContactDetailFragment : Fragment() {
             }
         }
 
-    private fun showDialog(permissions: Array<String>, requestCode: Int) {
+    private fun showDialog(permissions: Array<String>) {
         AlertDialog.Builder(requireContext()).apply {
             setMessage("Permission to access your STORAGE is required to use this app")
             setTitle("Permission required")
@@ -238,7 +255,7 @@ class ContactDetailFragment : Fragment() {
                 Intent.ACTION_PICK,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             )
-        resultLauncher.launch(galleryIntent)
+        imageResultLauncher.launch(galleryIntent)
     }
 
     private fun getCapturedImage(contentUri: Uri): Bitmap {
@@ -297,11 +314,52 @@ class ContactDetailFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.apply {
+            binding?.let {
+                putString(IMAGE, imageUri)
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding?.ivAvatar?.setImageURI((Uri.parse(imageUri)))
+    }
+
+//    override fun onResume() {
+//        super.onResume()
+//        Log.i(ContactsListActivity.TAG, "onResume: detail")
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        Log.i(ContactsListActivity.TAG, "onPause: detail")
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        Log.i(ContactsListActivity.TAG, "onStop: detail")
+//    }
+//
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        Log.i(ContactsListActivity.TAG, "onDestroyView: detail")
+//    }
+//
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        Log.i(ContactsListActivity.TAG, "onDestroy: detail")
+//    }
+
     companion object {
-        private const val EXTERNAL_STORAGE_REQUEST_CODE = 222
         private const val IMAGE_DIRECTORY = "imageDir"
         const val CONTACT = "contact"
         const val CONTACT_TO_SAVE = "contact_to_save"
         const val IS_NEW_CONTACT = "is_new_contact"
+        const val DETAILS_FRAGMENT_TAG_KEY = "DETAILS_FRAGMENT_TAG_KEY"
+
+        const val IMAGE = "image"
     }
 }
