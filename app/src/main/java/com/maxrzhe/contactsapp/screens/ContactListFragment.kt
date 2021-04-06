@@ -1,10 +1,10 @@
 package com.maxrzhe.contactsapp.screens
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -25,6 +25,7 @@ class ContactListFragment : Fragment() {
 
     private var contactAdapter: ContactAdapter? = null
     private var contactToSave: Contact? = null
+    private var isLandscape: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +39,6 @@ class ContactListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        var isLandscape = false
         arguments?.let {
             isLandscape = it.getBoolean(ContactsListActivity.IS_LANDSCAPE, false)
         }
@@ -134,35 +133,10 @@ class ContactListFragment : Fragment() {
         }
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        Log.i(ContactsListActivity.TAG, "onStart: list")
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        Log.i(ContactsListActivity.TAG, "onResume: list")
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        Log.i(ContactsListActivity.TAG, "onPause: list")
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        Log.i(ContactsListActivity.TAG, "onStop: list")
-//    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        Log.i(ContactsListActivity.TAG, "onDestroy: list")
-//    }
 
     private fun addContact(isLandscape: Boolean) = View.OnClickListener {
         parentFragmentManager.commit {
@@ -201,12 +175,38 @@ class ContactListFragment : Fragment() {
         return Gson().fromJson<List<Contact>>(savedContacts, type) ?: emptyList()
     }
 
+    private fun saveToSharedPreferences(contact: Contact) {
+        val sharedPreferences = context?.getSharedPreferences(
+            ContactsListActivity.SHARED_STORAGE_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
+        sharedPreferences?.let {
+            val savedJsonContacts =
+                sharedPreferences.getString(ContactsListActivity.CONTACT_LIST, null)
+            val type = object : TypeToken<List<Contact>>() {}.type
+            var savedContacts =
+                Gson().fromJson<List<Contact>>(savedJsonContacts, type) ?: emptyList()
+
+            val oldContact: Contact? = savedContacts.firstOrNull { it.id == contact.id }
+            if (oldContact != null) {
+                savedContacts = savedContacts - listOf(oldContact)
+            }
+            savedContacts = listOf(contact) + savedContacts
+            val json = Gson().toJson(savedContacts)
+            sharedPreferences.edit()?.putString(ContactsListActivity.CONTACT_LIST, json)?.apply()
+        }
+    }
+
+    fun saveContact(contact: Contact) {
+        saveToSharedPreferences(contact)
+        contactAdapter?.let {
+            it.addContact(contact)
+            Toast.makeText(requireContext(), "Contact saved", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     companion object {
         const val CONTACTS_FRAGMENT_LISTENER_KEY = "contact_fragment_listener_key"
         const val CONTACTS_FRAGMENT_TAG_KEY = "CONTACTS_FRAGMENT_TAG_KEY"
-    }
-
-    interface OnContactSaveListener {
-        fun onSave()
     }
 }

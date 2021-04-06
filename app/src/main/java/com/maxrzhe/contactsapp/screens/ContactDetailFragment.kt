@@ -13,19 +13,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.util.Patterns
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
-import androidx.fragment.app.setFragmentResult
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contactsapp.model.Contact
@@ -42,9 +35,15 @@ class ContactDetailFragment : Fragment() {
 
     private var contact: Contact? = null
     private var isNew: Boolean = false
-    private var contactId: Int = -1
-    private var imageUri: String = ""
     private var isLandscape: Boolean = false
+
+    private var contactId: Int = -1
+    private var name: String = ""
+    private var email: String = ""
+    private var phone: String = ""
+    private var imageUri: String = ""
+
+    private var onSaveContactListener: OnSaveContactListener? = null
 
     private val imageResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -78,14 +77,33 @@ class ContactDetailFragment : Fragment() {
             }
         }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnSaveContactListener) {
+            onSaveContactListener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        onSaveContactListener = null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        savedInstanceState?.apply {
+            name = getString(NAME, "")
+            email = getString(EMAIL, "")
+            phone = getString(PHONE, "")
+        }
+
         arguments?.let {
             contact = it.getParcelable(CONTACT)
             isNew = it.getBoolean(IS_NEW_CONTACT, false)
             isLandscape = it.getBoolean(ContactsListActivity.IS_LANDSCAPE, false)
         }
-        contactId = if (isNew) Random.nextInt(until = Int.MAX_VALUE) else contact?.id ?: -1
+        contactId = savedInstanceState?.getInt(CONTACT_ID)
+            ?: if (isNew) Random.nextInt(until = Int.MAX_VALUE) else contact?.id ?: -1
 
         imageUri = if (savedInstanceState != null) {
             savedInstanceState.getString(IMAGE, resources.getString(R.string.placeholder_uri))
@@ -111,13 +129,19 @@ class ContactDetailFragment : Fragment() {
                     tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
                     btnDetailsAdd.text =
                         resources.getString(R.string.detail_button_save_changes_text)
-                    contact?.let { cont ->
-                        etName.setText(cont.name)
-                        etPhone.setText(cont.phone)
-                        etEmail.setText(cont.email)
+                    if (contact != null) {
+                        contact?.let { cont ->
+                            etName.setText(cont.name)
+                            etPhone.setText(cont.phone)
+                            etEmail.setText(cont.email)
+                        }
+                    } else {
+                        etName.setText(name)
+                        etPhone.setText(phone)
+                        etEmail.setText(email)
                     }
                 }
-
+                binding?.ivAvatar?.setImageURI((Uri.parse(imageUri)))
                 btnDetailsAdd.setOnClickListener(saveContact())
                 tvAddImage.setOnClickListener(
                     checkForStoragePermission()
@@ -155,22 +179,12 @@ class ContactDetailFragment : Fragment() {
                     email = it.etEmail.text.toString(),
                     image = imageUri
                 )
-
                 if (contactId >= 0) {
-                    saveToSharedPreferences(contact)
-                    setFragmentResult(
-                        ContactListFragment.CONTACTS_FRAGMENT_LISTENER_KEY,
-                        bundleOf(CONTACT_TO_SAVE to contact)
-                    )
-                    Toast.makeText(requireContext(), "Contact saved", Toast.LENGTH_SHORT).show()
+                    onSaveContactListener?.onSave(contact)
                 }
+
                 if (!isLandscape) {
                     parentFragmentManager.popBackStackImmediate()
-
-                } else {
-                    parentFragmentManager.commit {
-                        replace(R.id.fl_container, ContactListFragment())
-                    }
                 }
             }
         }
@@ -292,40 +306,19 @@ class ContactDetailFragment : Fragment() {
         return Uri.parse(file.absolutePath)
     }
 
-    private fun saveToSharedPreferences(contact: Contact) {
-        val sharedPreferences = context?.getSharedPreferences(
-            ContactsListActivity.SHARED_STORAGE_NAME,
-            AppCompatActivity.MODE_PRIVATE
-        )
-        sharedPreferences?.let {
-            val savedJsonContacts =
-                sharedPreferences.getString(ContactsListActivity.CONTACT_LIST, null)
-            val type = object : TypeToken<List<Contact>>() {}.type
-            var savedContacts =
-                Gson().fromJson<List<Contact>>(savedJsonContacts, type) ?: emptyList()
-
-            val oldContact: Contact? = savedContacts.firstOrNull { it.id == contact.id }
-            if (oldContact != null) {
-                savedContacts = savedContacts - listOf(oldContact)
-            }
-            savedContacts = listOf(contact) + savedContacts
-            val json = Gson().toJson(savedContacts)
-            sharedPreferences.edit()?.putString(ContactsListActivity.CONTACT_LIST, json)?.apply()
-        }
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.apply {
             binding?.let {
                 putString(IMAGE, imageUri)
+                putInt(CONTACT_ID, contactId)
+                binding?.let {
+                    putString(NAME, it.etName.text.toString())
+                    putString(EMAIL, it.etEmail.text.toString())
+                    putString(PHONE, it.etPhone.text.toString())
+                }
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        binding?.ivAvatar?.setImageURI((Uri.parse(imageUri)))
     }
 
 //    override fun onResume() {
@@ -360,6 +353,14 @@ class ContactDetailFragment : Fragment() {
         const val IS_NEW_CONTACT = "is_new_contact"
         const val DETAILS_FRAGMENT_TAG_KEY = "DETAILS_FRAGMENT_TAG_KEY"
 
+        const val CONTACT_ID = "contact_id"
+        const val NAME = "name"
+        const val EMAIL = "email"
+        const val PHONE = "phone"
         const val IMAGE = "image"
+    }
+
+    interface OnSaveContactListener {
+        fun onSave(contact: Contact)
     }
 }
