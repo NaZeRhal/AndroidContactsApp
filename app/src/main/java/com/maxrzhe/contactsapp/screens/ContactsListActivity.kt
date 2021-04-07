@@ -112,18 +112,16 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
             }
         }
 
-        when {
-            isLandscape -> {
-                supportFragmentManager.apply {
-                    popBackStackImmediate()
-                    commit {
-                        replace(R.id.fl_container, contactListFragment, LIST_TAG)
+        if (isLandscape) {
+            supportFragmentManager.apply {
+                popBackStackImmediate()
+                commit {
+                    replace(R.id.fl_container, contactListFragment, LIST_TAG)
 
-                        detailFragment?.let {
-                            replace(R.id.fl_details, it, DETAILS_TAG)
-                        }
-                        setReorderingAllowed(true)
+                    detailFragment?.let {
+                        replace(R.id.fl_details, it, DETAILS_TAG)
                     }
+                    setReorderingAllowed(true)
                 }
             }
         }
