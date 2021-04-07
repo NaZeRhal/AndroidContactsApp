@@ -27,11 +27,15 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
     private lateinit var binding: ActivityListContactsBinding
 
     private var isLandscape: Boolean = false
-    private var contactListFragment: ContactListFragment? = null
-    private var detailFragment: ContactDetailFragment? = null
+//    private var contactListFragment: ContactListFragment? = null
 
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
+
+    companion object {
+        private const val DETAILS_TAG = "storage"
+        private const val LIST_TAG = "contact_list"
+    }
 
     private val batteryBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -69,19 +73,16 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
 
         isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-        supportFragmentManager.apply {
-            detailFragment =
-                findFragmentByTag(ContactDetailFragment.TAG_KEY) as? ContactDetailFragment
-            contactListFragment =
-                findFragmentByTag(ContactListFragment.TAG_KEY) as? ContactListFragment
-                    ?: ContactListFragment()
-        }
+
+        val detailFragment =
+            supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
+        val contactListFragment =
+            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
+                ?: ContactListFragment()
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                contactListFragment?.let {
-                    add(R.id.fl_container, it)
-                }
+                add(R.id.fl_container, contactListFragment)
             }
         }
 
@@ -90,12 +91,10 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
                 supportFragmentManager.apply {
                     popBackStackImmediate()
                     commit {
-                        contactListFragment?.let {
-                            replace(R.id.fl_container, it, ContactListFragment.TAG_KEY)
-                        }
+                        replace(R.id.fl_container, contactListFragment, LIST_TAG)
 
                         detailFragment?.let {
-                            replace(R.id.fl_details, it, ContactDetailFragment.TAG_KEY)
+                            replace(R.id.fl_details, it, DETAILS_TAG)
                         }
                         setReorderingAllowed(true)
                     }
@@ -139,7 +138,10 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        contactListFragment?.filter(newText)
+                        val contactListFragment =
+                            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
+                                ?: ContactListFragment()
+                        contactListFragment.filter(newText)
                         return true
                     }
                 })
@@ -171,18 +173,16 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
         unregisterReceiver(wifiBroadcastReceiver)
     }
 
-    companion object {
-        const val SHARED_STORAGE_NAME = "storage"
-        const val CONTACT_LIST = "contact_list"
-    }
-
     override fun onSave(contact: Contact) {
         if (!isLandscape) {
             menuItemSearch?.isVisible = true
             toolbar?.setDisplayHomeAsUpEnabled(false)
         }
 
-        contactListFragment?.saveContact(contact)
+        val contactListFragment =
+            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
+                ?: ContactListFragment()
+        contactListFragment.saveContact(contact)
         if (!isLandscape) {
             supportFragmentManager.popBackStackImmediate()
         }
@@ -198,9 +198,9 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
         val detailFragment = ContactDetailFragment.newInstance(contact)
         supportFragmentManager.commit {
             if (isLandscape) {
-                replace(R.id.fl_details, detailFragment, ContactDetailFragment.TAG_KEY)
+                replace(R.id.fl_details, detailFragment, DETAILS_TAG)
             } else {
-                add(R.id.fl_container, detailFragment, ContactDetailFragment.TAG_KEY)
+                add(R.id.fl_container, detailFragment, DETAILS_TAG)
                 addToBackStack(null)
             }
             setReorderingAllowed(true)

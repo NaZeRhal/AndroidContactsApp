@@ -37,7 +37,6 @@ class ContactDetailFragment : Fragment() {
 
     private var contact: Contact? = null
     private var isNew: Boolean = false
-    private var isLandscape: Boolean = false
 
     private var contactId: Int = -1
     private var name: String = ""
@@ -45,7 +44,8 @@ class ContactDetailFragment : Fragment() {
     private var phone: String = ""
     private var imageUri: String = ""
 
-    private var onSaveContactListener: OnSaveContactListener? = null
+    private val onSaveContactListener: OnSaveContactListener?
+        get() = (context as? OnSaveContactListener)
 
     private val imageResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -78,24 +78,29 @@ class ContactDetailFragment : Fragment() {
             }
         }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnSaveContactListener) {
-            onSaveContactListener = context
-        }
-    }
+    companion object {
+        private const val IMAGE_DIRECTORY = "imageDir"
+        private const val CONTACT_TO_SAVE = "contact_to_save"
 
-    override fun onDetach() {
-        super.onDetach()
-        onSaveContactListener = null
+        private const val ID = "id"
+        private const val NAME = "name"
+        private const val EMAIL = "email"
+        private const val PHONE = "phone"
+        private const val IMAGE = "image"
+
+        fun newInstance(contact: Contact?) = ContactDetailFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(CONTACT_TO_SAVE, contact)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        savedInstanceState?.apply {
-            name = getString(NAME, "")
-            email = getString(EMAIL, "")
-            phone = getString(PHONE, "")
+        if (savedInstanceState != null) {
+            name = savedInstanceState.getString(NAME, "")
+            email = savedInstanceState.getString(EMAIL, "")
+            phone = savedInstanceState.getString(PHONE, "")
         }
 
         arguments?.let {
@@ -118,44 +123,33 @@ class ContactDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        isLandscape = resources.getBoolean(R.bool.isLandscape)
         _binding = FragmentContactDetailBinding.inflate(inflater, container, false)
 
-        return binding?.let {
-            val view = it.root
+        return binding?.let { initView(it, contact) }
+    }
 
-            with(it) {
-                if (!isNew) {
-                    tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
-                    btnDetailsAdd.text =
-                        resources.getString(R.string.detail_button_save_changes_text)
-                    if (contact != null) {
-                        contact?.let { cont ->
-                            etName.setText(cont.name)
-                            etPhone.setText(cont.phone)
-                            etEmail.setText(cont.email)
-                        }
-                    } else {
-                        etName.setText(name)
-                        etPhone.setText(phone)
-                        etEmail.setText(email)
-                    }
-                }
+    private fun initView(binding: FragmentContactDetailBinding, contact: Contact?): View {
+        with(binding) {
+            etName.setText(contact?.name ?: name)
+            etPhone.setText(contact?.phone ?: phone)
+            etEmail.setText(contact?.email ?: email)
 
-                if (imageUri.isEmpty()) {
-                    ivAvatar.setImageResource(R.drawable.person_placeholder)
-                } else {
-                    ivAvatar.setImageURI((Uri.parse(imageUri)))
-                }
-
-                btnDetailsAdd.setOnClickListener(saveContact())
-                tvAddImage.setOnClickListener(
-                    checkForStoragePermission()
-                )
+            if (!isNew) {
+                tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
+                btnDetailsAdd.text =
+                    resources.getString(R.string.detail_button_save_changes_text)
             }
-            view
+
+            if (imageUri.isEmpty()) {
+                ivAvatar.setImageResource(R.drawable.person_placeholder)
+            } else {
+                ivAvatar.setImageURI((Uri.parse(imageUri)))
+            }
+
+            btnDetailsAdd.setOnClickListener(saveContact())
+            tvAddImage.setOnClickListener(checkForStoragePermission())
         }
+        return binding.root
     }
 
     private fun saveContact() = View.OnClickListener {
@@ -297,30 +291,9 @@ class ContactDetailFragment : Fragment() {
             binding?.let {
                 putString(IMAGE, imageUri)
                 putInt(ID, contactId)
-                binding?.let {
-                    putString(NAME, it.etName.text.toString())
-                    putString(EMAIL, it.etEmail.text.toString())
-                    putString(PHONE, it.etPhone.text.toString())
-                }
-            }
-        }
-    }
-
-    companion object {
-        private const val IMAGE_DIRECTORY = "imageDir"
-        private const val CONTACT_TO_SAVE = "contact_to_save"
-
-        const val TAG_KEY = "DETAILS_FRAGMENT_TAG_KEY"
-
-        const val ID = "id"
-        const val NAME = "name"
-        const val EMAIL = "email"
-        const val PHONE = "phone"
-        const val IMAGE = "image"
-
-        fun newInstance(contact: Contact?) = ContactDetailFragment().apply {
-            arguments = Bundle().apply {
-                putParcelable(CONTACT_TO_SAVE, contact)
+                putString(NAME, it.etName.text.toString())
+                putString(EMAIL, it.etEmail.text.toString())
+                putString(PHONE, it.etPhone.text.toString())
             }
         }
     }
