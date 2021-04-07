@@ -108,7 +108,7 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                add(R.id.fl_container, contactListFragment)
+                add(R.id.fl_container, contactListFragment, LIST_TAG)
             }
         }
 
