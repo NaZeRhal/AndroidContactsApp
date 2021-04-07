@@ -14,7 +14,9 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Patterns
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -71,7 +73,6 @@ class ContactDetailFragment : Fragment() {
             val isAllowed = permissions.entries.all { it.value != false }
             if (isAllowed) {
                 choosePhotoFromGallery()
-
             } else {
                 Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
             }
@@ -98,11 +99,11 @@ class ContactDetailFragment : Fragment() {
         }
 
         arguments?.let {
-            contact = it.getParcelable(CONTACT)
-            isNew = it.getBoolean(IS_NEW_CONTACT, false)
-            isLandscape = it.getBoolean(ContactsListActivity.IS_LANDSCAPE, false)
+            contact = it.getParcelable(CONTACT_TO_SAVE)
         }
-        contactId = savedInstanceState?.getInt(CONTACT_ID)
+
+        isNew = contact == null
+        contactId = savedInstanceState?.getInt(ID)
             ?: if (isNew) Random.nextInt(until = Int.MAX_VALUE) else contact?.id ?: -1
 
         imageUri = if (savedInstanceState != null) {
@@ -111,7 +112,6 @@ class ContactDetailFragment : Fragment() {
             if (isNew) resources.getString(R.string.placeholder_uri) else contact?.image
                 ?: resources.getString(R.string.placeholder_uri)
         }
-        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -119,6 +119,8 @@ class ContactDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        isLandscape = resources.getBoolean(R.bool.isLandscape)
         _binding = FragmentContactDetailBinding.inflate(inflater, container, false)
 
         return binding?.let {
@@ -151,24 +153,6 @@ class ContactDetailFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (!isLandscape) {
-            inflater.inflate(R.menu.main_menu, menu)
-            val searchIcon = menu.findItem(R.id.menu_item_search)
-            searchIcon.isVisible = false
-            (context as? ContactsListActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        } else {
-            super.onCreateOptionsMenu(menu, inflater)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> activity?.onBackPressed()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun saveContact() = View.OnClickListener {
         if (validateInput()) {
             binding?.let {
@@ -181,10 +165,6 @@ class ContactDetailFragment : Fragment() {
                 )
                 if (contactId >= 0) {
                     onSaveContactListener?.onSave(contact)
-                }
-
-                if (!isLandscape) {
-                    parentFragmentManager.popBackStackImmediate()
                 }
             }
         }
@@ -201,7 +181,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.PHONE.matcher(it.etPhone.text).matches() -> {
+                !Patterns.PHONE.matcher(it.etPhone.text.toString()).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct phone number",
@@ -209,7 +189,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.EMAIL_ADDRESS.matcher(it.etEmail.text).matches() -> {
+                !Patterns.EMAIL_ADDRESS.matcher(it.etEmail.text.toString()).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct email",
@@ -311,7 +291,7 @@ class ContactDetailFragment : Fragment() {
         outState.apply {
             binding?.let {
                 putString(IMAGE, imageUri)
-                putInt(CONTACT_ID, contactId)
+                putInt(ID, contactId)
                 binding?.let {
                     putString(NAME, it.etName.text.toString())
                     putString(EMAIL, it.etEmail.text.toString())
@@ -321,43 +301,23 @@ class ContactDetailFragment : Fragment() {
         }
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//        Log.i(ContactsListActivity.TAG, "onResume: detail")
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        Log.i(ContactsListActivity.TAG, "onPause: detail")
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        Log.i(ContactsListActivity.TAG, "onStop: detail")
-//    }
-//
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        Log.i(ContactsListActivity.TAG, "onDestroyView: detail")
-//    }
-//
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        Log.i(ContactsListActivity.TAG, "onDestroy: detail")
-//    }
-
     companion object {
         private const val IMAGE_DIRECTORY = "imageDir"
-        const val CONTACT = "contact"
-        const val CONTACT_TO_SAVE = "contact_to_save"
-        const val IS_NEW_CONTACT = "is_new_contact"
-        const val DETAILS_FRAGMENT_TAG_KEY = "DETAILS_FRAGMENT_TAG_KEY"
+        private const val CONTACT_TO_SAVE = "contact_to_save"
 
-        const val CONTACT_ID = "contact_id"
+        const val TAG_KEY = "DETAILS_FRAGMENT_TAG_KEY"
+
+        const val ID = "id"
         const val NAME = "name"
         const val EMAIL = "email"
         const val PHONE = "phone"
         const val IMAGE = "image"
+
+        fun newInstance(contact: Contact?) = ContactDetailFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(CONTACT_TO_SAVE, contact)
+            }
+        }
     }
 
     interface OnSaveContactListener {

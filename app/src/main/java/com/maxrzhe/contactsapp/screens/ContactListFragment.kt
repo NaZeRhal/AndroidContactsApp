@@ -1,20 +1,15 @@
 package com.maxrzhe.contactsapp.screens
 
+import android.content.Context
 import android.os.Bundle
-import android.view.*
-import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
-import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.FragmentContactListBinding
 import com.maxrzhe.contactsapp.model.Contact
@@ -24,24 +19,24 @@ class ContactListFragment : Fragment() {
     private val binding get() = _binding
 
     private var contactAdapter: ContactAdapter? = null
-    private var contactToSave: Contact? = null
-    private var isLandscape: Boolean = false
+    private var onAddDetailListener: OnAddDetailListener? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setFragmentResultListener(CONTACTS_FRAGMENT_LISTENER_KEY) { _, bundle ->
-            contactToSave = bundle.getParcelable(ContactDetailFragment.CONTACT_TO_SAVE)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnAddDetailListener) {
+            onAddDetailListener = context
         }
-        setHasOptionsMenu(true)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        onAddDetailListener = null
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        arguments?.let {
-            isLandscape = it.getBoolean(ContactsListActivity.IS_LANDSCAPE, false)
-        }
         _binding = FragmentContactListBinding.inflate(inflater, container, false)
 
         return binding?.let {
@@ -53,83 +48,15 @@ class ContactListFragment : Fragment() {
                     view.context,
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(contact: Contact) {
-                            val detailFragment = ContactDetailFragment().apply {
-                                arguments = Bundle().apply {
-                                    putParcelable(ContactDetailFragment.CONTACT, contact)
-                                    putBoolean(ContactDetailFragment.IS_NEW_CONTACT, false)
-                                    putBoolean(ContactsListActivity.IS_LANDSCAPE, isLandscape)
-                                }
-                            }
-                            if (!isLandscape) {
-                                parentFragmentManager.commit {
-                                    replace(
-                                        R.id.fl_container,
-                                        detailFragment,
-                                        ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
-                                    )
-                                    setReorderingAllowed(true)
-                                    addToBackStack(null)
-                                }
-                            } else {
-                                parentFragmentManager.commit {
-                                    replace(
-                                        R.id.fl_details,
-                                        detailFragment,
-                                        ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
-                                    )
-                                    setReorderingAllowed(true)
-                                }
-                            }
+                            onAddDetailListener?.onAddDetails(contact)
                         }
                     }
                 )
                 contactAdapter?.itemList = readContactsFromSharedPreferences()
                 adapter = contactAdapter
-                it.fabAdd.setOnClickListener(addContact(isLandscape))
+                it.fabAdd.setOnClickListener(addContact())
             }
             view
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-
-        (context as? ContactsListActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
-        val searchView = (menu.findItem(R.id.menu_item_search)).actionView as SearchView
-        val searchEditText = searchView.findViewById<EditText>(R.id.search_src_text)
-
-        searchEditText.apply {
-            setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.search_view_text_color
-                )
-            )
-
-            setHintTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.search_view_hint_color
-                )
-            )
-        }
-
-        searchView.apply {
-            imeOptions = EditorInfo.IME_ACTION_DONE
-            queryHint = resources.getString(R.string.toolbar_search_hint)
-
-            setOnQueryTextListener(
-                object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        return false
-                    }
-
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        contactAdapter?.filter = newText
-                        return true
-                    }
-                })
         }
     }
 
@@ -138,31 +65,8 @@ class ContactListFragment : Fragment() {
         _binding = null
     }
 
-    private fun addContact(isLandscape: Boolean) = View.OnClickListener {
-        parentFragmentManager.commit {
-            val detailFragment = ContactDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(ContactDetailFragment.IS_NEW_CONTACT, true)
-                    putBoolean(ContactsListActivity.IS_LANDSCAPE, isLandscape)
-                }
-            }
-            if (!isLandscape) {
-                replace(
-                    R.id.fl_container,
-                    detailFragment,
-                    ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
-                )
-                setReorderingAllowed(true)
-                addToBackStack(null)
-            } else {
-                replace(
-                    R.id.fl_details,
-                    detailFragment,
-                    ContactDetailFragment.DETAILS_FRAGMENT_TAG_KEY
-                )
-                setReorderingAllowed(true)
-            }
-        }
+    private fun addContact() = View.OnClickListener {
+        onAddDetailListener?.onAddDetails(null)
     }
 
     private fun readContactsFromSharedPreferences(): List<Contact> {
@@ -199,14 +103,18 @@ class ContactListFragment : Fragment() {
 
     fun saveContact(contact: Contact) {
         saveToSharedPreferences(contact)
-        contactAdapter?.let {
-            it.addContact(contact)
-            Toast.makeText(requireContext(), "Contact saved", Toast.LENGTH_SHORT).show()
-        }
+        contactAdapter?.itemList = readContactsFromSharedPreferences()
+    }
+
+    fun filter(newText: String?) {
+        contactAdapter?.filter = newText
     }
 
     companion object {
-        const val CONTACTS_FRAGMENT_LISTENER_KEY = "contact_fragment_listener_key"
-        const val CONTACTS_FRAGMENT_TAG_KEY = "CONTACTS_FRAGMENT_TAG_KEY"
+        const val TAG_KEY = "CONTACTS_FRAGMENT_TAG_KEY"
+    }
+
+    interface OnAddDetailListener {
+        fun onAddDetails(contact: Contact?)
     }
 }
