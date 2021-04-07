@@ -1,12 +1,7 @@
 package com.maxrzhe.contactsapp.screens
 
-import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -18,8 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
@@ -47,36 +40,8 @@ class ContactDetailFragment : Fragment() {
     private val onSaveContactListener: OnSaveContactListener?
         get() = (context as? OnSaveContactListener)
 
-    private val imageResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.let {
-                    val contentUri = it.data as Uri
-                    try {
-                        val selectedImage = getCapturedImage(contentUri)
-                        imageUri = saveImageToInternalStorage(selectedImage).toString()
-                        binding?.ivAvatar?.setImageBitmap(selectedImage)
-                    } catch (e: IOException) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Failed to load the Image from Gallery!",
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
-                    }
-                }
-            }
-        }
-
-    private val permissionRequestLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val isAllowed = permissions.entries.all { it.value != false }
-            if (isAllowed) {
-                choosePhotoFromGallery()
-            } else {
-                Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
+    private val onTakeImageListener: OnTakeImageListener?
+        get() = (context as? OnTakeImageListener)
 
     companion object {
         private const val IMAGE_DIRECTORY = "imageDir"
@@ -147,7 +112,7 @@ class ContactDetailFragment : Fragment() {
             }
 
             btnDetailsAdd.setOnClickListener(saveContact())
-            tvAddImage.setOnClickListener(checkForStoragePermission())
+            tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
         }
         return binding.root
     }
@@ -201,55 +166,21 @@ class ContactDetailFragment : Fragment() {
         } ?: true
     }
 
-    private fun checkForStoragePermission() =
-        View.OnClickListener {
-            val storagePermissions = arrayOf(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+    fun setupImage(contentUri: Uri) {
+        try {
+            val selectedImage = getCapturedImage(contentUri)
+            imageUri = saveImageToInternalStorage(selectedImage).toString()
+            binding?.ivAvatar?.setImageBitmap(selectedImage)
+        } catch (e: IOException) {
+            Toast.makeText(
+                requireContext(),
+                "Failed to load the Image from Gallery!",
+                Toast.LENGTH_LONG
             )
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        storagePermissions[0]
-                    ) + ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        storagePermissions[1]
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    if (shouldShowRequestPermissionRationale(storagePermissions[0]) ||
-                        shouldShowRequestPermissionRationale(storagePermissions[1])
-                    ) {
-                        showDialog(storagePermissions)
-                    } else {
-                        permissionRequestLauncher.launch(storagePermissions)
-                    }
-                } else {
-                    choosePhotoFromGallery()
-                }
-            }
+                .show()
         }
-
-    private fun showDialog(permissions: Array<String>) {
-        AlertDialog.Builder(requireContext()).apply {
-            setMessage("Permission to access your STORAGE is required to use this app")
-            setTitle("Permission required")
-            setPositiveButton("OK") { _, _ ->
-                permissionRequestLauncher.launch(permissions)
-            }
-        }
-            .show()
     }
 
-
-    private fun choosePhotoFromGallery() {
-        val galleryIntent =
-            Intent(
-                Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            )
-        imageResultLauncher.launch(galleryIntent)
-    }
 
     private fun getCapturedImage(contentUri: Uri): Bitmap {
         return when {
@@ -300,5 +231,9 @@ class ContactDetailFragment : Fragment() {
 
     interface OnSaveContactListener {
         fun onSave(contact: Contact)
+    }
+
+    interface OnTakeImageListener {
+        fun onTakeImage()
     }
 }

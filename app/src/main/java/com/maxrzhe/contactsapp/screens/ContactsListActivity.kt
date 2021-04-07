@@ -1,18 +1,26 @@
 package com.maxrzhe.contactsapp.screens
 
+import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -23,12 +31,10 @@ import com.maxrzhe.contactsapp.databinding.ActivityListContactsBinding
 import com.maxrzhe.contactsapp.model.Contact
 
 class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveContactListener,
-    ContactListFragment.OnAddDetailListener {
+    ContactListFragment.OnAddDetailListener, ContactDetailFragment.OnTakeImageListener {
     private lateinit var binding: ActivityListContactsBinding
 
     private var isLandscape: Boolean = false
-//    private var contactListFragment: ContactListFragment? = null
-
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
 
@@ -60,6 +66,28 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
         }
     }
 
+    private val permissionRequestLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val isAllowed = permissions.entries.all { it.value != false }
+            if (isAllowed) {
+                choosePhotoFromGallery()
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private val imageResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let {
+                    val contentUri = it.data as Uri
+                    val detailFragment =
+                        supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
+                    detailFragment?.setupImage(contentUri)
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListContactsBinding.inflate(layoutInflater)
@@ -68,11 +96,9 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
 
         setSupportActionBar(binding.tbMain)
         title = null
-
         toolbar = supportActionBar
 
         isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
 
         val detailFragment =
             supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
@@ -160,7 +186,6 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
         return super.onOptionsItemSelected(item)
     }
 
-
     override fun onStart() {
         super.onStart()
         registerReceiver(batteryBroadcastReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
@@ -205,6 +230,58 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
             }
             setReorderingAllowed(true)
         }
+    }
+
+    private fun checkForStoragePermission() {
+        val storagePermissions = arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    storagePermissions[0]
+                ) + ContextCompat.checkSelfPermission(
+                    this,
+                    storagePermissions[1]
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                if (shouldShowRequestPermissionRationale(storagePermissions[0]) ||
+                    shouldShowRequestPermissionRationale(storagePermissions[1])
+                ) {
+                    showDialog(storagePermissions)
+                } else {
+                    permissionRequestLauncher.launch(storagePermissions)
+                }
+            } else {
+                choosePhotoFromGallery()
+            }
+        }
+    }
+
+    private fun showDialog(permissions: Array<String>) {
+        AlertDialog.Builder(this).apply {
+            setMessage("Permission to access your STORAGE is required to use this app")
+            setTitle("Permission required")
+            setPositiveButton("OK") { _, _ ->
+                permissionRequestLauncher.launch(permissions)
+            }
+        }
+            .show()
+    }
+
+    private fun choosePhotoFromGallery() {
+        val galleryIntent =
+            Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            )
+        imageResultLauncher.launch(galleryIntent)
+    }
+
+    override fun onTakeImage() {
+        checkForStoragePermission()
     }
 }
 
