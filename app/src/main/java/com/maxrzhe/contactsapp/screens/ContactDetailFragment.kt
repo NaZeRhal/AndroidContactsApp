@@ -107,10 +107,9 @@ class ContactDetailFragment : Fragment() {
             ?: if (isNew) Random.nextInt(until = Int.MAX_VALUE) else contact?.id ?: -1
 
         imageUri = if (savedInstanceState != null) {
-            savedInstanceState.getString(IMAGE, resources.getString(R.string.placeholder_uri))
+            savedInstanceState.getString(IMAGE, "")
         } else {
-            if (isNew) resources.getString(R.string.placeholder_uri) else contact?.image
-                ?: resources.getString(R.string.placeholder_uri)
+            if (isNew) "" else contact?.image ?: ""
         }
     }
 
@@ -143,7 +142,13 @@ class ContactDetailFragment : Fragment() {
                         etEmail.setText(email)
                     }
                 }
-                binding?.ivAvatar?.setImageURI((Uri.parse(imageUri)))
+
+                if (imageUri.isEmpty()) {
+                    ivAvatar.setImageResource(R.drawable.person_placeholder)
+                } else {
+                    ivAvatar.setImageURI((Uri.parse(imageUri)))
+                }
+
                 btnDetailsAdd.setOnClickListener(saveContact())
                 tvAddImage.setOnClickListener(
                     checkForStoragePermission()

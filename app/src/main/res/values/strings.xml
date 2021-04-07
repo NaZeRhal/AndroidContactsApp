@@ -16,6 +16,4 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="placeholder_uri">"android.resource://com.maxrzhe.contactsapp/drawable/person_placeholder"</string>
-
 </resources>
