@@ -95,10 +95,6 @@ class ContactAdapter(
         }
     }
 
-    fun addContact(contact: Contact) {
-        itemList = listOf(contact) + itemList
-    }
-
     override fun getItemCount(): Int = sortedList.size()
 
     private fun performFiltering(query: String?) {

@@ -23,6 +23,7 @@
     <dimen name="detail_btn_add_marginStart">48dp</dimen>
     <dimen name="detail_btn_add_marginTop">16dp</dimen>
     <dimen name="detail_btn_add_marginEnd">48dp</dimen>
+    <dimen name="detail_btn_add_marginBottom">25dp</dimen>
     <dimen name="detail_btn_add_padding">8dp</dimen>
     <dimen name="detail_btn_add_textSize">16sp</dimen>
 </resources>

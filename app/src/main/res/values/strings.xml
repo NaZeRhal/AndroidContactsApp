@@ -6,16 +6,14 @@
     <string name="item_contact_iv_description">image</string>
 
     <string name="detail_description_avatar">avatar</string>
-    <string name="detail_hint_enter_name">Enter name</string>
-    <string name="detail_hint_enter_phone_number">Enter phone number</string>
-    <string name="detail_hint_enter_email">Enter email</string>
+    <string name="detail_hint_enter_name">Name</string>
+    <string name="detail_hint_enter_phone_number">Phone number</string>
+    <string name="detail_hint_enter_email">Email</string>
     <string name="detail_button_add_text">Add</string>
     <string name="detail_button_save_changes_text">Save changes</string>
     <string name="detail_tv_add_image_text">ADD IMAGE</string>
     <string name="detail_tv_change_image_text">CHANGE IMAGE</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="placeholder_uri">"android.resource://com.maxrzhe.contactsapp/drawable/person_placeholder"</string>
 
 </resources>

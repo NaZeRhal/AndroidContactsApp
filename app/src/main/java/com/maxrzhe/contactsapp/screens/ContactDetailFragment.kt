@@ -1,12 +1,7 @@
 package com.maxrzhe.contactsapp.screens
 
-import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -14,16 +9,11 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Patterns
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contactsapp.model.Contact
@@ -40,51 +30,57 @@ class ContactDetailFragment : Fragment() {
 
     private var contact: Contact? = null
     private var isNew: Boolean = false
-    private var imageUri: String = ""
+
     private var contactId: Int = -1
+    private var name: String = ""
+    private var email: String = ""
+    private var phone: String = ""
+    private var imageUri: String = ""
 
-    private val resultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.let {
-                    val contentUri = it.data as Uri
-                    try {
-                        val selectedImage = getCapturedImage(contentUri)
-                        imageUri = saveImageToInternalStorage(selectedImage).toString()
-                        binding?.ivAvatar?.setImageBitmap(selectedImage)
-                    } catch (e: IOException) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Failed to load the Image from Gallery!",
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
-                    }
-                }
+    private val onSaveContactListener: OnSaveContactListener?
+        get() = (context as? OnSaveContactListener)
+
+    private val onTakeImageListener: OnTakeImageListener?
+        get() = (context as? OnTakeImageListener)
+
+    companion object {
+        private const val IMAGE_DIRECTORY = "imageDir"
+        private const val CONTACT_TO_SAVE = "contact_to_save"
+
+        private const val ID = "id"
+        private const val NAME = "name"
+        private const val EMAIL = "email"
+        private const val PHONE = "phone"
+        private const val IMAGE = "image"
+
+        fun newInstance(contact: Contact?) = ContactDetailFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(CONTACT_TO_SAVE, contact)
             }
         }
-
-    private val permissionRequestLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val isAllowed = permissions.entries.all { it.value != false }
-            if (isAllowed) {
-                choosePhotoFromGallery()
-            } else {
-                Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            contact = it.getParcelable(CONTACT)
-            isNew = it.getBoolean(IS_NEW_CONTACT, false)
+        if (savedInstanceState != null) {
+            name = savedInstanceState.getString(NAME, "")
+            email = savedInstanceState.getString(EMAIL, "")
+            phone = savedInstanceState.getString(PHONE, "")
         }
-        contactId = if (isNew) Random.nextInt(until = Int.MAX_VALUE) else contact?.id ?: -1
-        imageUri = if (isNew) resources.getString(R.string.placeholder_uri) else contact?.image
-            ?: resources.getString(R.string.placeholder_uri)
 
-        setHasOptionsMenu(true)
+        arguments?.let {
+            contact = it.getParcelable(CONTACT_TO_SAVE)
+        }
+
+        isNew = contact == null
+        contactId = savedInstanceState?.getInt(ID)
+            ?: if (isNew) Random.nextInt(until = Int.MAX_VALUE) else contact?.id ?: -1
+
+        imageUri = if (savedInstanceState != null) {
+            savedInstanceState.getString(IMAGE, "")
+        } else {
+            if (isNew) "" else contact?.image ?: ""
+        }
     }
 
     override fun onCreateView(
@@ -94,45 +90,31 @@ class ContactDetailFragment : Fragment() {
     ): View? {
         _binding = FragmentContactDetailBinding.inflate(inflater, container, false)
 
-        return binding?.let {
-            val view = it.root
+        return binding?.let { initView(it, contact) }
+    }
 
-            with(it) {
-                if (!isNew) {
-                    tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
-                    btnDetailsAdd.text =
-                        resources.getString(R.string.detail_button_save_changes_text)
-                    contact?.let {
-                        etName.setText(it.name)
-                        etPhone.setText(it.phone)
-                        etEmail.setText(it.email)
-                        ivAvatar.setImageURI(Uri.parse(it.image))
-                    }
-                } else {
-                    ivAvatar.setImageResource(R.drawable.person_placeholder)
-                }
+    private fun initView(binding: FragmentContactDetailBinding, contact: Contact?): View {
+        with(binding) {
+            etName.setText(contact?.name ?: name)
+            etPhone.setText(contact?.phone ?: phone)
+            etEmail.setText(contact?.email ?: email)
 
-                btnDetailsAdd.setOnClickListener(saveContact())
-                tvAddImage.setOnClickListener(
-                    checkForStoragePermission(EXTERNAL_STORAGE_REQUEST_CODE)
-                )
+            if (!isNew) {
+                tvAddImage.text = resources.getString(R.string.detail_tv_change_image_text)
+                btnDetailsAdd.text =
+                    resources.getString(R.string.detail_button_save_changes_text)
             }
-            view
-        }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-        val searchIcon = menu.findItem(R.id.menu_item_search)
-        searchIcon.isVisible = false
-        (context as? ContactsListActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
+            if (imageUri.isEmpty()) {
+                ivAvatar.setImageResource(R.drawable.person_placeholder)
+            } else {
+                ivAvatar.setImageURI((Uri.parse(imageUri)))
+            }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> activity?.onBackPressed()
+            btnDetailsAdd.setOnClickListener(saveContact())
+            tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
         }
-        return super.onOptionsItemSelected(item)
+        return binding.root
     }
 
     private fun saveContact() = View.OnClickListener {
@@ -145,16 +127,9 @@ class ContactDetailFragment : Fragment() {
                     email = it.etEmail.text.toString(),
                     image = imageUri
                 )
-
                 if (contactId >= 0) {
-                    saveToSharedPreferences(contact)
-                    setFragmentResult(
-                        ContactListFragment.CONTACTS_FRAGMENT_LISTENER_KEY,
-                        bundleOf(CONTACT_TO_SAVE to contact)
-                    )
+                    onSaveContactListener?.onSave(contact)
                 }
-
-                parentFragmentManager.popBackStackImmediate()
             }
         }
     }
@@ -170,7 +145,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.PHONE.matcher(it.etPhone.text).matches() -> {
+                !Patterns.PHONE.matcher(it.etPhone.text.toString()).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct phone number",
@@ -178,7 +153,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.EMAIL_ADDRESS.matcher(it.etEmail.text).matches() -> {
+                !Patterns.EMAIL_ADDRESS.matcher(it.etEmail.text.toString()).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct email",
@@ -191,55 +166,21 @@ class ContactDetailFragment : Fragment() {
         } ?: true
     }
 
-    private fun checkForStoragePermission(requestCode: Int) =
-        View.OnClickListener {
-            val storagePermissions = arrayOf(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+    fun setupImage(contentUri: Uri) {
+        try {
+            val selectedImage = getCapturedImage(contentUri)
+            imageUri = saveImageToInternalStorage(selectedImage).toString()
+            binding?.ivAvatar?.setImageBitmap(selectedImage)
+        } catch (e: IOException) {
+            Toast.makeText(
+                requireContext(),
+                "Failed to load the Image from Gallery!",
+                Toast.LENGTH_LONG
             )
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        storagePermissions[0]
-                    ) + ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        storagePermissions[1]
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    if (shouldShowRequestPermissionRationale(storagePermissions[0]) ||
-                        shouldShowRequestPermissionRationale(storagePermissions[1])
-                    ) {
-                        showDialog(storagePermissions, requestCode)
-                    } else {
-                        permissionRequestLauncher.launch(storagePermissions)
-                    }
-                } else {
-                    choosePhotoFromGallery()
-                }
-            }
+                .show()
         }
-
-    private fun showDialog(permissions: Array<String>, requestCode: Int) {
-        AlertDialog.Builder(requireContext()).apply {
-            setMessage("Permission to access your STORAGE is required to use this app")
-            setTitle("Permission required")
-            setPositiveButton("OK") { _, _ ->
-                permissionRequestLauncher.launch(permissions)
-            }
-        }
-            .show()
     }
 
-
-    private fun choosePhotoFromGallery() {
-        val galleryIntent =
-            Intent(
-                Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            )
-        resultLauncher.launch(galleryIntent)
-    }
 
     private fun getCapturedImage(contentUri: Uri): Bitmap {
         return when {
@@ -275,33 +216,24 @@ class ContactDetailFragment : Fragment() {
         return Uri.parse(file.absolutePath)
     }
 
-    private fun saveToSharedPreferences(contact: Contact) {
-        val sharedPreferences = context?.getSharedPreferences(
-            ContactsListActivity.SHARED_STORAGE_NAME,
-            AppCompatActivity.MODE_PRIVATE
-        )
-        sharedPreferences?.let {
-            val savedJsonContacts =
-                sharedPreferences.getString(ContactsListActivity.CONTACT_LIST, null)
-            val type = object : TypeToken<List<Contact>>() {}.type
-            var savedContacts =
-                Gson().fromJson<List<Contact>>(savedJsonContacts, type) ?: emptyList()
-
-            val oldContact: Contact? = savedContacts.firstOrNull { it.id == contact.id }
-            if (oldContact != null) {
-                savedContacts = savedContacts - listOf(oldContact)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.apply {
+            binding?.let {
+                putString(IMAGE, imageUri)
+                putInt(ID, contactId)
+                putString(NAME, it.etName.text.toString())
+                putString(EMAIL, it.etEmail.text.toString())
+                putString(PHONE, it.etPhone.text.toString())
             }
-            savedContacts = listOf(contact) + savedContacts
-            val json = Gson().toJson(savedContacts)
-            sharedPreferences.edit()?.putString(ContactsListActivity.CONTACT_LIST, json)?.apply()
         }
     }
 
-    companion object {
-        private const val EXTERNAL_STORAGE_REQUEST_CODE = 222
-        private const val IMAGE_DIRECTORY = "imageDir"
-        const val CONTACT = "contact"
-        const val CONTACT_TO_SAVE = "contact_to_save"
-        const val IS_NEW_CONTACT = "is_new_contact"
+    interface OnSaveContactListener {
+        fun onSave(contact: Contact)
+    }
+
+    interface OnTakeImageListener {
+        fun onTakeImage()
     }
 }

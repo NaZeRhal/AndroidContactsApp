@@ -1,19 +1,14 @@
 package com.maxrzhe.contactsapp.screens
 
 import android.os.Bundle
-import android.view.*
-import android.view.inputmethod.EditorInfo
-import android.widget.EditText
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
-import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.FragmentContactListBinding
 import com.maxrzhe.contactsapp.model.Contact
@@ -23,14 +18,14 @@ class ContactListFragment : Fragment() {
     private val binding get() = _binding
 
     private var contactAdapter: ContactAdapter? = null
-    private var contactToSave: Contact? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setFragmentResultListener(CONTACTS_FRAGMENT_LISTENER_KEY) { _, bundle ->
-            contactToSave = bundle.getParcelable(ContactDetailFragment.CONTACT_TO_SAVE)
-        }
-        setHasOptionsMenu(true)
+    private val onAddDetailListener: OnAddDetailListener?
+        get() = (context as? OnAddDetailListener)
+
+
+    companion object {
+        private const val CONTACT_LIST = "contact_list"
+        private const val SHARED_STORAGE_NAME = "storage"
     }
 
     override fun onCreateView(
@@ -39,82 +34,7 @@ class ContactListFragment : Fragment() {
     ): View? {
         _binding = FragmentContactListBinding.inflate(inflater, container, false)
 
-        return binding?.let {
-            val view = it.root
-            it.flContainer.apply {
-                layoutManager = LinearLayoutManager(view.context)
-                setHasFixedSize(true)
-                contactAdapter = ContactAdapter(
-                    view.context,
-                    object : ContactAdapter.OnContactClickListener {
-                        override fun onClick(contact: Contact) {
-                            val detailFragment = ContactDetailFragment().apply {
-                                arguments = Bundle().apply {
-                                    putParcelable(ContactDetailFragment.CONTACT, contact)
-                                    putBoolean(ContactDetailFragment.IS_NEW_CONTACT, false)
-                                }
-                            }
-                            parentFragmentManager.commit {
-                                replace(id, detailFragment)
-                                setReorderingAllowed(true)
-                                addToBackStack(null)
-                            }
-                        }
-                    }
-                )
-                contactAdapter?.itemList = readContactsFromSharedPreferences()
-                adapter = contactAdapter
-
-            }
-            view
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding?.fabAdd?.setOnClickListener(addContact())
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-
-        (context as? ContactsListActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
-        val searchView = (menu.findItem(R.id.menu_item_search)).actionView as SearchView
-        val searchEditText = searchView.findViewById<EditText>(R.id.search_src_text)
-
-        searchEditText.apply {
-            setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.search_view_text_color
-                )
-            )
-
-            setHintTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.search_view_hint_color
-                )
-            )
-        }
-
-        searchView.apply {
-            imeOptions = EditorInfo.IME_ACTION_DONE
-            queryHint = resources.getString(R.string.toolbar_search_hint)
-
-            setOnQueryTextListener(
-                object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        return false
-                    }
-
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        contactAdapter?.filter = newText
-                        return true
-                    }
-                })
-        }
+        return binding?.let { initView(it) }
     }
 
     override fun onDestroyView() {
@@ -122,32 +42,74 @@ class ContactListFragment : Fragment() {
         _binding = null
     }
 
-    private fun addContact() = View.OnClickListener {
-        parentFragmentManager.commit {
-            val detailFragment = ContactDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(ContactDetailFragment.IS_NEW_CONTACT, true)
-                }
+    private fun initView(binding: FragmentContactListBinding): View {
+        return with(binding) {
+            rvContactList.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true)
+                contactAdapter = ContactAdapter(
+                    requireContext(),
+                    object : ContactAdapter.OnContactClickListener {
+                        override fun onClick(contact: Contact) {
+                            onAddDetailListener?.onAddDetails(contact)
+                        }
+                    }
+                )
+                contactAdapter?.itemList = readContactsFromSharedPreferences()
+                adapter = contactAdapter
+                fabAdd.setOnClickListener(addContact())
             }
-            binding?.let {
-                replace(it.flContainer.id, detailFragment)
-                setReorderingAllowed(true)
-                addToBackStack(null)
-            }
+            root
         }
+    }
+
+    private fun addContact() = View.OnClickListener {
+        onAddDetailListener?.onAddDetails(null)
     }
 
     private fun readContactsFromSharedPreferences(): List<Contact> {
         val sharedPreferences = context?.getSharedPreferences(
-            ContactsListActivity.SHARED_STORAGE_NAME,
+            SHARED_STORAGE_NAME,
             AppCompatActivity.MODE_PRIVATE
         )
-        val savedContacts = sharedPreferences?.getString(ContactsListActivity.CONTACT_LIST, null)
+        val savedContacts = sharedPreferences?.getString(CONTACT_LIST, null)
         val type = object : TypeToken<List<Contact>>() {}.type
         return Gson().fromJson<List<Contact>>(savedContacts, type) ?: emptyList()
     }
 
-    companion object {
-        const val CONTACTS_FRAGMENT_LISTENER_KEY = "contact_fragment_listener_key"
+    private fun saveToSharedPreferences(contact: Contact) {
+        val sharedPreferences = context?.getSharedPreferences(
+            SHARED_STORAGE_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
+        sharedPreferences?.let {
+            val savedJsonContacts =
+                sharedPreferences.getString(CONTACT_LIST, null)
+            val type = object : TypeToken<List<Contact>>() {}.type
+            var savedContacts =
+                Gson().fromJson<List<Contact>>(savedJsonContacts, type) ?: emptyList()
+
+            val oldContact: Contact? = savedContacts.firstOrNull { it.id == contact.id }
+            if (oldContact != null) {
+                savedContacts = savedContacts - listOf(oldContact)
+            }
+            savedContacts = listOf(contact) + savedContacts
+            val json = Gson().toJson(savedContacts)
+            sharedPreferences.edit()?.putString(CONTACT_LIST, json)?.apply()
+        }
+    }
+
+    fun saveContact(contact: Contact) {
+        saveToSharedPreferences(contact)
+        contactAdapter?.itemList = readContactsFromSharedPreferences()
+        contactAdapter?.notifyDataSetChanged()
+    }
+
+    fun filter(newText: String?) {
+        contactAdapter?.filter = newText
+    }
+
+    interface OnAddDetailListener {
+        fun onAddDetails(contact: Contact?)
     }
 }
