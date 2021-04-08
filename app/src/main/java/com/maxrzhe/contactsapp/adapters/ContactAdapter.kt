@@ -17,6 +17,9 @@ class ContactAdapter(
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
+    private val onSearchResultListener: OnSearchResultListener?
+        get() = (context as? OnSearchResultListener)
+
     var itemList: List<Contact> = emptyList()
         set(value) {
             field = value
@@ -104,6 +107,12 @@ class ContactAdapter(
             val filterPattern: String = query.toLowerCase(Locale.getDefault()).trim()
             itemList.filter { anyMatches(it, filterPattern) }
         }
+
+        if (itemList.size != filteredContacts.size) {
+            onSearchResultListener?.onSearchResult(filteredContacts.size)
+        } else {
+            onSearchResultListener?.onSearchResult(-1)
+        }
         replaceAll(filteredContacts)
     }
 
@@ -132,4 +141,7 @@ class ContactAdapter(
         fun onClick(contact: Contact)
     }
 
+    interface OnSearchResultListener {
+        fun onSearchResult(resultCount: Int)
+    }
 }

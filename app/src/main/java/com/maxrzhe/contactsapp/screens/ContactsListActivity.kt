@@ -17,6 +17,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
@@ -27,11 +28,15 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
 import com.maxrzhe.contactsapp.R
+import com.maxrzhe.contactsapp.adapters.ContactAdapter.*
 import com.maxrzhe.contactsapp.databinding.ActivityListContactsBinding
 import com.maxrzhe.contactsapp.model.Contact
+import com.maxrzhe.contactsapp.screens.ContactDetailFragment.*
+import com.maxrzhe.contactsapp.screens.ContactListFragment.*
 
-class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveContactListener,
-    ContactListFragment.OnAddDetailListener, ContactDetailFragment.OnTakeImageListener {
+class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
+    OnAddDetailListener, OnTakeImageListener,
+    OnSearchResultListener {
     private lateinit var binding: ActivityListContactsBinding
 
     private var isLandscape: Boolean = false
@@ -179,19 +184,20 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
                 menuItemSearch?.isVisible = true
                 toolbar?.setDisplayHomeAsUpEnabled(false)
                 onBackPressed()
+                binding.tvSearchResult?.visibility = View.VISIBLE
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         registerReceiver(batteryBroadcastReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         registerReceiver(wifiBroadcastReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         unregisterReceiver(batteryBroadcastReceiver)
         unregisterReceiver(wifiBroadcastReceiver)
     }
@@ -213,6 +219,7 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
     }
 
     override fun onAddDetails(contact: Contact?) {
+        binding.tvSearchResult?.visibility = View.GONE
         if (!isLandscape) {
             menuItemSearch?.isVisible = false
             toolbar?.setDisplayHomeAsUpEnabled(true)
@@ -280,6 +287,22 @@ class ContactsListActivity : AppCompatActivity(), ContactDetailFragment.OnSaveCo
 
     override fun onTakeImage() {
         checkForStoragePermission()
+    }
+
+    override fun onSearchResult(resultCount: Int) {
+        if (resultCount >= 0) {
+            binding.tvSearchResult?.visibility = View.VISIBLE
+            val result =
+                resources.getQuantityString(
+                    R.plurals.search_result_plurals,
+                    resultCount,
+                    resultCount
+                )
+            binding.tvSearchResult?.text = result
+        } else {
+            binding.tvSearchResult?.visibility = View.GONE
+            binding.tvSearchResult?.text = ""
+        }
     }
 }
 

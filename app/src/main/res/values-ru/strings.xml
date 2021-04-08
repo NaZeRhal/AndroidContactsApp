@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fab_add_description_button_add">кнопка добавить</string>
+    <string name="toolbar_search_hint">Введите имя, почту или номер телефона…</string>
+    <string name="menu_item_search_title">Поиск</string>
+    <string name="item_contact_iv_description">картинка</string>
+    <string name="detail_description_avatar">аватар</string>
+    <string name="detail_hint_enter_name">Имя</string>
+    <string name="detail_hint_enter_phone_number">Номер телефона</string>
+    <string name="detail_hint_enter_email">Почта</string>
+    <string name="detail_button_add_text">Добавить</string>
+    <string name="detail_button_save_changes_text">Сохранить</string>
+    <string name="detail_tv_add_image_text">Добавить фото</string>
+    <string name="detail_tv_change_image_text">Изменить фото</string>
+    
+    <plurals name="search_result_plurals">
+        <item quantity="one">%s контакт найден</item>
+        <item quantity="few">%s контакта найдено</item>
+        <item quantity="many">%s контактов найдено</item>
+    </plurals>
+</resources>
