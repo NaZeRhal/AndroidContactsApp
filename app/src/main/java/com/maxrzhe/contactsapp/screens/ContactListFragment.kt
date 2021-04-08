@@ -4,14 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.FragmentContactListBinding
 import com.maxrzhe.contactsapp.model.Contact
+import com.maxrzhe.contactsapp.viewmodel.ContactViewModelFactory
+import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
 
 class ContactListFragment : Fragment() {
     private var _binding: FragmentContactListBinding? = null
@@ -19,13 +19,13 @@ class ContactListFragment : Fragment() {
 
     private var contactAdapter: ContactAdapter? = null
 
-    private val onAddDetailListener: OnAddDetailListener?
-        get() = (context as? OnAddDetailListener)
+    private val onSelectContactListener: OnSelectContactListener?
+        get() = (context as? OnSelectContactListener)
 
-
-    companion object {
-        private const val CONTACT_LIST = "contact_list"
-        private const val SHARED_STORAGE_NAME = "storage"
+    private val sharedViewModel: SharedViewModel by activityViewModels {
+        ContactViewModelFactory(
+            requireActivity().application
+        )
     }
 
     override fun onCreateView(
@@ -33,7 +33,6 @@ class ContactListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentContactListBinding.inflate(inflater, container, false)
-
         return binding?.let { initView(it) }
     }
 
@@ -51,11 +50,11 @@ class ContactListFragment : Fragment() {
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(contact: Contact) {
-                            onAddDetailListener?.onAddDetails(contact)
+                            sharedViewModel.select(contact)
+                            onSelectContactListener?.onSelect()
                         }
                     }
                 )
-                contactAdapter?.itemList = readContactsFromSharedPreferences()
                 adapter = contactAdapter
                 fabAdd.setOnClickListener(addContact())
             }
@@ -63,53 +62,23 @@ class ContactListFragment : Fragment() {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        sharedViewModel.getContacts().observe(viewLifecycleOwner, { contacts ->
+            contactAdapter?.itemList = contacts
+        })
+    }
+
     private fun addContact() = View.OnClickListener {
-        onAddDetailListener?.onAddDetails(null)
-    }
-
-    private fun readContactsFromSharedPreferences(): List<Contact> {
-        val sharedPreferences = context?.getSharedPreferences(
-            SHARED_STORAGE_NAME,
-            AppCompatActivity.MODE_PRIVATE
-        )
-        val savedContacts = sharedPreferences?.getString(CONTACT_LIST, null)
-        val type = object : TypeToken<List<Contact>>() {}.type
-        return Gson().fromJson<List<Contact>>(savedContacts, type) ?: emptyList()
-    }
-
-    private fun saveToSharedPreferences(contact: Contact) {
-        val sharedPreferences = context?.getSharedPreferences(
-            SHARED_STORAGE_NAME,
-            AppCompatActivity.MODE_PRIVATE
-        )
-        sharedPreferences?.let {
-            val savedJsonContacts =
-                sharedPreferences.getString(CONTACT_LIST, null)
-            val type = object : TypeToken<List<Contact>>() {}.type
-            var savedContacts =
-                Gson().fromJson<List<Contact>>(savedJsonContacts, type) ?: emptyList()
-
-            val oldContact: Contact? = savedContacts.firstOrNull { it.id == contact.id }
-            if (oldContact != null) {
-                savedContacts = savedContacts - listOf(oldContact)
-            }
-            savedContacts = listOf(contact) + savedContacts
-            val json = Gson().toJson(savedContacts)
-            sharedPreferences.edit()?.putString(CONTACT_LIST, json)?.apply()
-        }
-    }
-
-    fun saveContact(contact: Contact) {
-        saveToSharedPreferences(contact)
-        contactAdapter?.itemList = readContactsFromSharedPreferences()
-        contactAdapter?.notifyDataSetChanged()
+        sharedViewModel.select(null)
+        onSelectContactListener?.onSelect()
     }
 
     fun filter(newText: String?) {
         contactAdapter?.filter = newText
     }
 
-    interface OnAddDetailListener {
-        fun onAddDetails(contact: Contact?)
+    interface OnSelectContactListener {
+        fun onSelect()
     }
 }

@@ -30,12 +30,11 @@ import androidx.fragment.app.commit
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.adapters.ContactAdapter.*
 import com.maxrzhe.contactsapp.databinding.ActivityListContactsBinding
-import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.screens.ContactDetailFragment.*
 import com.maxrzhe.contactsapp.screens.ContactListFragment.*
 
 class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
-    OnAddDetailListener, OnTakeImageListener,
+    OnSelectContactListener, OnTakeImageListener,
     OnSearchResultListener {
     private lateinit var binding: ActivityListContactsBinding
 
@@ -202,30 +201,26 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
         unregisterReceiver(wifiBroadcastReceiver)
     }
 
-    override fun onSave(contact: Contact) {
+    override fun onSave() {
         if (!isLandscape) {
             menuItemSearch?.isVisible = true
             toolbar?.setDisplayHomeAsUpEnabled(false)
         }
 
-        val contactListFragment =
-            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
-                ?: ContactListFragment()
-        contactListFragment.saveContact(contact)
         if (!isLandscape) {
             supportFragmentManager.popBackStackImmediate()
         }
         Toast.makeText(this, "Contact saved", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onAddDetails(contact: Contact?) {
+    override fun onSelect() {
         binding.tvSearchResult?.visibility = View.GONE
         if (!isLandscape) {
             menuItemSearch?.isVisible = false
             toolbar?.setDisplayHomeAsUpEnabled(true)
         }
 
-        val detailFragment = ContactDetailFragment.newInstance(contact)
+        val detailFragment = ContactDetailFragment()
         supportFragmentManager.commit {
             if (isLandscape) {
                 replace(R.id.fl_details, detailFragment, DETAILS_TAG)
