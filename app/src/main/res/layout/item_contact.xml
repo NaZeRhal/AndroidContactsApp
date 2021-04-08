@@ -20,6 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="80"
+            android:fontFamily="@font/alegreya_sans_sc"
             android:gravity="center"
             android:textSize="@dimen/item_contact_tv_name_textSize"
             tools:text="Name Surname" />
