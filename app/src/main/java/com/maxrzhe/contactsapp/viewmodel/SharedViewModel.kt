@@ -8,18 +8,17 @@ import com.maxrzhe.contactsapp.database.Repository
 import com.maxrzhe.contactsapp.database.SQLRepository
 import com.maxrzhe.contactsapp.model.Contact
 
-class SharedViewModel(private val app: Application) : AndroidViewModel(app) {
+class SharedViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val repository: Repository
-        get() = SQLRepository(app.applicationContext)
+    private val repository: Repository = SQLRepository(app.applicationContext)
 
-    private var _contact = MutableLiveData<Contact?>(null)
-    val contact: LiveData<Contact?> = _contact
+    private var _selectedContact = MutableLiveData<Contact?>(null)
+    val selectedContact: LiveData<Contact?> = _selectedContact
 
     private val _contacts = MutableLiveData<List<Contact>>()
 
     fun select(selectedContact: Contact?) {
-        _contact.value = selectedContact
+        _selectedContact.value = selectedContact
     }
 
     fun getContacts(): LiveData<List<Contact>> {
@@ -29,26 +28,14 @@ class SharedViewModel(private val app: Application) : AndroidViewModel(app) {
         return _contacts
     }
 
-    fun addOrUpdate(contact: Contact) {
-        var contacts = _contacts.value ?: emptyList()
-        val oldContact = contacts.firstOrNull { it.id == contact.id }
+    fun add(contact: Contact) {
+        repository.add(contact)
+        loadContacts()
+    }
 
-        if (oldContact != null) {
-            contacts = contacts - listOf(oldContact)
-            contacts = contacts + listOf(contact)
-            repository.update(contact)
-        } else {
-            val id = repository.add(contact)
-            val newContact = Contact(
-                id = id,
-                name = contact.name,
-                email = contact.email,
-                phone = contact.phone,
-                image = contact.image
-            )
-            contacts = contacts + listOf(newContact)
-        }
-        _contacts.value = contacts
+    fun update(contact: Contact) {
+        repository.update(contact)
+        loadContacts()
     }
 
     private fun loadContacts() {

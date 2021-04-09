@@ -5,20 +5,36 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.contactsapp.model.Contact
 
-class SQLRepository(private val context: Context) : Repository {
+class SQLRepository(context: Context) : Repository {
 
-    private val dbHandler: DatabaseHandler
-        get() = DatabaseHandler(context)
+    private val dbHandler: DatabaseHandler = DatabaseHandler(context)
 
-    private var _allContacts = MutableLiveData<List<Contact>>()
-    private val allContacts: LiveData<List<Contact>> = _allContacts
+    private var allContacts = MutableLiveData<List<Contact>>()
 
     override fun add(contact: Contact): Long {
-        return dbHandler.add(contact)
+        var contacts = allContacts.value ?: emptyList()
+        val id = dbHandler.add(contact)
+        val newContact = Contact(
+            id = id,
+            name = contact.name,
+            email = contact.email,
+            phone = contact.phone,
+            image = contact.image
+        )
+        contacts = contacts + listOf(newContact)
+        allContacts.value = contacts
+        return id
     }
 
     override fun update(contact: Contact) {
-        dbHandler.update(contact)
+        var contacts = allContacts.value ?: emptyList()
+        val oldContact = contacts.firstOrNull { it.id == contact.id }
+        if (oldContact != null) {
+            contacts = contacts - listOf(oldContact)
+            contacts = contacts + listOf(contact)
+            dbHandler.update(contact)
+        }
+        allContacts.value = contacts
     }
 
     override fun delete(contact: Contact) {
@@ -26,8 +42,8 @@ class SQLRepository(private val context: Context) : Repository {
     }
 
     override fun findAll(): LiveData<List<Contact>> {
-        if (_allContacts.value == null) {
-            _allContacts.value = dbHandler.findAll()
+        if (allContacts.value == null) {
+            allContacts.value = dbHandler.findAll()
         }
         return allContacts
     }

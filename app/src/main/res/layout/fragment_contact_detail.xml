@@ -7,10 +7,6 @@
         <variable
             name="viewModel"
             type="com.maxrzhe.contactsapp.viewmodel.SharedViewModel" />
-
-        <variable
-            name="detailFragment"
-            type="com.maxrzhe.contactsapp.screens.ContactDetailFragment" />
     </data>
 
     <ScrollView
@@ -30,7 +26,7 @@
                 android:layout_height="@dimen/detail_iv_avatar_height"
                 android:layout_marginTop="@dimen/detail_iv_avatar_marginTop"
                 android:contentDescription="@string/detail_description_avatar"
-                app:imageUri="@{viewModel.contact.image}"
+                app:imageUri="@{viewModel.selectedContact.image}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -40,7 +36,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_light"
-                android:text="@{viewModel.contact == null ? @string/detail_tv_add_image_text : @string/detail_tv_change_image_text}"
+                app:nullableField="@{viewModel.selectedContact}"
+                app:textChoiceNull="@{@string/detail_tv_add_image_text}"
+                app:textChoiceNotNull="@{@string/detail_tv_change_image_text}"
                 android:textColor="@color/purple_500"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -74,7 +72,7 @@
                         android:fontFamily="@font/alegreya_sans_sc"
                         android:hint="@string/detail_hint_enter_name"
                         android:inputType="text"
-                        android:text="@{viewModel.contact.name}"
+                        android:text="@{viewModel.selectedContact.name}"
                         android:textSize="@dimen/detail_et_name_textSize"
                         android:textStyle="bold"
                         android:theme="@style/EditText" />
@@ -94,7 +92,7 @@
                         android:fontFamily="@font/roboto"
                         android:hint="@string/detail_hint_enter_phone_number"
                         android:inputType="phone"
-                        android:text="@{viewModel.contact.phone}"
+                        android:text="@{viewModel.selectedContact.phone}"
                         android:textSize="@dimen/detail_et_phone_textSize"
                         android:theme="@style/EditText" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -114,7 +112,7 @@
                         android:fontFamily="@font/roboto"
                         android:hint="@string/detail_hint_enter_email"
                         android:inputType="textEmailAddress"
-                        android:text="@{viewModel.contact.email}"
+                        android:text="@{viewModel.selectedContact.email}"
                         android:textSize="@dimen/detail_et_email_textSize"
                         android:theme="@style/EditText" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -129,9 +127,11 @@
                 android:layout_marginEnd="@dimen/detail_btn_add_marginEnd"
                 android:layout_marginBottom="@dimen/detail_btn_add_marginBottom"
                 android:padding="@dimen/detail_btn_add_padding"
-                android:text="@{viewModel.contact == null ? @string/detail_button_add_text : @string/detail_button_save_changes_text}"
                 android:textSize="@dimen/detail_btn_add_textSize"
                 android:textStyle="bold"
+                app:nullableField="@{viewModel.selectedContact}"
+                app:textChoiceNull="@{@string/detail_button_add_text}"
+                app:textChoiceNotNull="@{@string/detail_button_save_changes_text}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

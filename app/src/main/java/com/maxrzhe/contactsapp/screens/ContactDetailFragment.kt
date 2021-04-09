@@ -66,7 +66,7 @@ class ContactDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sharedViewModel.contact.observe(viewLifecycleOwner, { selectedContact ->
+        sharedViewModel.selectedContact.observe(viewLifecycleOwner, { selectedContact ->
             this.contact = selectedContact
             contactId = contact?.id ?: -1
             imageUri = contact?.image
@@ -83,9 +83,13 @@ class ContactDetailFragment : Fragment() {
                     email = it.etEmail.text.toString(),
                     image = imageUri
                 )
-                sharedViewModel.addOrUpdate(contact)
-                onSaveContactListener?.onSave()
 
+                if (contactId < 0) {
+                    sharedViewModel.add(contact)
+                } else {
+                    sharedViewModel.update(contact)
+                }
+                onSaveContactListener?.onSave()
             }
         }
     }
