@@ -6,14 +6,12 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contactsapp.model.Contact
@@ -25,10 +23,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.*
 
-class ContactDetailFragment : Fragment() {
-    private var _binding: FragmentContactDetailBinding? = null
-    private val binding get() = _binding
-
+class ContactDetailFragment : BaseViewBindingFragment<FragmentContactDetailBinding>() {
     private var contact: Contact? = null
     private var contactId: Long = -1
     private var imageUri: String? = null
@@ -49,23 +44,17 @@ class ContactDetailFragment : Fragment() {
         private const val IMAGE_DIRECTORY = "imageDir"
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentContactDetailBinding.inflate(inflater, container, false)
-        binding?.let {
-            it.viewModel = sharedViewModel
-            it.lifecycleOwner = requireActivity()
-            it.btnDetailsAdd.setOnClickListener(saveContact())
-            it.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
-        }
-        return binding?.root
-    }
+    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
+        FragmentContactDetailBinding::inflate
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun setup() {
+        with(binding) {
+            viewModel = sharedViewModel
+            lifecycleOwner = requireActivity()
+            btnDetailsAdd.setOnClickListener(saveContact())
+            tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
+        }
+
         sharedViewModel.selectedContact.observe(viewLifecycleOwner, { selectedContact ->
             this.contact = selectedContact
             contactId = contact?.id ?: -1
@@ -75,12 +64,12 @@ class ContactDetailFragment : Fragment() {
 
     private fun saveContact() = View.OnClickListener {
         if (validateInput()) {
-            binding?.let {
+            with(binding) {
                 val contact = Contact(
                     id = contactId,
-                    name = it.etName.text.toString(),
-                    phone = it.etPhone.text.toString(),
-                    email = it.etEmail.text.toString(),
+                    name = etName.text.toString(),
+                    phone = etPhone.text.toString(),
+                    email = etEmail.text.toString(),
                     image = imageUri
                 )
 
@@ -95,9 +84,9 @@ class ContactDetailFragment : Fragment() {
     }
 
     private fun validateInput(): Boolean {
-        return binding?.let {
+        return with(binding) {
             when {
-                it.etName.text.isNullOrEmpty() -> {
+                etName.text.isNullOrEmpty() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter a name",
@@ -105,7 +94,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.PHONE.matcher(it.etPhone.text.toString()).matches() -> {
+                !Patterns.PHONE.matcher(etPhone.text.toString()).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct phone number",
@@ -113,7 +102,7 @@ class ContactDetailFragment : Fragment() {
                     ).show()
                     false
                 }
-                !Patterns.EMAIL_ADDRESS.matcher(it.etEmail.text.toString()).matches() -> {
+                !Patterns.EMAIL_ADDRESS.matcher(etEmail.text.toString()).matches() -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter correct email",
@@ -123,14 +112,14 @@ class ContactDetailFragment : Fragment() {
                 }
                 else -> true
             }
-        } ?: true
+        }
     }
 
     fun setupImage(contentUri: Uri) {
         try {
             val selectedImage = getCapturedImage(contentUri)
             imageUri = saveImageToInternalStorage(selectedImage).toString()
-            binding?.ivAvatar?.setImageBitmap(selectedImage)
+            binding.ivAvatar.setImageBitmap(selectedImage)
         } catch (e: IOException) {
             Toast.makeText(
                 requireContext(),

@@ -1,10 +1,8 @@
 package com.maxrzhe.contactsapp.screens
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
@@ -13,10 +11,7 @@ import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.viewmodel.ContactViewModelFactory
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
 
-class ContactListFragment : Fragment() {
-    private var _binding: FragmentContactListBinding? = null
-    private val binding get() = _binding
-
+class ContactListFragment : BaseViewBindingFragment<FragmentContactListBinding>() {
     private var contactAdapter: ContactAdapter? = null
 
     private val onSelectContactListener: OnSelectContactListener?
@@ -28,21 +23,11 @@ class ContactListFragment : Fragment() {
         )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentContactListBinding.inflate(inflater, container, false)
-        return binding?.let { initView(it) }
-    }
+    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
+        FragmentContactListBinding::inflate
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun initView(binding: FragmentContactListBinding): View {
-        return with(binding) {
+    override fun setup() {
+        with(binding) {
             rvContactList.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
@@ -58,12 +43,7 @@ class ContactListFragment : Fragment() {
                 adapter = contactAdapter
                 fabAdd.setOnClickListener(addContact())
             }
-            root
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         sharedViewModel.getContacts().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
