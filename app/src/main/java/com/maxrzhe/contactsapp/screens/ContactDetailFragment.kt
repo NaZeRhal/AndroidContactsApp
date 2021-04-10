@@ -12,18 +12,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contactsapp.model.Contact
-import com.maxrzhe.contactsapp.viewmodel.ContactViewModelFactory
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
+import com.maxrzhe.contactsapp.viewmodel.SharedViewModelFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.util.*
 
-class ContactDetailFragment : BaseViewBindingFragment<FragmentContactDetailBinding>() {
+class ContactDetailFragment :
+    BaseFragment<FragmentContactDetailBinding, SharedViewModel>() {
     private var contact: Contact? = null
     private var contactId: Long = -1
     private var imageUri: String? = null
@@ -34,18 +35,13 @@ class ContactDetailFragment : BaseViewBindingFragment<FragmentContactDetailBindi
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
 
-    private val sharedViewModel: SharedViewModel by activityViewModels {
-        ContactViewModelFactory(
-            requireActivity().application
-        )
-    }
-
-    companion object {
-        private const val IMAGE_DIRECTORY = "imageDir"
-    }
+    override val viewModelFactory: ViewModelProvider.Factory
+        get() = SharedViewModelFactory(requireActivity().application)
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
         FragmentContactDetailBinding::inflate
+
+    override fun getViewModelClass(): Class<SharedViewModel> = SharedViewModel::class.java
 
     override fun setup() {
         with(binding) {
@@ -55,7 +51,7 @@ class ContactDetailFragment : BaseViewBindingFragment<FragmentContactDetailBindi
             tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
         }
 
-        sharedViewModel.selectedContact.observe(viewLifecycleOwner, { selectedContact ->
+        sharedViewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
             this.contact = selectedContact
             contactId = contact?.id ?: -1
             imageUri = contact?.image
@@ -171,5 +167,9 @@ class ContactDetailFragment : BaseViewBindingFragment<FragmentContactDetailBindi
 
     interface OnTakeImageListener {
         fun onTakeImage()
+    }
+
+    companion object {
+        private const val IMAGE_DIRECTORY = "imageDir"
     }
 }

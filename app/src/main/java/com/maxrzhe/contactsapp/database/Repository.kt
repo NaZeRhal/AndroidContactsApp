@@ -3,13 +3,13 @@ package com.maxrzhe.contactsapp.database
 import androidx.lifecycle.LiveData
 import com.maxrzhe.contactsapp.model.Contact
 
-interface Repository {
+interface Repository<T> {
 
-    fun add(contact: Contact): Long
+    fun add(contact: T): Long
 
-    fun update(contact: Contact)
+    fun update(contact: T)
 
-    fun delete(contact: Contact)
+    fun delete(contact: T)
 
-    fun findAll(): LiveData<List<Contact>>
+    fun findAll(): LiveData<List<T>>
 }

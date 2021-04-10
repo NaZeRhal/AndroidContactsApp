@@ -9,7 +9,7 @@ data class Contact(
     val phone: String?,
     val email: String?,
     val image: String?
-): Parcelable {
+) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
         parcel.readString(),

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.contactsapp.model.Contact
 
-class SQLRepository(context: Context) : Repository {
+class SQLRepository(context: Context) : Repository<Contact> {
 
     private val dbHandler: DatabaseHandler = DatabaseHandler(context)
 

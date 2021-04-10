@@ -3,28 +3,28 @@ package com.maxrzhe.contactsapp.screens
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.FragmentContactListBinding
 import com.maxrzhe.contactsapp.model.Contact
-import com.maxrzhe.contactsapp.viewmodel.ContactViewModelFactory
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
+import com.maxrzhe.contactsapp.viewmodel.SharedViewModelFactory
 
-class ContactListFragment : BaseViewBindingFragment<FragmentContactListBinding>() {
+class ContactListFragment :
+    BaseFragment<FragmentContactListBinding, SharedViewModel>() {
     private var contactAdapter: ContactAdapter? = null
 
     private val onSelectContactListener: OnSelectContactListener?
         get() = (context as? OnSelectContactListener)
 
-    private val sharedViewModel: SharedViewModel by activityViewModels {
-        ContactViewModelFactory(
-            requireActivity().application
-        )
-    }
+    override val viewModelFactory: ViewModelProvider.Factory
+        get() = SharedViewModelFactory(requireActivity().application)
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
+
+    override fun getViewModelClass(): Class<SharedViewModel> = SharedViewModel::class.java
 
     override fun setup() {
         with(binding) {
@@ -44,7 +44,7 @@ class ContactListFragment : BaseViewBindingFragment<FragmentContactListBinding>(
                 fabAdd.setOnClickListener(addContact())
             }
         }
-        sharedViewModel.getContacts().observe(viewLifecycleOwner, { contacts ->
+        sharedViewModel.findAll().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
     }

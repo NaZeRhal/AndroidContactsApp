@@ -1,45 +1,44 @@
 package com.maxrzhe.contactsapp.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.contactsapp.database.Repository
 import com.maxrzhe.contactsapp.database.SQLRepository
 import com.maxrzhe.contactsapp.model.Contact
 
-class SharedViewModel(app: Application) : AndroidViewModel(app) {
+class SharedViewModel(app: Application) : BaseViewModel<Contact>(app) {
 
-    private val repository: Repository = SQLRepository(app.applicationContext)
+    override val repository: Repository<Contact> = SQLRepository(app.applicationContext)
 
-    private var _selectedContact = MutableLiveData<Contact?>(null)
-    val selectedContact: LiveData<Contact?> = _selectedContact
+    private var _selectedItem = MutableLiveData<Contact?>(null)
+    val selectedItem: LiveData<Contact?> = _selectedItem
 
-    private val _contacts = MutableLiveData<List<Contact>>()
+    private val _allItems = MutableLiveData<List<Contact>>()
 
-    fun select(selectedContact: Contact?) {
-        _selectedContact.value = selectedContact
+    override fun select(selectedContact: Contact?) {
+        _selectedItem.value = selectedContact
     }
 
-    fun getContacts(): LiveData<List<Contact>> {
-        if (_contacts.value == null) {
+    override fun findAll(): LiveData<List<Contact>> {
+        if (_allItems.value == null) {
             loadContacts()
         }
-        return _contacts
+        return _allItems
     }
 
-    fun add(contact: Contact) {
+    override fun add(contact: Contact) {
         repository.add(contact)
         loadContacts()
     }
 
-    fun update(contact: Contact) {
+    override fun update(contact: Contact) {
         repository.update(contact)
         loadContacts()
     }
 
     private fun loadContacts() {
         val loadedContacts = repository.findAll()
-        _contacts.postValue(loadedContacts.value)
+        _allItems.postValue(loadedContacts.value)
     }
 }
