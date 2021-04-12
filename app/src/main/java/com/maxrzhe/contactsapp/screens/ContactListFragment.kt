@@ -1,5 +1,6 @@
 package com.maxrzhe.contactsapp.screens
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +25,7 @@ class ContactListFragment :
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
 
-    override fun getViewModelClass(): Class<SharedViewModel> = SharedViewModel::class.java
+    override fun getViewModelClass() = SharedViewModel::class.java
 
     override fun setup() {
         with(binding) {
@@ -45,6 +46,9 @@ class ContactListFragment :
             }
         }
         sharedViewModel.findAll().observe(viewLifecycleOwner, { contacts ->
+            contacts.forEach {
+                Log.i("ALL_CONTACTS", "setup: name = ${it.name}")
+            }
             contactAdapter?.itemList = contacts
         })
     }

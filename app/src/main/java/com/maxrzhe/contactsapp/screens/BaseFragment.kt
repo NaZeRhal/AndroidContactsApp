@@ -7,12 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
-import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.viewmodel.BaseViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
-abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel<Contact>> : Fragment() {
+abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
 
     protected lateinit var sharedViewModel: VM
 

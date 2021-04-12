@@ -1,44 +1,44 @@
 package com.maxrzhe.contactsapp.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.maxrzhe.contactsapp.database.Repository
-import com.maxrzhe.contactsapp.database.SQLRepository
+import com.maxrzhe.contactsapp.database.ContactDatabase
+import com.maxrzhe.contactsapp.database.ContactRepository
 import com.maxrzhe.contactsapp.model.Contact
 
-class SharedViewModel(app: Application) : BaseViewModel<Contact>(app) {
+class SharedViewModel(app: Application) : BaseViewModel(app) {
 
-    override val repository: Repository<Contact> = SQLRepository(app.applicationContext)
+    private val readAllData: LiveData<List<Contact>>
+    private val contactRepository: ContactRepository
 
     private var _selectedItem = MutableLiveData<Contact?>(null)
     val selectedItem: LiveData<Contact?> = _selectedItem
 
-    private val _allItems = MutableLiveData<List<Contact>>()
+    init {
+        val contactRoomDao = ContactDatabase.getRoomDatabase(app).contactDao()
+        contactRepository = ContactRepository(contactRoomDao)
+        readAllData = contactRepository.findAll()
+    }
 
     override fun select(selectedContact: Contact?) {
         _selectedItem.value = selectedContact
     }
 
     override fun findAll(): LiveData<List<Contact>> {
-        if (_allItems.value == null) {
-            loadContacts()
+        Log.i("ALL_CONTACTS", "setup: null = ${readAllData.value.isNullOrEmpty()}")
+        readAllData.value?.forEach {
+            Log.i("ALL_CONTACTS", "setup: name = ${it.name}")
         }
-        return _allItems
+        return readAllData
     }
 
-    override fun add(contact: Contact) {
-        repository.add(contact)
-        loadContacts()
+    override suspend fun add(contact: Contact) {
+        contactRepository.add(contact)
     }
 
-    override fun update(contact: Contact) {
-        repository.update(contact)
-        loadContacts()
-    }
-
-    private fun loadContacts() {
-        val loadedContacts = repository.findAll()
-        _allItems.postValue(loadedContacts.value)
+    override suspend fun update(contact: Contact) {
+        contactRepository.update(contact)
     }
 }

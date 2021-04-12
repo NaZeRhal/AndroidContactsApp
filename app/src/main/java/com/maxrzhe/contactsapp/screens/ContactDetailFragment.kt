@@ -13,10 +13,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModelFactory
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -26,7 +28,6 @@ import java.util.*
 class ContactDetailFragment :
     BaseFragment<FragmentContactDetailBinding, SharedViewModel>() {
     private var contact: Contact? = null
-    private var contactId: Long = -1
     private var imageUri: String? = null
 
     private val onSaveContactListener: OnSaveContactListener?
@@ -41,7 +42,7 @@ class ContactDetailFragment :
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
         FragmentContactDetailBinding::inflate
 
-    override fun getViewModelClass(): Class<SharedViewModel> = SharedViewModel::class.java
+    override fun getViewModelClass() = SharedViewModel::class.java
 
     override fun setup() {
         with(binding) {
@@ -53,7 +54,6 @@ class ContactDetailFragment :
 
         sharedViewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
             this.contact = selectedContact
-            contactId = contact?.id ?: -1
             imageUri = contact?.image
         })
     }
@@ -62,17 +62,17 @@ class ContactDetailFragment :
         if (validateInput()) {
             with(binding) {
                 val contact = Contact(
-                    id = contactId,
+                    id = contact?.id ?: 0,
                     name = etName.text.toString(),
                     phone = etPhone.text.toString(),
                     email = etEmail.text.toString(),
                     image = imageUri
                 )
 
-                if (contactId < 0) {
-                    sharedViewModel.add(contact)
+                if (contact.id <= 0) {
+                    sharedViewModel.viewModelScope.launch { sharedViewModel.add(contact) }
                 } else {
-                    sharedViewModel.update(contact)
+                    sharedViewModel.viewModelScope.launch { sharedViewModel.update(contact) }
                 }
                 onSaveContactListener?.onSave()
             }

@@ -3,17 +3,15 @@ package com.maxrzhe.contactsapp.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.maxrzhe.contactsapp.database.Repository
+import com.maxrzhe.contactsapp.model.Contact
 
-abstract class BaseViewModel<T>(app: Application) : AndroidViewModel(app) {
+abstract class BaseViewModel(app: Application) : AndroidViewModel(app) {
 
-    protected abstract val repository: Repository<T>
+    abstract fun select(selectedContact: Contact?)
 
-    abstract fun select(selectedContact: T?)
+    abstract fun findAll(): LiveData<List<Contact>>
 
-    abstract fun findAll(): LiveData<List<T>>
+    abstract suspend fun add(contact: Contact)
 
-    abstract fun add(contact: T)
-
-    abstract fun update(contact: T)
+    abstract suspend fun update(contact: Contact)
 }

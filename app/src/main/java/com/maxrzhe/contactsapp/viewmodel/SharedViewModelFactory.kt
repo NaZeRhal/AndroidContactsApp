@@ -7,10 +7,13 @@ import androidx.lifecycle.ViewModelProvider
 class SharedViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SharedViewModel::class.java)) {
-            return SharedViewModel(application) as T
-        } else {
-            throw IllegalArgumentException("Cannot create instance for class SharedViewModel")
+        return when {
+            modelClass.isAssignableFrom(SharedViewModel::class.java) -> {
+                SharedViewModel(application) as T
+            }
+            else -> {
+                throw IllegalArgumentException("Cannot create instance for class SharedViewModel")
+            }
         }
     }
 }
