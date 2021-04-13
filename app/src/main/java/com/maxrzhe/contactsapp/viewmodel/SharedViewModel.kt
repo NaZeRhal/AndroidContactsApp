@@ -6,15 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.repository.Repository
-import com.maxrzhe.contactsapp.repository.factory.ContactRoomRepositoryFactory
-//import com.maxrzhe.contactsapp.repository.factory.ContactSqlRepositoryFactory
+import com.maxrzhe.contactsapp.repository.RepositoryFactory
+import com.maxrzhe.contactsapp.repository.RepositoryType
 import kotlinx.coroutines.launch
 
 class SharedViewModel(app: Application) : BaseViewModel(app) {
 
     private val readAllData: LiveData<List<Contact>>
-    private val repository: Repository = ContactRoomRepositoryFactory().create(app)
-//    private val repository: Repository = ContactSqlRepositoryFactory().create(app)
+    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
+//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
 
     private var _selectedItem = MutableLiveData<Contact?>(null)
     val selectedItem: LiveData<Contact?> = _selectedItem
