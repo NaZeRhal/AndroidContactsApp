@@ -1,6 +1,5 @@
 package com.maxrzhe.contactsapp.screens
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,9 +45,6 @@ class ContactListFragment :
             }
         }
         sharedViewModel.findAll().observe(viewLifecycleOwner, { contacts ->
-            contacts.forEach {
-                Log.i("ALL_CONTACTS", "setup: name = ${it.name}")
-            }
             contactAdapter?.itemList = contacts
         })
     }
