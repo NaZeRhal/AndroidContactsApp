@@ -70,9 +70,9 @@ class ContactDetailFragment :
                 )
 
                 if (contact.id <= 0) {
-                    sharedViewModel.viewModelScope.launch { sharedViewModel.add(contact) }
+                    sharedViewModel.add(contact)
                 } else {
-                    sharedViewModel.viewModelScope.launch { sharedViewModel.update(contact) }
+                   sharedViewModel.update(contact)
                 }
                 onSaveContactListener?.onSave()
             }

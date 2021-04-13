@@ -4,9 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contactsapp.database.ContactDatabase
 import com.maxrzhe.contactsapp.database.ContactRepository
 import com.maxrzhe.contactsapp.model.Contact
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SharedViewModel(app: Application) : BaseViewModel(app) {
 
@@ -34,11 +37,15 @@ class SharedViewModel(app: Application) : BaseViewModel(app) {
         return readAllData
     }
 
-    override suspend fun add(contact: Contact) {
-        contactRepository.add(contact)
+    override fun add(contact: Contact) {
+        viewModelScope.launch(Dispatchers.IO) {
+            contactRepository.add(contact)
+        }
     }
 
-    override suspend fun update(contact: Contact) {
-        contactRepository.update(contact)
+    override fun update(contact: Contact) {
+        viewModelScope.launch(Dispatchers.IO) {
+            contactRepository.update(contact)
+        }
     }
 }

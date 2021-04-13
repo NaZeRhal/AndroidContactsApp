@@ -11,7 +11,7 @@ abstract class BaseViewModel(app: Application) : AndroidViewModel(app) {
 
     abstract fun findAll(): LiveData<List<Contact>>
 
-    abstract suspend fun add(contact: Contact)
+    abstract fun add(contact: Contact)
 
-    abstract suspend fun update(contact: Contact)
+    abstract fun update(contact: Contact)
 }
