@@ -5,8 +5,12 @@
     <data>
 
         <variable
-            name="viewModel"
+            name="sharedViewModel"
             type="com.maxrzhe.contactsapp.viewmodel.SharedViewModel" />
+
+        <variable
+            name="viewModel"
+            type="com.maxrzhe.contactsapp.viewmodel.ContactDetailViewModel" />
     </data>
 
     <ScrollView
@@ -26,7 +30,7 @@
                 android:layout_height="@dimen/detail_iv_avatar_height"
                 android:layout_marginTop="@dimen/detail_iv_avatar_marginTop"
                 android:contentDescription="@string/detail_description_avatar"
-                app:imageUri="@{viewModel.selectedItem.image}"
+                app:imageUri="@{sharedViewModel.selectedItem.image}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_light"
-                android:text="@{viewModel.detailImageText(viewModel.selectedItem)}"
+                android:text="@{viewModel.detailImageText(sharedViewModel.selectedItem)}"
                 android:textColor="@color/purple_500"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +74,7 @@
                         android:fontFamily="@font/alegreya_sans_sc"
                         android:hint="@string/detail_hint_enter_name"
                         android:inputType="text"
-                        android:text="@{viewModel.selectedItem.name}"
+                        android:text="@{sharedViewModel.selectedItem.name}"
                         android:textSize="@dimen/detail_et_name_textSize"
                         android:textStyle="bold"
                         android:theme="@style/EditText" />
@@ -90,7 +94,7 @@
                         android:fontFamily="@font/roboto"
                         android:hint="@string/detail_hint_enter_phone_number"
                         android:inputType="phone"
-                        android:text="@{viewModel.selectedItem.phone}"
+                        android:text="@{sharedViewModel.selectedItem.phone}"
                         android:textSize="@dimen/detail_et_phone_textSize"
                         android:theme="@style/EditText" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -110,7 +114,7 @@
                         android:fontFamily="@font/roboto"
                         android:hint="@string/detail_hint_enter_email"
                         android:inputType="textEmailAddress"
-                        android:text="@{viewModel.selectedItem.email}"
+                        android:text="@{sharedViewModel.selectedItem.email}"
                         android:textSize="@dimen/detail_et_email_textSize"
                         android:theme="@style/EditText" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -125,7 +129,7 @@
                 android:layout_marginEnd="@dimen/detail_btn_add_marginEnd"
                 android:layout_marginBottom="@dimen/detail_btn_add_marginBottom"
                 android:padding="@dimen/detail_btn_add_padding"
-                android:text="@{viewModel.detailSubmitButtonText(viewModel.selectedItem)}"
+                android:text="@{viewModel.detailSubmitButtonText(sharedViewModel.selectedItem)}"
                 android:textSize="@dimen/detail_btn_add_textSize"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"

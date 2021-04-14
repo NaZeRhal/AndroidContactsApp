@@ -3,28 +3,32 @@ package com.maxrzhe.contactsapp.screens
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.FragmentContactListBinding
 import com.maxrzhe.contactsapp.model.Contact
+import com.maxrzhe.contactsapp.viewmodel.BaseViewModelFactory
+import com.maxrzhe.contactsapp.viewmodel.ContactListViewModel
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
-import com.maxrzhe.contactsapp.viewmodel.SharedViewModelFactory
 
 class ContactListFragment :
-    BaseFragment<FragmentContactListBinding, SharedViewModel>() {
+    BaseFragment<FragmentContactListBinding, ContactListViewModel>() {
     private var contactAdapter: ContactAdapter? = null
+
+    private val sharedViewModel by activityViewModels<SharedViewModel>()
 
     private val onSelectContactListener: OnSelectContactListener?
         get() = (context as? OnSelectContactListener)
 
     override val viewModelFactory: ViewModelProvider.Factory
-        get() = SharedViewModelFactory(requireActivity().application)
+        get() = BaseViewModelFactory(requireActivity().application)
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
 
-    override fun getViewModelClass() = SharedViewModel::class.java
+    override fun getViewModelClass() = ContactListViewModel::class.java
 
     override fun bindView() {}
 
@@ -37,7 +41,7 @@ class ContactListFragment :
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(contact: Contact) {
-                            viewModel.select(contact)
+                            sharedViewModel.select(contact)
                             onSelectContactListener?.onSelect()
                         }
                     }
@@ -52,7 +56,7 @@ class ContactListFragment :
     }
 
     private fun addContact() = View.OnClickListener {
-        viewModel.select(null)
+        sharedViewModel.select(null)
         onSelectContactListener?.onSelect()
     }
 

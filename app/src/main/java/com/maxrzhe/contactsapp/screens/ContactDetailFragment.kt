@@ -7,16 +7,19 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contactsapp.model.Contact
+import com.maxrzhe.contactsapp.viewmodel.BaseViewModelFactory
+import com.maxrzhe.contactsapp.viewmodel.ContactDetailViewModel
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
-import com.maxrzhe.contactsapp.viewmodel.SharedViewModelFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -24,9 +27,11 @@ import java.io.OutputStream
 import java.util.*
 
 class ContactDetailFragment :
-    BaseFragment<FragmentContactDetailBinding, SharedViewModel>() {
+    BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
     private var contact: Contact? = null
     private var imageUri: String? = null
+
+    private val sharedViewModel by activityViewModels<SharedViewModel>()
 
     private val onSaveContactListener: OnSaveContactListener?
         get() = (context as? OnSaveContactListener)
@@ -35,15 +40,16 @@ class ContactDetailFragment :
         get() = (context as? OnTakeImageListener)
 
     override val viewModelFactory: ViewModelProvider.Factory
-        get() = SharedViewModelFactory(requireActivity().application)
+        get() = BaseViewModelFactory(requireActivity().application)
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
         FragmentContactDetailBinding::inflate
 
-    override fun getViewModelClass() = SharedViewModel::class.java
+    override fun getViewModelClass() = ContactDetailViewModel::class.java
 
     override fun bindView() {
         binding.viewModel = viewModel
+        binding.sharedViewModel = sharedViewModel
     }
 
     override fun initView() {
@@ -53,7 +59,7 @@ class ContactDetailFragment :
             tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
         }
 
-        viewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
+        sharedViewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
             this.contact = selectedContact
             imageUri = contact?.image
         })
@@ -73,7 +79,7 @@ class ContactDetailFragment :
                 if (contact.id <= 0) {
                     viewModel?.add(contact)
                 } else {
-                   viewModel?.update(contact)
+                    viewModel?.update(contact)
                 }
                 onSaveContactListener?.onSave()
             }
