@@ -1,23 +1,30 @@
 package com.maxrzhe.contactsapp.repository
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.maxrzhe.contactsapp.dao.ContactDao
 import com.maxrzhe.contactsapp.model.Contact
+import com.maxrzhe.contactsapp.model.ContactMapping
 
-class ContactRoomRepository(private val contactDao: ContactDao) : Repository{
+class ContactRoomRepository(private val contactDao: ContactDao) : Repository {
     override suspend fun add(contact: Contact) {
-        contactDao.add(contact)
+        contactDao.add(ContactMapping.contactToContactRoom(contact))
     }
 
     override suspend fun update(contact: Contact) {
-        contactDao.update(contact)
+        contactDao.update(ContactMapping.contactToContactRoom(contact))
     }
 
     override suspend fun delete(contact: Contact) {
-        contactDao.delete(contact)
+        contactDao.delete(ContactMapping.contactToContactRoom(contact))
     }
 
     override fun findAll(): LiveData<List<Contact>> {
-        return contactDao.findAll()
+        val roomContactsLiveData = contactDao.findAll()
+        return Transformations.map(roomContactsLiveData) { roomContact ->
+            ContactMapping.contactRoomToContact(
+                roomContact
+            )
+        }
     }
 }

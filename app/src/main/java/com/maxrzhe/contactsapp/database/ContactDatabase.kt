@@ -5,9 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.maxrzhe.contactsapp.dao.ContactDao
-import com.maxrzhe.contactsapp.model.Contact
+import com.maxrzhe.contactsapp.model.ContactRoom
 
-@Database(entities = [Contact::class], version = 1, exportSchema = false)
+@Database(entities = [ContactRoom::class], version = 1, exportSchema = false)
 abstract class ContactDatabase : RoomDatabase() {
 
     abstract fun contactDao(): ContactDao

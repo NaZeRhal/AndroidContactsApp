@@ -36,9 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_light"
-                app:nullableField="@{viewModel.selectedItem}"
-                app:textChoiceNull="@{@string/detail_tv_add_image_text}"
-                app:textChoiceNotNull="@{@string/detail_tv_change_image_text}"
+                android:text="@{viewModel.detailImageText(viewModel.selectedItem)}"
                 android:textColor="@color/purple_500"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +63,7 @@
                     android:layout_height="wrap_content"
                     app:hintTextAppearance="@style/HintText">
 
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -85,7 +83,7 @@
                     android:layout_height="wrap_content"
                     app:hintTextAppearance="@style/HintText">
 
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_phone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -105,7 +103,7 @@
                     app:hintTextAppearance="@style/HintText"
                     app:hintTextColor="@color/purple_700">
 
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -127,11 +125,9 @@
                 android:layout_marginEnd="@dimen/detail_btn_add_marginEnd"
                 android:layout_marginBottom="@dimen/detail_btn_add_marginBottom"
                 android:padding="@dimen/detail_btn_add_padding"
+                android:text="@{viewModel.detailSubmitButtonText(viewModel.selectedItem)}"
                 android:textSize="@dimen/detail_btn_add_textSize"
                 android:textStyle="bold"
-                app:nullableField="@{viewModel.selectedItem}"
-                app:textChoiceNull="@{@string/detail_button_add_text}"
-                app:textChoiceNotNull="@{@string/detail_button_save_changes_text}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

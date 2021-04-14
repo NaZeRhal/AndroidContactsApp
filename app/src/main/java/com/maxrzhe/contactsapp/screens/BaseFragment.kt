@@ -13,7 +13,7 @@ import io.reactivex.disposables.Disposable
 
 abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
 
-    protected lateinit var sharedViewModel: VM
+    protected lateinit var viewModel: VM
 
     private val disposableContainer = CompositeDisposable()
     private var _binding: ViewBinding? = null
@@ -26,11 +26,12 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
     protected abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
 
     protected abstract fun getViewModelClass(): Class<VM>
-    protected abstract fun setup()
+    protected abstract fun initView()
+    protected abstract fun bindView()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedViewModel =
+        viewModel =
             ViewModelProvider(requireActivity(), viewModelFactory).get(getViewModelClass())
     }
 
@@ -39,13 +40,14 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        _binding = bindingInflater.invoke(inflater, container, false)
+        _binding = bindingInflater(inflater, container, false)
         return requireNotNull(_binding).root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setup()
+        bindView()
+        initView()
     }
 
     override fun onDestroyView() {

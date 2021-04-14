@@ -26,7 +26,9 @@ class ContactListFragment :
 
     override fun getViewModelClass() = SharedViewModel::class.java
 
-    override fun setup() {
+    override fun bindView() {}
+
+    override fun initView() {
         with(binding) {
             rvContactList.apply {
                 layoutManager = LinearLayoutManager(requireContext())
@@ -35,7 +37,7 @@ class ContactListFragment :
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(contact: Contact) {
-                            sharedViewModel.select(contact)
+                            viewModel.select(contact)
                             onSelectContactListener?.onSelect()
                         }
                     }
@@ -44,13 +46,13 @@ class ContactListFragment :
                 fabAdd.setOnClickListener(addContact())
             }
         }
-        sharedViewModel.findAll().observe(viewLifecycleOwner, { contacts ->
+        viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
     }
 
     private fun addContact() = View.OnClickListener {
-        sharedViewModel.select(null)
+        viewModel.select(null)
         onSelectContactListener?.onSelect()
     }
 

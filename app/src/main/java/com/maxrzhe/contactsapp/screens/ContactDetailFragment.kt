@@ -42,15 +42,18 @@ class ContactDetailFragment :
 
     override fun getViewModelClass() = SharedViewModel::class.java
 
-    override fun setup() {
+    override fun bindView() {
+        binding.viewModel = viewModel
+    }
+
+    override fun initView() {
         with(binding) {
-            viewModel = sharedViewModel
             lifecycleOwner = requireActivity()
             btnDetailsAdd.setOnClickListener(saveContact())
             tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
         }
 
-        sharedViewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
+        viewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
             this.contact = selectedContact
             imageUri = contact?.image
         })
@@ -68,9 +71,9 @@ class ContactDetailFragment :
                 )
 
                 if (contact.id <= 0) {
-                    sharedViewModel.add(contact)
+                    viewModel?.add(contact)
                 } else {
-                   sharedViewModel.update(contact)
+                   viewModel?.update(contact)
                 }
                 onSaveContactListener?.onSave()
             }
@@ -170,4 +173,6 @@ class ContactDetailFragment :
     companion object {
         private const val IMAGE_DIRECTORY = "imageDir"
     }
+
+
 }

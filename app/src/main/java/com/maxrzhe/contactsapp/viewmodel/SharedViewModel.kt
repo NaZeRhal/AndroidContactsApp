@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.repository.Repository
 import com.maxrzhe.contactsapp.repository.RepositoryFactory
@@ -23,23 +24,43 @@ class SharedViewModel(app: Application) : BaseViewModel(app) {
         readAllData = repository.findAll()
     }
 
-    override fun select(selectedContact: Contact?) {
+    fun select(selectedContact: Contact?) {
         _selectedItem.value = selectedContact
     }
 
-    override fun findAll(): LiveData<List<Contact>> {
+    fun findAll(): LiveData<List<Contact>> {
         return readAllData
     }
 
-    override fun add(contact: Contact) {
+    fun add(contact: Contact) {
         viewModelScope.launch {
             repository.add(contact)
         }
     }
 
-    override fun update(contact: Contact) {
+    fun update(contact: Contact) {
         viewModelScope.launch {
             repository.update(contact)
+        }
+    }
+
+    fun detailImageText(
+        contact: Contact?,
+    ): Int {
+        return if (contact == null) {
+            R.string.detail_tv_add_image_text
+        } else {
+            R.string.detail_tv_change_image_text
+        }
+    }
+
+    fun detailSubmitButtonText(
+        contact: Contact?,
+    ): Int {
+        return if (contact == null) {
+            R.string.detail_button_add_text
+        } else {
+            R.string.detail_button_save_changes_text
         }
     }
 }
