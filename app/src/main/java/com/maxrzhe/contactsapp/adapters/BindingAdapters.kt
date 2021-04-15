@@ -3,6 +3,7 @@ package com.maxrzhe.contactsapp.adapters
 import android.net.Uri
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
 import com.maxrzhe.contactsapp.R
 
 @BindingAdapter("app:imageUri")

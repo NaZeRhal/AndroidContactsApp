@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_light"
-                android:text="@{viewModel.detailImageText(sharedViewModel.selectedItem)}"
+                android:text="@{sharedViewModel.detailImageText()}"
                 android:textColor="@color/purple_500"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -74,7 +74,7 @@
                         android:fontFamily="@font/alegreya_sans_sc"
                         android:hint="@string/detail_hint_enter_name"
                         android:inputType="text"
-                        android:text="@{sharedViewModel.selectedItem.name}"
+                        android:text="@={sharedViewModel.name}"
                         android:textSize="@dimen/detail_et_name_textSize"
                         android:textStyle="bold"
                         android:theme="@style/EditText" />
@@ -94,7 +94,7 @@
                         android:fontFamily="@font/roboto"
                         android:hint="@string/detail_hint_enter_phone_number"
                         android:inputType="phone"
-                        android:text="@{sharedViewModel.selectedItem.phone}"
+                        android:text="@={sharedViewModel.phone}"
                         android:textSize="@dimen/detail_et_phone_textSize"
                         android:theme="@style/EditText" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -114,7 +114,7 @@
                         android:fontFamily="@font/roboto"
                         android:hint="@string/detail_hint_enter_email"
                         android:inputType="textEmailAddress"
-                        android:text="@{sharedViewModel.selectedItem.email}"
+                        android:text="@={sharedViewModel.email}"
                         android:textSize="@dimen/detail_et_email_textSize"
                         android:theme="@style/EditText" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -128,8 +128,9 @@
                 android:layout_marginTop="@dimen/detail_btn_add_marginTop"
                 android:layout_marginEnd="@dimen/detail_btn_add_marginEnd"
                 android:layout_marginBottom="@dimen/detail_btn_add_marginBottom"
+                android:onClick="@{() -> sharedViewModel.onSaveContact()}"
                 android:padding="@dimen/detail_btn_add_padding"
-                android:text="@{viewModel.detailSubmitButtonText(sharedViewModel.selectedItem)}"
+                android:text="@{sharedViewModel.detailSubmitButtonText()}"
                 android:textSize="@dimen/detail_btn_add_textSize"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -55,67 +55,14 @@ class ContactDetailFragment :
     override fun initView() {
         with(binding) {
             lifecycleOwner = requireActivity()
-            btnDetailsAdd.setOnClickListener(saveContact())
             tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
         }
 
         sharedViewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
+            Log.i("NEW_NAME", "initView: ${selectedContact?.name}")
             this.contact = selectedContact
             imageUri = contact?.image
         })
-    }
-
-    private fun saveContact() = View.OnClickListener {
-        if (validateInput()) {
-            with(binding) {
-                val contact = Contact(
-                    id = contact?.id ?: 0,
-                    name = etName.text.toString(),
-                    phone = etPhone.text.toString(),
-                    email = etEmail.text.toString(),
-                    image = imageUri
-                )
-
-                if (contact.id <= 0) {
-                    viewModel?.add(contact)
-                } else {
-                    viewModel?.update(contact)
-                }
-                onSaveContactListener?.onSave()
-            }
-        }
-    }
-
-    private fun validateInput(): Boolean {
-        return with(binding) {
-            when {
-                etName.text.isNullOrEmpty() -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter a name",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    false
-                }
-                !Patterns.PHONE.matcher(etPhone.text.toString()).matches() -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter correct phone number",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    false
-                }
-                !Patterns.EMAIL_ADDRESS.matcher(etEmail.text.toString()).matches() -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter correct email",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    false
-                }
-                else -> true
-            }
-        }
     }
 
     fun setupImage(contentUri: Uri) {
