@@ -127,4 +127,39 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         return contentValues
     }
 
+    fun findById(id: Long): Contact? {
+        val query = "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_ID=$id"
+
+        val db = this.readableDatabase
+        val cursor: Cursor?
+        var contact: Contact? = null
+
+        try {
+            cursor = db.rawQuery(query, null)
+
+            cursor?.let { raw ->
+                with(raw) {
+                    if (moveToFirst()) {
+                        do {
+                            contact = Contact(
+                                id = getLong(getColumnIndex(KEY_ID)),
+                                name = getString(getColumnIndex(KEY_NAME)),
+                                phone = getString(getColumnIndex(KEY_PHONE)),
+                                email = getString(getColumnIndex(KEY_EMAIL)),
+                                image = getString(getColumnIndex(KEY_IMAGE))
+                            )
+                        } while (moveToNext())
+                    }
+                }
+            }
+            db.close()
+            return contact
+        } catch (e: SQLException) {
+            db.execSQL(query)
+            db.close()
+            return contact
+        }
+
+    }
+
 }

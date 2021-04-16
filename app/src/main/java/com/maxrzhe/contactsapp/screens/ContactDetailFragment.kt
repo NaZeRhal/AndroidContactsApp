@@ -7,16 +7,12 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
-import android.util.Patterns
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
-import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contactsapp.viewmodel.ContactDetailViewModel
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
@@ -28,7 +24,6 @@ import java.util.*
 
 class ContactDetailFragment :
     BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
-    private var contact: Contact? = null
     private var imageUri: String? = null
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
@@ -49,27 +44,29 @@ class ContactDetailFragment :
 
     override fun bindView() {
         binding.viewModel = viewModel
-        binding.sharedViewModel = sharedViewModel
+        binding.lifecycleOwner = requireActivity()
     }
 
     override fun initView() {
-        with(binding) {
-            lifecycleOwner = requireActivity()
-            tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
-        }
-
-        sharedViewModel.selectedItem.observe(viewLifecycleOwner, { selectedContact ->
-            Log.i("NEW_NAME", "initView: ${selectedContact?.name}")
-            this.contact = selectedContact
-            imageUri = contact?.image
+        sharedViewModel.contactId.observe(viewLifecycleOwner, {
+            viewModel.manageSelectedId(it)
         })
+        viewModel.savedMarker.observe(viewLifecycleOwner, {
+            if (it) {
+                viewModel.resetMarker()
+                onSaveContactListener?.onSave()
+            }
+        })
+        binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
     }
 
     fun setupImage(contentUri: Uri) {
         try {
             val selectedImage = getCapturedImage(contentUri)
             imageUri = saveImageToInternalStorage(selectedImage).toString()
-            binding.ivAvatar.setImageBitmap(selectedImage)
+            imageUri?.let {
+                viewModel.manageImageUri(it)
+            }
         } catch (e: IOException) {
             Toast.makeText(
                 requireContext(),
@@ -94,14 +91,6 @@ class ContactDetailFragment :
     private fun saveImageToInternalStorage(selectedImage: Bitmap): Uri {
         val wrapper = ContextWrapper(requireContext())
         val dir = wrapper.getDir(IMAGE_DIRECTORY, Context.MODE_PRIVATE)
-
-        val contactImage = contact?.image?.split("/")?.last()
-        val existingImage = dir.listFiles()?.firstOrNull {
-            it.name.endsWith(contactImage.toString())
-        }
-        if (existingImage != null) {
-            requireContext().deleteFile(existingImage.name)
-        }
         val imageName = "${UUID.randomUUID()}.jpg"
         val file = File(dir, imageName)
         try {

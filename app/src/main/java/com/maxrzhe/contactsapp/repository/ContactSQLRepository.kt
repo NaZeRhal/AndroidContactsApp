@@ -6,6 +6,11 @@ import com.maxrzhe.contactsapp.model.Contact
 
 class ContactSQLRepository(private val contactSqlDao: ContactSqlDao) : Repository {
 
+
+    override fun findById(id: Long): LiveData<Contact?> {
+        return contactSqlDao.findById(id)
+    }
+
     override suspend fun add(contact: Contact) {
         contactSqlDao.add(contact)
     }

@@ -2,6 +2,7 @@ package com.maxrzhe.contactsapp.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.model.ContactRoom
 
 @Dao
@@ -15,6 +16,9 @@ interface ContactDao {
 
     @Delete
     suspend fun delete(contactRoom: ContactRoom)
+
+    @Query("SELECT * FROM contacts_table WHERE id=:id")
+    fun findById(id: Long): LiveData<ContactRoom>
 
     @Query("SELECT * FROM contacts_table")
     fun findAll(): LiveData<List<ContactRoom>>

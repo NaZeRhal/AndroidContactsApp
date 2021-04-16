@@ -93,7 +93,7 @@ class ContactAdapter(
                 .into(ivContactImage)
 
             root.setOnClickListener {
-                onContactClickListener.onClick(contact)
+                onContactClickListener.onClick(contact.id)
             }
         }
     }
@@ -138,7 +138,7 @@ class ContactAdapter(
 
 
     interface OnContactClickListener {
-        fun onClick(contact: Contact)
+        fun onClick(contactId: Long)
     }
 
     interface OnSearchResultListener {

@@ -1,6 +1,5 @@
 package com.maxrzhe.contactsapp.screens
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.FragmentContactListBinding
-import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contactsapp.viewmodel.ContactListViewModel
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
@@ -41,8 +39,9 @@ class ContactListFragment :
                 contactAdapter = ContactAdapter(
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
-                        override fun onClick(contact: Contact) {
-                            sharedViewModel.select(contact)
+                        override fun onClick(contactId: Long) {
+                            sharedViewModel.select(contactId)
+
                             onSelectContactListener?.onSelect()
                         }
                     }
@@ -57,7 +56,7 @@ class ContactListFragment :
     }
 
     private fun addContact() = View.OnClickListener {
-        sharedViewModel.select(null)
+        sharedViewModel.select(0)
         onSelectContactListener?.onSelect()
     }
 
