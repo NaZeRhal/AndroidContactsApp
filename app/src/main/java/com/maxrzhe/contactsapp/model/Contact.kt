@@ -25,8 +25,4 @@ sealed class Contact {
         override val phone: String,
         override val image: String
     ) : Contact(), Parcelable
-
-    companion object {
-        fun emptyContact(): Existing = Existing(0, "", "", "", "")
-    }
 }

@@ -2,7 +2,6 @@ package com.maxrzhe.contactsapp.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.model.ContactRoom
 
 @Dao
