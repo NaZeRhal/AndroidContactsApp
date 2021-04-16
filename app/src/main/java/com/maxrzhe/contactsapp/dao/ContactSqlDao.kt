@@ -10,12 +10,12 @@ class ContactSqlDao(context: Context) {
 
     private val dbHandler: DatabaseHandler = DatabaseHandler(context)
 
-    private var allContacts = MutableLiveData<List<Contact>>()
+    private var allContacts = MutableLiveData<List<Contact.Existing>>()
 
-    fun add(contact: Contact) {
+    fun add(contact: Contact.New) {
         var contacts = allContacts.value ?: emptyList()
         val id = dbHandler.add(contact)
-        val newContact = Contact.New(
+        val newContact = Contact.Existing(
             id = id,
             name = contact.name,
             email = contact.email,
@@ -26,7 +26,7 @@ class ContactSqlDao(context: Context) {
         allContacts.value = contacts
     }
 
-    fun update(contact: Contact) {
+    fun update(contact: Contact.Existing) {
         var contacts = allContacts.value ?: emptyList()
         val oldContact = contacts.firstOrNull { it.id == contact.id }
         if (oldContact != null) {
@@ -37,18 +37,18 @@ class ContactSqlDao(context: Context) {
         allContacts.value = contacts
     }
 
-    fun delete(contact: Contact) {
+    fun delete(contact: Contact.Existing) {
         dbHandler.delete(contact)
     }
 
-    fun findAll(): LiveData<List<Contact>> {
+    fun findAll(): LiveData<List<Contact.Existing>> {
         if (allContacts.value == null) {
             allContacts.value = dbHandler.findAll()
         }
         return allContacts
     }
 
-    fun findById(id: Long): Contact {
+    fun findById(id: Long): Contact.Existing? {
         return dbHandler.findById(id)
     }
 }

@@ -31,10 +31,10 @@ class ContactDetailViewModel(private val app: Application) :
             id.set(selectedId)
             val contact =
                 if (selectedId > 0) repository.findById(selectedId) else Contact.New()
-            name.set(contact.name)
-            email.set(contact.email)
-            phone.set(contact.phone)
-            image.set(contact.image)
+            name.set(contact?.name ?: "")
+            email.set(contact?.email ?: "")
+            phone.set(contact?.phone ?: "")
+            image.set(contact?.image ?: "")
         }
     }
 
@@ -46,7 +46,7 @@ class ContactDetailViewModel(private val app: Application) :
         image.set(imageUri)
     }
 
-    private fun add(contact: Contact) {
+    private fun add(contact: Contact.New) {
         viewModelScope.launch {
             repository.add(contact)
         }

@@ -8,14 +8,14 @@ import com.maxrzhe.contactsapp.repository.RepositoryFactory
 import com.maxrzhe.contactsapp.repository.RepositoryType
 
 class ContactListViewModel(app: Application) : BaseViewModel(app) {
-    private val readAllData: LiveData<List<Contact>>
+    private val readAllData: LiveData<List<Contact.Existing>>
     private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
 
     init {
         readAllData = repository.findAll()
     }
 
-    fun findAll(): LiveData<List<Contact>> {
+    fun findAll(): LiveData<List<Contact.Existing>> {
         return readAllData
     }
 

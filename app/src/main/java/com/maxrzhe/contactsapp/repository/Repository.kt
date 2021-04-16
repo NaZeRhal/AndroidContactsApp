@@ -5,13 +5,13 @@ import com.maxrzhe.contactsapp.model.Contact
 
 interface Repository {
 
-    suspend fun findById(id: Long): Contact
+    suspend fun findById(id: Long): Contact.Existing?
 
-    suspend fun add(contact: Contact)
+    suspend fun add(contact: Contact.New)
 
-    suspend fun update(contact: Contact)
+    suspend fun update(contact: Contact.Existing)
 
-    suspend fun delete(contact: Contact)
+    suspend fun delete(contact: Contact.Existing)
 
-    fun findAll(): LiveData<List<Contact>>
+    fun findAll(): LiveData<List<Contact.Existing>>
 }
