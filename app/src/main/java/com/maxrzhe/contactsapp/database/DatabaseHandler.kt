@@ -39,7 +39,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         onCreate(db)
     }
 
-    fun add(contact: Contact): Long {
+    fun add(contact: Contact.New): Long {
         val db = this.writableDatabase
         val contentValues = getContentValue(contact)
 
@@ -52,7 +52,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         return success
     }
 
-    fun update(contact: Contact): Int {
+    fun update(contact: Contact.Existing): Int {
         val db = this.writableDatabase
         val contentValues = getContentValue(contact)
 
@@ -66,7 +66,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         return success
     }
 
-    fun delete(contact: Contact): Int {
+    fun delete(contact: Contact.Existing): Int {
         val db = this.writableDatabase
 
         val success = db.delete(
@@ -78,8 +78,8 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         return success
     }
 
-    fun findAll(): List<Contact> {
-        var contacts: List<Contact> = emptyList()
+    fun findAll(): List<Contact.Existing> {
+        var contacts: List<Contact.Existing> = emptyList()
         val query = "SELECT * FROM $TABLE_CONTACTS"
 
         val db = this.readableDatabase
@@ -127,12 +127,12 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         return contentValues
     }
 
-    fun findById(id: Long): Contact {
+    fun findById(id: Long): Contact.Existing? {
         val query = "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_ID=$id"
 
         val db = this.readableDatabase
         val cursor: Cursor?
-        var contact = Contact.New()
+        var contact: Contact.Existing? = null
 
         try {
             cursor = db.rawQuery(query, null)
@@ -141,7 +141,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
                 with(raw) {
                     if (moveToFirst()) {
                         do {
-                            contact = Contact.New(
+                            contact = Contact.Existing(
                                 id = getLong(getColumnIndex(KEY_ID)),
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
