@@ -11,12 +11,11 @@ class ContactSqlDao(context: Context) {
     private val dbHandler: DatabaseHandler = DatabaseHandler(context)
 
     private var allContacts = MutableLiveData<List<Contact>>()
-    private var contact = MutableLiveData<Contact>()
 
     fun add(contact: Contact) {
         var contacts = allContacts.value ?: emptyList()
         val id = dbHandler.add(contact)
-        val newContact = Contact(
+        val newContact = Contact.New(
             id = id,
             name = contact.name,
             email = contact.email,
@@ -49,8 +48,7 @@ class ContactSqlDao(context: Context) {
         return allContacts
     }
 
-    fun findById(id: Long): LiveData<Contact?> {
-        contact.value = dbHandler.findById(id)
-        return contact
+    fun findById(id: Long): Contact {
+        return dbHandler.findById(id)
     }
 }

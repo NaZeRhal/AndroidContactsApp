@@ -5,7 +5,7 @@ import com.maxrzhe.contactsapp.model.Contact
 
 interface Repository {
 
-    fun findById(id: Long): LiveData<Contact?>
+    suspend fun findById(id: Long): Contact
 
     suspend fun add(contact: Contact)
 

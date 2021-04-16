@@ -92,7 +92,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
                 with(raw) {
                     if (moveToFirst()) {
                         do {
-                            val contact = Contact(
+                            val contact = Contact.Existing(
                                 id = getLong(getColumnIndex(KEY_ID)),
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
@@ -127,12 +127,12 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         return contentValues
     }
 
-    fun findById(id: Long): Contact? {
+    fun findById(id: Long): Contact {
         val query = "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_ID=$id"
 
         val db = this.readableDatabase
         val cursor: Cursor?
-        var contact: Contact? = null
+        var contact = Contact.New()
 
         try {
             cursor = db.rawQuery(query, null)
@@ -141,7 +141,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
                 with(raw) {
                     if (moveToFirst()) {
                         do {
-                            contact = Contact(
+                            contact = Contact.New(
                                 id = getLong(getColumnIndex(KEY_ID)),
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
@@ -159,7 +159,5 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
             db.close()
             return contact
         }
-
     }
-
 }

@@ -8,13 +8,9 @@ import com.maxrzhe.contactsapp.model.ContactMapping
 
 class ContactRoomRepository(private val contactDao: ContactDao) : Repository {
 
-    override fun findById(id: Long): LiveData<Contact?> {
+    override suspend fun findById(id: Long): Contact {
         val roomContact = contactDao.findById(id)
-        return Transformations.map(roomContact) { contact ->
-            ContactMapping.contactRoomToContact(
-                contact
-            )
-        }
+        return ContactMapping.contactRoomToContact(roomContact)
     }
 
     override suspend fun add(contact: Contact) {

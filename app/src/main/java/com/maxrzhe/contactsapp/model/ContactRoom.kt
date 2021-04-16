@@ -10,8 +10,8 @@ import kotlinx.parcelize.Parcelize
 data class ContactRoom(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
-    val name: String?,
-    val phone: String?,
-    val email: String?,
-    val image: String?
+    val name: String,
+    val phone: String,
+    val email: String,
+    val image: String
 ) : Parcelable

@@ -27,19 +27,14 @@ class ContactDetailViewModel(private val app: Application) :
     val image = ObservableField("")
 
     fun manageSelectedId(selectedId: Long) {
-        id.set(selectedId)
-        if (selectedId > 0) {
-            repository.findById(selectedId).observeForever {
-                name.set(it?.name ?: "")
-                email.set(it?.email ?: "")
-                phone.set(it?.phone ?: "")
-                image.set(it?.image ?: "")
-            }
-        } else {
-            name.set("")
-            email.set("")
-            phone.set("")
-            image.set("")
+        viewModelScope.launch {
+            id.set(selectedId)
+            val contact =
+                if (selectedId > 0) repository.findById(selectedId) else Contact.New()
+            name.set(contact.name)
+            email.set(contact.email)
+            phone.set(contact.phone)
+            image.set(contact.image)
         }
     }
 
@@ -57,7 +52,7 @@ class ContactDetailViewModel(private val app: Application) :
         }
     }
 
-    private fun update(contact: Contact) {
+    private fun update(contact: Contact.Existing) {
         viewModelScope.launch {
             repository.update(contact)
         }
@@ -65,17 +60,23 @@ class ContactDetailViewModel(private val app: Application) :
 
     fun addOrUpdate() {
         if (validateInput()) {
-            val contact = Contact(
-                id = id.get(),
-                name = name.get(),
-                phone = phone.get(),
-                email = email.get(),
-                image = image.get()
-            )
-
-            if (contact.id <= 0) {
+            if (id.get() <= 0) {
+                val contact =
+                    Contact.New(
+                        name = name.get() ?: "",
+                        phone = phone.get() ?: "",
+                        email = email.get() ?: "",
+                        image = image.get() ?: ""
+                    )
                 add(contact)
             } else {
+                val contact = Contact.Existing(
+                    id = id.get(),
+                    name = name.get() ?: "",
+                    phone = phone.get() ?: "",
+                    email = email.get() ?: "",
+                    image = image.get() ?: ""
+                )
                 update(contact)
             }
             _savedMarker.value = true
