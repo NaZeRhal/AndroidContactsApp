@@ -2,7 +2,6 @@ package com.maxrzhe.contactsapp.viewmodel
 
 import android.app.Application
 import androidx.databinding.ObservableField
-import androidx.databinding.ObservableLong
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -20,22 +19,22 @@ class ContactDetailViewModel(private val app: Application) :
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker
 
-    val id: ObservableLong = ObservableLong(0)
+    val id: ObservableField<Long?> = ObservableField(0)
     val name = ObservableField("")
     val email = ObservableField("")
     val phone = ObservableField("")
     val image = ObservableField("")
 
     fun manageSelectedId(selectedId: Long) {
-        viewModelScope.launch {
-            id.set(selectedId)
-            val contact =
-                if (selectedId > 0) repository.findById(selectedId) else Contact.New()
-            name.set(contact?.name ?: "")
-            email.set(contact?.email ?: "")
-            phone.set(contact?.phone ?: "")
-            image.set(contact?.image ?: "")
-        }
+            viewModelScope.launch {
+                id.set(selectedId)
+                val contact =
+                    if (selectedId > 0) repository.findById(selectedId) else Contact.New()
+                name.set(contact?.name ?: "")
+                email.set(contact?.email ?: "")
+                phone.set(contact?.phone ?: "")
+                image.set(contact?.image ?: "")
+            }
     }
 
     fun resetMarker() {
@@ -60,7 +59,16 @@ class ContactDetailViewModel(private val app: Application) :
 
     fun addOrUpdate() {
         if (validateInput()) {
-            if (id.get() <= 0) {
+            if (id.get() != null && id.get()!! > 0) {
+                val contact = Contact.Existing(
+                    id = id.get() ?: 0,
+                    name = name.get() ?: "",
+                    phone = phone.get() ?: "",
+                    email = email.get() ?: "",
+                    image = image.get() ?: ""
+                )
+                update(contact)
+            } else {
                 val contact =
                     Contact.New(
                         name = name.get() ?: "",
@@ -69,15 +77,6 @@ class ContactDetailViewModel(private val app: Application) :
                         image = image.get() ?: ""
                     )
                 add(contact)
-            } else {
-                val contact = Contact.Existing(
-                    id = id.get(),
-                    name = name.get() ?: "",
-                    phone = phone.get() ?: "",
-                    email = email.get() ?: "",
-                    image = image.get() ?: ""
-                )
-                update(contact)
             }
             _savedMarker.value = true
         }

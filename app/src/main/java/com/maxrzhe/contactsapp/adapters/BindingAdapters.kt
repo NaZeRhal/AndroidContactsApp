@@ -17,8 +17,8 @@ fun imageUri(view: ImageView, imageUriString: String?) {
 }
 
 @BindingAdapter("app:addOrChangeImageText")
-fun addOrChangeImageText(v: TextView, id: Long) {
-    if (id <= 0) {
+fun addOrChangeImageText(v: TextView, id: Long?) {
+    if (id != null && id <= 0) {
         v.text = v.context.getString(R.string.detail_tv_add_image_text)
     } else {
         v.text = v.context.getString(R.string.detail_tv_change_image_text)
@@ -26,8 +26,8 @@ fun addOrChangeImageText(v: TextView, id: Long) {
 }
 
 @BindingAdapter("app:addOrChangeButtonText")
-fun addOrChangeButtonText(v: Button, id: Long) {
-    if (id <= 0) {
+fun addOrChangeButtonText(v: Button, id: Long?) {
+    if (id != null && id <= 0) {
         v.text = v.context.getString(R.string.detail_button_add_text)
     } else {
         v.text = v.context.getString(R.string.detail_button_save_changes_text)
