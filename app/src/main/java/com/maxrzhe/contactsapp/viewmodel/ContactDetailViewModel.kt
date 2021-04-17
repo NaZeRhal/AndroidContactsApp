@@ -6,6 +6,7 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.repository.Repository
 import com.maxrzhe.contactsapp.repository.RepositoryFactory
@@ -26,6 +27,24 @@ class ContactDetailViewModel(private val app: Application) :
     val phone = ObservableField("")
     val image = ObservableField("")
     val isChanging = ObservableBoolean(false)
+
+    val imageTextRes: ObservableField<String?> =
+        object : ObservableField<String?>(isChanging) {
+            override fun get(): String {
+                return if (!isChanging.get())
+                    app.applicationContext.getString(R.string.detail_tv_add_image_text)
+                else app.applicationContext.getString(R.string.detail_tv_change_image_text)
+            }
+        }
+
+    val buttonTextRes: ObservableField<String?> =
+        object : ObservableField<String?>(isChanging) {
+            override fun get(): String {
+                return if (!isChanging.get())
+                    app.applicationContext.getString(R.string.detail_button_add_text)
+                else app.applicationContext.getString(R.string.detail_button_save_changes_text)
+            }
+        }
 
     fun manageSelectedId(selectedId: Long) {
         viewModelScope.launch {
