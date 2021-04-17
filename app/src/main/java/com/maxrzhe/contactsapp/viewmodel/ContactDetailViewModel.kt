@@ -28,6 +28,8 @@ class ContactDetailViewModel(private val app: Application) :
     val image = ObservableField("")
     val isChanging = ObservableBoolean(false)
 
+    val isLoading = ObservableBoolean(true)
+
     val imageTextRes: ObservableField<String?> =
         object : ObservableField<String?>(isChanging) {
             override fun get(): String {
@@ -47,6 +49,7 @@ class ContactDetailViewModel(private val app: Application) :
         }
 
     fun manageSelectedId(selectedId: Long) {
+        isLoading.set(true)
         viewModelScope.launch {
             id.set(selectedId)
             val contact =
@@ -56,6 +59,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set(contact?.phone ?: "")
             image.set(contact?.image ?: "")
             isChanging.set(id.get() != null && id.get()!! > 0)
+            isLoading.set(false)
         }
     }
 
