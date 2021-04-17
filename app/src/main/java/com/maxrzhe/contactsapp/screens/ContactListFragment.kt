@@ -41,7 +41,6 @@ class ContactListFragment :
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(contactId: Long) {
                             sharedViewModel.select(contactId)
-
                             onSelectContactListener?.onSelect()
                         }
                     }
@@ -56,7 +55,7 @@ class ContactListFragment :
     }
 
     private fun addContact() = View.OnClickListener {
-        sharedViewModel.select(0)
+        sharedViewModel.select(null)
         onSelectContactListener?.onSelect()
     }
 

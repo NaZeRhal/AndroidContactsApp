@@ -6,10 +6,10 @@ import androidx.lifecycle.MutableLiveData
 
 class SharedViewModel(app: Application) : BaseViewModel(app) {
 
-    private var _contactId = MutableLiveData<Long>(0)
-    val contactId: LiveData<Long> = _contactId
+    private var _contactId = MutableLiveData<Long?>(null)
+    val contactId: LiveData<Long?> = _contactId
 
-    fun select(selectedContactId: Long) {
+    fun select(selectedContactId: Long?) {
         _contactId.value = selectedContactId
     }
 }

@@ -3,6 +3,7 @@ package com.maxrzhe.contactsapp.viewmodel
 import android.app.Application
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
+import androidx.databinding.ObservableInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -21,45 +22,43 @@ class ContactDetailViewModel(private val app: Application) :
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker
 
-    val id: ObservableField<Long?> = ObservableField(0)
-    val name = ObservableField("")
-    val email = ObservableField("")
-    val phone = ObservableField("")
-    val image = ObservableField("")
-    val isChanging = ObservableBoolean(false)
+    private var id: Long? = null
 
+    val name = ObservableField<String?>()
+    val email = ObservableField<String?>()
+    val phone = ObservableField<String?>()
+    val image = ObservableField<String?>()
     val isLoading = ObservableBoolean(true)
 
-    val imageTextRes: ObservableField<String?> =
-        object : ObservableField<String?>(isChanging) {
-            override fun get(): String {
-                return if (!isChanging.get())
-                    app.applicationContext.getString(R.string.detail_tv_add_image_text)
-                else app.applicationContext.getString(R.string.detail_tv_change_image_text)
-            }
-        }
+    val imageTextRes = ObservableInt(R.string.detail_tv_add_image_text)
+    val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
 
-    val buttonTextRes: ObservableField<String?> =
-        object : ObservableField<String?>(isChanging) {
-            override fun get(): String {
-                return if (!isChanging.get())
-                    app.applicationContext.getString(R.string.detail_button_add_text)
-                else app.applicationContext.getString(R.string.detail_button_save_changes_text)
-            }
-        }
-
-    fun manageSelectedId(selectedId: Long) {
+    fun manageSelectedId(selectedId: Long?) {
         isLoading.set(true)
+        id = selectedId
         viewModelScope.launch {
-            id.set(selectedId)
             val contact =
-                if (selectedId > 0) repository.findById(selectedId) else Contact.New()
-            name.set(contact?.name ?: "")
-            email.set(contact?.email ?: "")
-            phone.set(contact?.phone ?: "")
-            image.set(contact?.image ?: "")
-            isChanging.set(id.get() != null && id.get()!! > 0)
+                if (selectedId != null) repository.findById(selectedId) else Contact.New()
+            setupFields(contact)
             isLoading.set(false)
+        }
+    }
+
+    private fun setupFields(contact: Contact?) {
+        if (contact == null || contact is Contact.New) {
+            name.set("")
+            email.set("")
+            phone.set("")
+            image.set("")
+            imageTextRes.set(R.string.detail_tv_add_image_text)
+            buttonTextRes.set(R.string.detail_button_add_text)
+        } else {
+            name.set(contact.name)
+            email.set(contact.email)
+            phone.set(contact.phone)
+            image.set(contact.image)
+            imageTextRes.set(R.string.detail_tv_change_image_text)
+            buttonTextRes.set(R.string.detail_button_save_changes_text)
         }
     }
 
@@ -69,6 +68,7 @@ class ContactDetailViewModel(private val app: Application) :
 
     fun manageImageUri(imageUri: String) {
         image.set(imageUri)
+        imageTextRes.set(R.string.detail_tv_change_image_text)
     }
 
     private fun add(contact: Contact.New) {
@@ -85,15 +85,17 @@ class ContactDetailViewModel(private val app: Application) :
 
     fun addOrUpdate() {
         if (validateInput()) {
-            if (isChanging.get()) {
-                val contact = Contact.Existing(
-                    id = id.get() ?: 0,
-                    name = name.get() ?: "",
-                    phone = phone.get() ?: "",
-                    email = email.get() ?: "",
-                    image = image.get() ?: ""
-                )
-                update(contact)
+            if (id != null) {
+                id?.let {
+                    val contact = Contact.Existing(
+                        id = it,
+                        name = name.get() ?: "",
+                        phone = phone.get() ?: "",
+                        email = email.get() ?: "",
+                        image = image.get() ?: ""
+                    )
+                    update(contact)
+                }
             } else {
                 val contact =
                     Contact.New(
