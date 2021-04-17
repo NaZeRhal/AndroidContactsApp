@@ -1,6 +1,7 @@
 package com.maxrzhe.contactsapp.viewmodel
 
 import android.app.Application
+import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,17 +25,19 @@ class ContactDetailViewModel(private val app: Application) :
     val email = ObservableField("")
     val phone = ObservableField("")
     val image = ObservableField("")
+    val isChanging = ObservableBoolean(false)
 
     fun manageSelectedId(selectedId: Long) {
-            viewModelScope.launch {
-                id.set(selectedId)
-                val contact =
-                    if (selectedId > 0) repository.findById(selectedId) else Contact.New()
-                name.set(contact?.name ?: "")
-                email.set(contact?.email ?: "")
-                phone.set(contact?.phone ?: "")
-                image.set(contact?.image ?: "")
-            }
+        viewModelScope.launch {
+            id.set(selectedId)
+            val contact =
+                if (selectedId > 0) repository.findById(selectedId) else Contact.New()
+            name.set(contact?.name ?: "")
+            email.set(contact?.email ?: "")
+            phone.set(contact?.phone ?: "")
+            image.set(contact?.image ?: "")
+            isChanging.set(id.get() != null && id.get()!! > 0)
+        }
     }
 
     fun resetMarker() {
@@ -59,7 +62,7 @@ class ContactDetailViewModel(private val app: Application) :
 
     fun addOrUpdate() {
         if (validateInput()) {
-            if (id.get() != null && id.get()!! > 0) {
+            if (isChanging.get()) {
                 val contact = Contact.Existing(
                     id = id.get() ?: 0,
                     name = name.get() ?: "",
