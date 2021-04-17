@@ -20,7 +20,7 @@ class ContactAdapter(
     private val onSearchResultListener: OnSearchResultListener?
         get() = (context as? OnSearchResultListener)
 
-    var itemList: List<Contact> = emptyList()
+    var itemList: List<Contact.Existing> = emptyList()
         set(value) {
             field = value
             performFiltering(filter)
@@ -33,10 +33,10 @@ class ContactAdapter(
         }
 
     private val sortedList = SortedList(
-        Contact::class.java,
-        object : SortedList.Callback<Contact>() {
+        Contact.Existing::class.java,
+        object : SortedList.Callback<Contact.Existing>() {
 
-            override fun compare(contact1: Contact?, contact2: Contact?): Int {
+            override fun compare(contact1: Contact.Existing?, contact2: Contact.Existing?): Int {
                 return if (contact1?.name != null && contact2?.name != null) {
                     contact1.name.toLowerCase(Locale.getDefault())
                         .compareTo(contact2.name.toLowerCase(Locale.getDefault()))
@@ -59,13 +59,19 @@ class ContactAdapter(
                 notifyItemRangeChanged(position, count)
             }
 
-            override fun areContentsTheSame(oldContact: Contact?, newContact: Contact?): Boolean {
+            override fun areContentsTheSame(
+                oldContact: Contact.Existing?,
+                newContact: Contact.Existing?
+            ): Boolean {
                 return if (oldContact != null && newContact != null) {
                     oldContact == newContact
                 } else false
             }
 
-            override fun areItemsTheSame(contact1: Contact?, contact2: Contact?): Boolean {
+            override fun areItemsTheSame(
+                contact1: Contact.Existing?,
+                contact2: Contact.Existing?
+            ): Boolean {
                 return if (contact1 != null && contact2 != null) {
                     contact1.id == contact2.id
                 } else false
@@ -93,7 +99,7 @@ class ContactAdapter(
                 .into(ivContactImage)
 
             root.setOnClickListener {
-                onContactClickListener.onClick(contact)
+                onContactClickListener.onClick(contact.id)
             }
         }
     }
@@ -116,7 +122,7 @@ class ContactAdapter(
         replaceAll(filteredContacts)
     }
 
-    private fun replaceAll(contacts: List<Contact>) {
+    private fun replaceAll(contacts: List<Contact.Existing>) {
         sortedList.beginBatchedUpdates()
         (sortedList.size() - 1 downTo 0 step 1).forEach { i ->
             val contact = sortedList[i]
@@ -130,15 +136,15 @@ class ContactAdapter(
 
     private fun anyMatches(contact: Contact, pattern: String): Boolean {
         return with(contact) {
-            name?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
-                    email?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false ||
-                    phone?.toLowerCase(Locale.getDefault())?.contains(pattern) ?: false
+            name.toLowerCase(Locale.getDefault()).contains(pattern) ||
+                    email.toLowerCase(Locale.getDefault()).contains(pattern) ||
+                    phone.toLowerCase(Locale.getDefault()).contains(pattern)
         }
     }
 
 
     interface OnContactClickListener {
-        fun onClick(contact: Contact)
+        fun onClick(contactId: Long)
     }
 
     interface OnSearchResultListener {
