@@ -22,6 +22,21 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(
         private const val KEY_PHONE = "phone"
         private const val KEY_EMAIL = "email"
         private const val KEY_IMAGE = "image"
+
+        @Volatile
+        private var INSTANCE: DatabaseHandler? = null
+
+        fun getInstance(context: Context): DatabaseHandler {
+            val tmpInstance = INSTANCE
+            if (tmpInstance != null) {
+                return tmpInstance
+            }
+            synchronized(this) {
+                val instance = DatabaseHandler(context)
+                INSTANCE = instance
+                return instance
+            }
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase?) {

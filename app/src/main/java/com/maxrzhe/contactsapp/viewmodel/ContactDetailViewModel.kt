@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 class ContactDetailViewModel(private val app: Application) :
     BaseViewModel(app) {
 
+//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
     private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
 
     private var _savedMarker = MutableLiveData(false)
