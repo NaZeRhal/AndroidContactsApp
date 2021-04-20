@@ -8,9 +8,26 @@ import com.maxrzhe.contactsapp.model.Contact
 
 class ContactSqlDao(context: Context) {
 
-    private val dbHandler: DatabaseHandler = DatabaseHandler(context)
+    private val dbHandler: DatabaseHandler = DatabaseHandler.getInstance(context)
 
     private var allContacts = MutableLiveData<List<Contact.Existing>>()
+
+    companion object {
+        @Volatile
+        private var INSTANCE: ContactSqlDao? = null
+
+        fun getInstance(context: Context): ContactSqlDao {
+            val tmpInstance = INSTANCE
+            if (tmpInstance != null) {
+                return tmpInstance
+            }
+            synchronized(this) {
+                val instance = ContactSqlDao(context)
+                INSTANCE = instance
+                return instance
+            }
+        }
+    }
 
     fun add(contact: Contact.New) {
         var contacts = allContacts.value ?: emptyList()

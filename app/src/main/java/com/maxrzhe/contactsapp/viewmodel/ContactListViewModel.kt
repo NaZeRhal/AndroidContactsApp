@@ -9,6 +9,7 @@ import com.maxrzhe.contactsapp.repository.RepositoryType
 
 class ContactListViewModel(app: Application) : BaseViewModel(app) {
     private val readAllData: LiveData<List<Contact.Existing>>
+//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
     private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
 
     init {
