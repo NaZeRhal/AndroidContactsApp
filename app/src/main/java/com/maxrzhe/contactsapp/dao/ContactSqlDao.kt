@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.contactsapp.database.DatabaseHandler
 import com.maxrzhe.contactsapp.model.Contact
 
-class ContactSqlDao(context: Context) {
+class ContactSqlDao private constructor(context: Context) {
 
     private val dbHandler: DatabaseHandler = DatabaseHandler.getInstance(context)
 

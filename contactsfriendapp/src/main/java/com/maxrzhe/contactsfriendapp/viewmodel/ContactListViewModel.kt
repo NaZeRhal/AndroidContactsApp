@@ -2,21 +2,26 @@ package com.maxrzhe.contactsfriendapp.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.maxrzhe.contactsfriendapp.data.ContactProviderHandler
 import com.maxrzhe.contactsfriendapp.model.Contact
-import com.maxrzhe.contactsfriendapp.repository.Repository
-import com.maxrzhe.contactsfriendapp.repository.RepositoryFactory
-import com.maxrzhe.contactsfriendapp.repository.RepositoryType
+import kotlinx.coroutines.launch
 
 class ContactListViewModel(app: Application) : BaseViewModel(app) {
-    private val readAllData: LiveData<List<Contact.Existing>>
-//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
-    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
+
+    private var _readAllData = MutableLiveData<List<Contact>>()
+    private val readAllData: LiveData<List<Contact>> = _readAllData
+
+    private val providerHandler = ContactProviderHandler(app)
 
     init {
-        readAllData = repository.findAll()
+        viewModelScope.launch {
+            _readAllData.value = providerHandler.readAllContacts().value
+        }
     }
 
-    fun findAll(): LiveData<List<Contact.Existing>> {
+    fun findAll(): LiveData<List<Contact>> {
         return readAllData
     }
 

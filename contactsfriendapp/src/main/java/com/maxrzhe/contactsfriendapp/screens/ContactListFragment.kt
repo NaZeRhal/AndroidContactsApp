@@ -1,7 +1,6 @@
 package com.maxrzhe.contactsfriendapp.screens
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -46,17 +45,11 @@ class ContactListFragment :
                     }
                 )
                 adapter = contactAdapter
-                fabAdd.setOnClickListener(addContact())
             }
         }
         viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
-    }
-
-    private fun addContact() = View.OnClickListener {
-        sharedViewModel.select(null)
-        onSelectContactListener?.onSelect()
     }
 
     fun filter(newText: String?) {
