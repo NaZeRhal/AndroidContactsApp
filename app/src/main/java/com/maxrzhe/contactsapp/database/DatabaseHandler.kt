@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.maxrzhe.contactsapp.model.Contact
 
-class DatabaseHandler(context: Context) : SQLiteOpenHelper(
+class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
     context, DATABASE_NAME, null, DATABASE_VERSION
 ) {
 

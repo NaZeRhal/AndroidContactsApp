@@ -23,7 +23,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:toggleVisibility="@{viewModel.isLoading}"
+            toggleVisibility="@{viewModel.isLoading}"
             tools:visibility="visible" />
 
         <ScrollView
@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:clickable="true"
             android:focusable="true"
-            app:toggleVisibility="@{!viewModel.isLoading}">
+            toggleVisibility="@{!viewModel.isLoading}">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                     android:layout_height="@dimen/detail_iv_avatar_height"
                     android:layout_marginTop="@dimen/detail_iv_avatar_marginTop"
                     android:contentDescription="@string/detail_description_avatar"
-                    app:imageUri="@{viewModel.image}"
+                    imageUri="@{viewModel.image}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

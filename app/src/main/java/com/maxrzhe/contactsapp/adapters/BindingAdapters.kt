@@ -6,7 +6,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.maxrzhe.contactsapp.R
 
-@BindingAdapter("app:imageUri")
+@BindingAdapter("imageUri")
 fun imageUri(view: ImageView, imageUriString: String?) {
     if (imageUriString == null || imageUriString.isEmpty()) {
         view.setImageResource(R.drawable.person_placeholder)
@@ -15,7 +15,7 @@ fun imageUri(view: ImageView, imageUriString: String?) {
     }
 }
 
-@BindingAdapter("app:toggleVisibility")
+@BindingAdapter("toggleVisibility")
 fun toggleVisibility(v: View, isVisible: Boolean) {
     v.visibility = if (isVisible) View.VISIBLE else View.GONE
 }
