@@ -7,7 +7,7 @@ import com.maxrzhe.contactsapp.repository.Repository
 import com.maxrzhe.contactsapp.repository.RepositoryFactory
 import com.maxrzhe.contactsapp.repository.RepositoryType
 
-class ContactListViewModel(app: Application) : BaseViewModel(app) {
+class ContactListViewModel(app: Application) : com.maxrzhe.core.viewmodel.BaseViewModel(app) {
     private val readAllData: LiveData<List<Contact.Existing>>
     private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
 //    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)

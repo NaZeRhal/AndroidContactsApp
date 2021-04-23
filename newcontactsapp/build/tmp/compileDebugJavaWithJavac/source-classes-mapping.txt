@@ -1,0 +1,2 @@
+com/maxrzhe/newcontactsapp/BuildConfig.java
+ com.maxrzhe.newcontactsapp.BuildConfig

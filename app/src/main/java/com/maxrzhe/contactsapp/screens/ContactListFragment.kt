@@ -3,9 +3,7 @@ package com.maxrzhe.contactsapp.screens
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.contactsapp.adapters.ContactAdapter
 import com.maxrzhe.contactsapp.databinding.FragmentContactListBinding
 import com.maxrzhe.contactsapp.viewmodel.BaseViewModelFactory
@@ -13,7 +11,7 @@ import com.maxrzhe.contactsapp.viewmodel.ContactListViewModel
 import com.maxrzhe.contactsapp.viewmodel.SharedViewModel
 
 class ContactListFragment :
-    BaseFragment<FragmentContactListBinding, ContactListViewModel>() {
+    com.maxrzhe.core.screens.BaseFragment<FragmentContactListBinding, ContactListViewModel>() {
     private var contactAdapter: ContactAdapter? = null
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()

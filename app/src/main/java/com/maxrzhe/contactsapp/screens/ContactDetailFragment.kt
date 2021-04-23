@@ -10,7 +10,6 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.maxrzhe.contactsapp.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contactsapp.viewmodel.BaseViewModelFactory
@@ -23,7 +22,7 @@ import java.io.OutputStream
 import java.util.*
 
 class ContactDetailFragment :
-    BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
+    com.maxrzhe.core.screens.BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
     private var imageUri: String? = null
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()

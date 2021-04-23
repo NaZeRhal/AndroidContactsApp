@@ -6,16 +6,14 @@ import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contactsapp.R
 import com.maxrzhe.contactsapp.model.Contact
 import com.maxrzhe.contactsapp.repository.Repository
 import com.maxrzhe.contactsapp.repository.RepositoryFactory
 import com.maxrzhe.contactsapp.repository.RepositoryType
-import kotlinx.coroutines.launch
 
 class ContactDetailViewModel(private val app: Application) :
-    BaseViewModel(app) {
+    com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
     private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
 //    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
