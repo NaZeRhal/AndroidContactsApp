@@ -1,2 +1,3 @@
+include ':newcontactsapp'
 include ':app'
 rootProject.name = "ContactsApp"
