@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contacts.R
+import com.maxrzhe.contacts.provider.ContactProviderHandler
 import com.maxrzhe.contacts.repository.Repository
 import com.maxrzhe.contacts.repository.RepositoryFactory
 import com.maxrzhe.contacts.repository.RepositoryType
@@ -17,8 +18,9 @@ import kotlinx.coroutines.launch
 class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
-    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
-//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
+//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
+//        private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
+    private val providerHandler = ContactProviderHandler(app)
 
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker
@@ -38,8 +40,10 @@ class ContactDetailViewModel(private val app: Application) :
         isLoading.set(true)
         id = selectedId
         viewModelScope.launch {
+//            val contact =
+//                if (selectedId != null) repository.findById(selectedId) else Contact.New()
             val contact =
-                if (selectedId != null) repository.findById(selectedId) else Contact.New()
+                if (selectedId != null) providerHandler.loadContact(selectedId) else Contact.New()
             setupFields(contact)
             isLoading.set(false)
         }
@@ -74,13 +78,13 @@ class ContactDetailViewModel(private val app: Application) :
 
     private fun add(contact: Contact.New) {
         viewModelScope.launch {
-            repository.add(contact)
+//            repository.add(contact)
         }
     }
 
     private fun update(contact: Contact.Existing) {
         viewModelScope.launch {
-            repository.update(contact)
+//            repository.update(contact)
         }
     }
 

@@ -18,11 +18,10 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
 
         const val TABLE_CONTACTS = "Contacts_table"
         const val KEY_ID = "_id"
-
-        private const val KEY_NAME = "name"
-        private const val KEY_PHONE = "phone"
-        private const val KEY_EMAIL = "email"
-        private const val KEY_IMAGE = "image"
+        const val KEY_NAME = "name"
+        const val KEY_PHONE = "phone"
+        const val KEY_EMAIL = "email"
+        const val KEY_IMAGE = "image"
 
         @Volatile
         private var INSTANCE: DatabaseHandler? = null

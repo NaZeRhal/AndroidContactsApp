@@ -23,8 +23,7 @@
             android:name="com.maxrzhe.contacts.provider.ContactContentProvider"
             android:authorities="com.maxrzhe.contacts.provider.ContactContentProvider"
             android:exported="true"
-            android:readPermission="com.maxrzhe.contacts.provider.READ_DATABASE"
-            android:writePermission="com.maxrzhe.contacts.provider.WRITE_DATABASE" />
+            android:grantUriPermissions="true" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
