@@ -1,3 +1,4 @@
+include ':newcontactsapp'
 include ':contacts'
 include ':core'
 include ':app'
