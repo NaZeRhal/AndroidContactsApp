@@ -1,11 +1,10 @@
 package com.maxrzhe.contacts.screens
 
-import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -89,10 +88,16 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
     }
 
     private fun saveImageToInternalStorage(selectedImage: Bitmap): Uri {
-        val wrapper = ContextWrapper(requireContext())
-        val dir = wrapper.getDir(IMAGE_DIRECTORY, Context.MODE_PRIVATE)
+        val filePath = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.getStorageDirectory()
+        } else {
+            Environment.getExternalStorageDirectory()
+        }
+        val dir = File("${filePath.absoluteFile}/${IMAGE_DIRECTORY}")
+        dir.mkdir()
         val imageName = "${UUID.randomUUID()}.jpg"
         val file = File(dir, imageName)
+
         try {
             val stream: OutputStream = FileOutputStream(file)
             selectedImage.compress(Bitmap.CompressFormat.JPEG, 75, stream)

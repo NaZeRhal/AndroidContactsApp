@@ -11,13 +11,11 @@ import com.maxrzhe.core.viewmodel.BaseViewModel
 
 class ContactListViewModel(app: Application) : BaseViewModel(app) {
     private val readAllData: LiveData<List<Contact.Existing>>
-//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
-//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
-    private val providerFactory = ContactProviderHandler(app)
+    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
+//    private val repository: Repository = ContactProviderHandler(app)
 
     init {
-//        readAllData = repository.findAll()
-        readAllData = providerFactory.readAllContacts()
+        readAllData = repository.findAll()
     }
 
     fun findAll(): LiveData<List<Contact.Existing>> {
