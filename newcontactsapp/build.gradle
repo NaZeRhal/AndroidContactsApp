@@ -10,7 +10,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.maxrzhe.contactsapp"
+        applicationId "com.maxrzhe.newcontactsapp"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
