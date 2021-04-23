@@ -10,15 +10,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ContactsApp">
-        <activity android:name="com.maxrzhe.contacts.screens.ContactsListActivity"
-            android:screenOrientation="portrait"
-            >
+        <activity
+            android:name="com.maxrzhe.contacts.screens.ContactsListActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name="com.maxrzhe.contacts.provider.ContactContentProvider"
+            android:authorities="com.maxrzhe.contacts.provider.ContactContentProvider"
+            android:exported="true"
+            android:readPermission="com.maxrzhe.contacts.provider.READ_DATABASE"
+            android:writePermission="com.maxrzhe.contacts.provider.WRITE_DATABASE" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
