@@ -5,13 +5,14 @@ import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.maxrzhe.contacts.R
+import java.io.File
 
 @BindingAdapter("imageUri")
 fun imageUri(view: ImageView, imageUriString: String?) {
     if (imageUriString == null || imageUriString.isEmpty()) {
         view.setImageResource(R.drawable.person_placeholder)
     } else {
-        view.setImageURI(Uri.parse(imageUriString))
+        view.setImageURI(Uri.fromFile(File(imageUriString)))
     }
 }
 

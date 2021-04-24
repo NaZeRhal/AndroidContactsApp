@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -62,7 +63,7 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
     fun setupImage(contentUri: Uri) {
         try {
             val selectedImage = getCapturedImage(contentUri)
-            imageUri = saveImageToInternalStorage(selectedImage).toString()
+            imageUri = saveImageToExternalStorage(selectedImage).toString()
             imageUri?.let {
                 viewModel.manageImageUri(it)
             }
@@ -87,13 +88,13 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
         }
     }
 
-    private fun saveImageToInternalStorage(selectedImage: Bitmap): Uri {
+    private fun saveImageToExternalStorage(selectedImage: Bitmap): Uri {
         val filePath = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.getStorageDirectory()
         } else {
             Environment.getExternalStorageDirectory()
         }
-        val dir = File("${filePath.absoluteFile}/${IMAGE_DIRECTORY}")
+        val dir = File("${filePath.absolutePath}/${IMAGE_DIRECTORY}")
         dir.mkdir()
         val imageName = "${UUID.randomUUID()}.jpg"
         val file = File(dir, imageName)
@@ -106,6 +107,7 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
         } catch (e: IOException) {
             e.printStackTrace()
         }
+        Log.i("NEW_IMAGE", "saveImageToExternalStorage: ${file.absolutePath}")
         return Uri.parse(file.absolutePath)
     }
 

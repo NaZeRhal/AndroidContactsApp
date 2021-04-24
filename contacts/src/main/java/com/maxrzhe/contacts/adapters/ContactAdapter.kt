@@ -1,6 +1,11 @@
 package com.maxrzhe.contacts.adapters
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -9,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.databinding.ItemContactBinding
 import com.maxrzhe.core.model.Contact
+import java.io.File
 import java.util.*
 
 class ContactAdapter(
@@ -96,7 +102,7 @@ class ContactAdapter(
 
             Glide
                 .with(context)
-                .load(contact.image)
+                .load(Uri.fromFile(File(contact.image)))
                 .placeholder(R.drawable.person_placeholder)
                 .circleCrop()
                 .into(ivContactImage)
@@ -144,7 +150,6 @@ class ContactAdapter(
                     phone.toLowerCase(Locale.getDefault()).contains(pattern)
         }
     }
-
 
     interface OnContactClickListener {
         fun onClick(contactId: Long)
