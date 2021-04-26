@@ -18,7 +18,6 @@ class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
     private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
-//    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.ROOM)
 
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker
