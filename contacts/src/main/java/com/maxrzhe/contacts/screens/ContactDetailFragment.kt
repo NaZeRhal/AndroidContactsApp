@@ -49,6 +49,7 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
 
     override fun initView() {
         sharedViewModel.contactId.observe(viewLifecycleOwner, {
+            Log.i("PER_AL", "initView: selectedId=$it")
             viewModel.manageSelectedId(it)
         })
         viewModel.savedMarker.observe(viewLifecycleOwner, {

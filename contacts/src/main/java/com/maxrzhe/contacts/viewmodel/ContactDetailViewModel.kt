@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.provider.ContactProviderHandler
 import com.maxrzhe.contacts.repository.Repository
 import com.maxrzhe.contacts.repository.RepositoryFactory
 import com.maxrzhe.contacts.repository.RepositoryType
@@ -19,7 +18,6 @@ class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
     private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
-//    private val repository: Repository = ContactProviderHandler(app)
 
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker

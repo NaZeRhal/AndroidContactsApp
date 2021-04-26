@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ContactsApp">
         <activity
-            android:name="com.maxrzhe.contacts.screens.ContactsListActivity"
+            android:name="com.maxrzhe.newcontactsapp.screens.ContactsConsumerListActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
