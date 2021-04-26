@@ -1,14 +1,11 @@
 package com.maxrzhe.newcontactsapp.screens
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
-import com.maxrzhe.contacts.viewmodel.SharedViewModel
 import com.maxrzhe.core.screens.BaseFragment
 import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerListViewModel
 import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerViewModelFactory
@@ -16,14 +13,6 @@ import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerViewModelFactory
 class ContactConsumerListFragment :
     BaseFragment<FragmentContactListBinding, ContactConsumerListViewModel>() {
     private var contactAdapter: ContactAdapter? = null
-
-    private val sharedViewModel by activityViewModels<SharedViewModel>()
-
-    private val onSelectContactListener: OnSelectContactListener?
-        get() = (context as? OnSelectContactListener)
-
-    private val onInitFragmentViewListener: OnInitFragmentViewListener?
-        get() = (context as? OnInitFragmentViewListener)
 
     override val viewModelFactory: ViewModelProvider.Factory
         get() = ContactConsumerViewModelFactory(requireActivity().application)
@@ -44,39 +33,20 @@ class ContactConsumerListFragment :
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(contactId: Long) {
-                            sharedViewModel.select(contactId)
-                            onSelectContactListener?.onSelect()
+                            //NOTHING TO DO
                         }
                     }
                 )
                 adapter = contactAdapter
-                fabAdd.setOnClickListener(addContact())
             }
         }
 
-        onInitFragmentViewListener?.run {
-            if (onInitFragmentView()) {
-                viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
-                    contactAdapter?.itemList = contacts
-                })
-            }
-        }
-    }
-
-    private fun addContact() = View.OnClickListener {
-        sharedViewModel.select(null)
-        onSelectContactListener?.onSelect()
+        viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
+            contactAdapter?.itemList = contacts
+        })
     }
 
     fun filter(newText: String?) {
         contactAdapter?.filter = newText
-    }
-
-    interface OnSelectContactListener {
-        fun onSelect()
-    }
-
-    interface OnInitFragmentViewListener {
-        fun onInitFragmentView(): Boolean
     }
 }

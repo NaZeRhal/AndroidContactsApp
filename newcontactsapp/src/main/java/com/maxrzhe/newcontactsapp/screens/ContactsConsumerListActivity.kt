@@ -1,7 +1,6 @@
 package com.maxrzhe.newcontactsapp.screens
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,12 +8,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -30,12 +27,9 @@ import androidx.fragment.app.commit
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.ActivityListContactsBinding
-import com.maxrzhe.contacts.screens.ContactDetailFragment
-import com.maxrzhe.contacts.screens.ContactDetailFragment.*
 
-class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
-    ContactConsumerListFragment.OnSelectContactListener, OnTakeImageListener,
-    ContactAdapter.OnSearchResultListener, ContactConsumerListFragment.OnInitFragmentViewListener {
+class ContactsConsumerListActivity : AppCompatActivity(),
+    ContactAdapter.OnSearchResultListener {
     private lateinit var binding: ActivityListContactsBinding
 
     private var isLandscape: Boolean = false
@@ -43,7 +37,6 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
     private var menuItemSearch: MenuItem? = null
 
     companion object {
-        private const val DETAILS_TAG = "storage"
         private const val LIST_TAG = "contact_list"
     }
 
@@ -74,21 +67,10 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val isAllowed = permissions.entries.all { it.value != false }
             if (isAllowed) {
-                onInitFragmentView()
+                binding.pbMain?.visibility = View.GONE
+                binding.flContainer.visibility = View.VISIBLE
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-    private val imageResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.let {
-                    val contentUri = it.data as Uri
-                    val detailFragment =
-                        supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
-                    detailFragment?.setupImage(contentUri)
-                }
             }
         }
 
@@ -104,8 +86,11 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
 
         isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-        val detailFragment =
-            supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
+        binding.pbMain?.visibility = View.VISIBLE
+        binding.flContainer.visibility = View.GONE
+
+        checkForStoragePermission()
+
         val contactConsumerListFragment =
             supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactConsumerListFragment
                 ?: ContactConsumerListFragment()
@@ -121,10 +106,6 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
                 popBackStackImmediate()
                 commit {
                     replace(R.id.fl_container, contactConsumerListFragment, LIST_TAG)
-
-                    detailFragment?.let {
-                        replace(R.id.fl_details, it, DETAILS_TAG)
-                    }
                     setReorderingAllowed(true)
                 }
             }
@@ -201,38 +182,7 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
         unregisterReceiver(wifiBroadcastReceiver)
     }
 
-    override fun onSave() {
-        if (!isLandscape) {
-            menuItemSearch?.isVisible = true
-            toolbar?.setDisplayHomeAsUpEnabled(false)
-        }
-
-        if (!isLandscape) {
-            supportFragmentManager.popBackStackImmediate()
-        }
-        Toast.makeText(this, "Contact saved", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onSelect() {
-        binding.tvSearchResult?.visibility = View.GONE
-        if (!isLandscape) {
-            menuItemSearch?.isVisible = false
-            toolbar?.setDisplayHomeAsUpEnabled(true)
-        }
-
-        val detailFragment = ContactDetailFragment()
-        supportFragmentManager.commit {
-            if (isLandscape) {
-                replace(R.id.fl_details, detailFragment, DETAILS_TAG)
-            } else {
-                add(R.id.fl_container, detailFragment, DETAILS_TAG)
-                addToBackStack(null)
-            }
-            setReorderingAllowed(true)
-        }
-    }
-
-    private fun checkForStoragePermission(): Boolean {
+    private fun checkForStoragePermission() {
         val storagePermissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -255,10 +205,10 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
                     permissionRequestLauncher.launch(storagePermissions)
                 }
             } else {
-                return true
+                binding.pbMain?.visibility = View.GONE
+                binding.flContainer.visibility = View.VISIBLE
             }
         }
-        return true
     }
 
     private fun showDialog(permissions: Array<String>) {
@@ -270,19 +220,6 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
             }
         }
             .show()
-    }
-
-    private fun choosePhotoFromGallery() {
-        val galleryIntent =
-            Intent(
-                Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            )
-        imageResultLauncher.launch(galleryIntent)
-    }
-
-    override fun onTakeImage() {
-        choosePhotoFromGallery()
     }
 
     override fun onSearchResult(resultCount: Int) {
@@ -299,10 +236,6 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
             binding.tvSearchResult?.visibility = View.GONE
             binding.tvSearchResult?.text = ""
         }
-    }
-
-    override fun onInitFragmentView(): Boolean {
-        return checkForStoragePermission()
     }
 }
 
