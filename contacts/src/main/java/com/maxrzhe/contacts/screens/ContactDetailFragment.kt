@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -49,7 +48,6 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
 
     override fun initView() {
         sharedViewModel.contactId.observe(viewLifecycleOwner, {
-            Log.i("PER_AL", "initView: selectedId=$it")
             viewModel.manageSelectedId(it)
         })
         viewModel.savedMarker.observe(viewLifecycleOwner, {
@@ -108,7 +106,6 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        Log.i("NEW_IMAGE", "saveImageToExternalStorage: ${file.absolutePath}")
         return Uri.parse(file.absolutePath)
     }
 

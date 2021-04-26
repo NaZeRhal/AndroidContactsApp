@@ -1,6 +1,5 @@
 package com.maxrzhe.newcontactsapp.screens
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +44,6 @@ class ContactConsumerListFragment :
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(contactId: Long) {
-                            Log.i("PER_AL", "onClick: click")
                             sharedViewModel.select(contactId)
                             onSelectContactListener?.onSelect()
                         }
@@ -57,7 +55,6 @@ class ContactConsumerListFragment :
         }
 
         onInitFragmentViewListener?.run {
-            Log.i("PER_AL", "initView: ${onInitFragmentView()}")
             if (onInitFragmentView()) {
                 viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
                     contactAdapter?.itemList = contacts

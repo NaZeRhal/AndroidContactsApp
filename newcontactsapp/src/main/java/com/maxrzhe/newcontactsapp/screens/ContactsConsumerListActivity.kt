@@ -15,7 +15,6 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -221,7 +220,6 @@ class ContactsConsumerListActivity : AppCompatActivity(), OnSaveContactListener,
             toolbar?.setDisplayHomeAsUpEnabled(true)
         }
 
-        Log.i("PER_AL", "onSelect: click")
         val detailFragment = ContactDetailFragment()
         supportFragmentManager.commit {
             if (isLandscape) {
