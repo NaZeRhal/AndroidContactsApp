@@ -27,11 +27,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:vs_currentValue="0"
         app:vs_nickColor="@android:color/holo_red_light"
-        app:vs_nickLength="20dp"
-        app:vs_nickWidth="3dp"
+        app:vs_nickLength="25dp"
+        app:vs_nickWidth="2dp"
         app:vs_strokeColor="@android:color/holo_blue_dark"
-        app:vs_strokeRadius="100dp"
-        app:vs_strokeWidth="4dp" />
+        app:vs_strokeRadius="150dp"
+        app:vs_strokeWidth="5dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

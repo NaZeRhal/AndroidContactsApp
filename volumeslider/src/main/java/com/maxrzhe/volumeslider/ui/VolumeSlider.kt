@@ -5,6 +5,7 @@ import android.graphics.*
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -24,13 +25,14 @@ class VolumeSlider @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr), GestureDetector.OnGestureListener {
 
     companion object {
-        private const val DEFAULT_SLIDER_SIZE_DP = 100
+        private const val DEFAULT_SLIDER_WIDTH_SIZE_DP = 100
+        private const val DEFAULT_SLIDER_HEIGHT_SIZE_DP = 115
         private const val DEFAULT_STROKE_RADIUS_DP = 50
         private const val DEFAULT_STROKE_COLOR = Color.BLACK
-        private const val DEFAULT_STROKE_WIDTH_DP = 3
+        private const val DEFAULT_STROKE_WIDTH_DP = 2
         private const val DEFAULT_NICK_COLOR = Color.RED
-        private const val DEFAULT_NICK_WIDTH_DP = 3
-        private const val DEFAULT_NICK_LENGTH_DP = 20
+        private const val DEFAULT_NICK_WIDTH_DP = 2
+        private const val DEFAULT_NICK_LENGTH_DP = 15
     }
 
     @Px
@@ -127,8 +129,9 @@ class VolumeSlider @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val initSize = resolveDefaultSize(widthMeasureSpec)
-        setMeasuredDimension(initSize, initSize)
+        val initWidth = resolveWidthSize(widthMeasureSpec)
+        val initHeight = resolveHeightSize(heightMeasureSpec)
+        setMeasuredDimension(initWidth, initHeight)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -215,15 +218,27 @@ class VolumeSlider @JvmOverloads constructor(
         canvas.drawOval(sliderFrame, strokePaint)
     }
 
-    private fun resolveDefaultSize(spec: Int): Int {
+    private fun resolveHeightSize(spec: Int): Int {
+        return when (MeasureSpec.getMode(spec)) {
+            MeasureSpec.AT_MOST -> min(
+                MeasureSpec.getSize(spec),
+                (sliderStrokeRadius * 2 + slideStrokeWidth * 0.5).toInt()
+            )
+            MeasureSpec.EXACTLY -> MeasureSpec.getSize(spec)
+            MeasureSpec.UNSPECIFIED -> context.dpToPx(DEFAULT_SLIDER_HEIGHT_SIZE_DP).toInt()
+            else -> MeasureSpec.getSize(spec)
+        }
+    }
+
+    private fun resolveWidthSize(spec: Int): Int {
         resolveFixedNicks()
         return when (MeasureSpec.getMode(spec)) {
             MeasureSpec.AT_MOST -> min(
                 MeasureSpec.getSize(spec),
-                (nickRightStart.x - nickLeftStart.x)
+                (nickRightStart.x - nickLeftStart.x).coerceAtLeast((sliderStrokeRadius * 2 + slideStrokeWidth * 0.5).toInt())
             )
             MeasureSpec.EXACTLY -> MeasureSpec.getSize(spec)
-            MeasureSpec.UNSPECIFIED -> context.dpToPx(DEFAULT_SLIDER_SIZE_DP).toInt()
+            MeasureSpec.UNSPECIFIED -> context.dpToPx(DEFAULT_SLIDER_WIDTH_SIZE_DP).toInt()
             else -> MeasureSpec.getSize(spec)
         }
     }
@@ -275,7 +290,7 @@ class VolumeSlider @JvmOverloads constructor(
     ): Boolean {
         val rotationDegrees = calculateAngle(e2?.x, e2?.y)
         currentValue = (rotationDegrees / 2.4).toInt()
-        if (rotationDegrees >= 0 && currentValue <= 100) {
+        if (currentValue in 0..100) {
             resolveMovingNick()
             invalidate()
         }
