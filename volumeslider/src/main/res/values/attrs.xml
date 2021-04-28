@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="VolumeSlider">
+        <attr name="vs_strokeColor" format="color" />
+        <attr name="vs_strokeRadius" format="dimension" />
+        <attr name="vs_strokeWidth" format="dimension" />
+        <attr name="vs_nickColor" format="color" />
+        <attr name="vs_nickLength" format="dimension" />
+        <attr name="vs_nickWidth" format="dimension" />
+        <attr name="vs_currentValue" format="integer"/>
+    </declare-styleable>
+</resources>

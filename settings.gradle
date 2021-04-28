@@ -1,3 +1,4 @@
+include ':volumeslider'
 include ':newcontactsapp'
 include ':contacts'
 include ':core'
