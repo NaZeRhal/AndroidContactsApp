@@ -185,6 +185,9 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
                 onBackPressed()
                 binding.tvSearchResult?.visibility = View.VISIBLE
             }
+            R.id.menu_item_volume -> {
+                startActivity(Intent(this, VolumeSettingActivity::class.java))
+            }
         }
         return super.onOptionsItemSelected(item)
     }

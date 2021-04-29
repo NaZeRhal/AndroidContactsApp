@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.maxrzhe.contacts.viewmodel.VolumeSettingViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".screens.VolumeSettingActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tb_volume_settings"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/toolbar_background_color"
+            android:theme="@style/ToolbarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:titleTextColor="@color/white" />
+
+        <TextView
+            android:id="@+id/tv_current_volume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="@={viewModel.currentVolume}"
+            android:textSize="32sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tb_volume_settings" />
+
+        <com.maxrzhe.volumeslider.ui.VolumeSlider
+            android:id="@+id/vs_volume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:currentValue="@={viewModel.volumeValue}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:vs_nickColor="@android:color/holo_red_light"
+            app:vs_nickLength="25dp"
+            app:vs_nickWidth="2dp"
+            app:vs_strokeColor="@android:color/holo_blue_dark"
+            app:vs_strokeRadius="150dp"
+            app:vs_strokeWidth="5dp" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
