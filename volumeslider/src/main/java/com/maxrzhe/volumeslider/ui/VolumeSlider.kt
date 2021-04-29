@@ -5,7 +5,6 @@ import android.graphics.*
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -53,7 +52,7 @@ class VolumeSlider @JvmOverloads constructor(
     @ColorInt
     private var nickColor = DEFAULT_NICK_COLOR
 
-    private var currentValue: Int = 0
+    var currentValue: Int = 0
 
     private val center = Point()
     private val nickLeftStart = Point()
@@ -99,7 +98,7 @@ class VolumeSlider @JvmOverloads constructor(
             sliderColor =
                 ta.getColor(R.styleable.VolumeSlider_vs_strokeColor, DEFAULT_STROKE_COLOR)
             nickColor = ta.getColor(R.styleable.VolumeSlider_vs_nickColor, DEFAULT_NICK_COLOR)
-            currentValue = ta.getInt(R.styleable.VolumeSlider_vs_currentValue, 0)
+            currentValue = ta.getInt(R.styleable.VolumeSlider_currentValue, 0)
             ta.recycle()
         }
         setup()
@@ -278,6 +277,13 @@ class VolumeSlider @JvmOverloads constructor(
             nickMovingStart.y - (nickLength * sin(Math.toRadians(30.0 - currentValue.toFloat() * 2.4))).toInt()
     }
 
+    fun setSliderRotationListener(sliderRotationListener: SliderRotationListener) {
+        this.listener = sliderRotationListener
+    }
+
+    fun isSameValue(value: Int) = this.currentValue == value
+
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         return if (gestureDetector.onTouchEvent(event)) true else super.onTouchEvent(event)
     }
@@ -289,7 +295,8 @@ class VolumeSlider @JvmOverloads constructor(
         distanceY: Float
     ): Boolean {
         val rotationDegrees = calculateAngle(e2?.x, e2?.y)
-        currentValue = (rotationDegrees / 2.4).toInt()
+        val tmpAngle = (rotationDegrees / 2.4).toInt()
+        currentValue = if (tmpAngle < 0) currentValue else tmpAngle
         if (currentValue in 0..100) {
             resolveMovingNick()
             invalidate()

@@ -7,6 +7,6 @@
         <attr name="vs_nickColor" format="color" />
         <attr name="vs_nickLength" format="dimension" />
         <attr name="vs_nickWidth" format="dimension" />
-        <attr name="vs_currentValue" format="integer"/>
+        <attr name="currentValue" format="integer"/>
     </declare-styleable>
 </resources>
