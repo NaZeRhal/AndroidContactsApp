@@ -55,7 +55,10 @@ class ContactSqlDao private constructor(context: Context) {
     }
 
     fun delete(contact: Contact.Existing) {
+        var contacts = allContacts.value ?: emptyList()
+        contacts = contacts - listOf(contact)
         dbHandler.delete(contact)
+        allContacts.value = contacts
     }
 
     fun findAll(): LiveData<List<Contact.Existing>> {

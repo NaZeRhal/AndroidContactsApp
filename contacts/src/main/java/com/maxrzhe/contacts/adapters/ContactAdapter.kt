@@ -1,11 +1,7 @@
 package com.maxrzhe.contacts.adapters
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -114,6 +110,10 @@ class ContactAdapter(
     }
 
     override fun getItemCount(): Int = sortedList.size()
+
+    fun getContactAt(position: Int): Contact.Existing {
+        return sortedList[position]
+    }
 
     private fun performFiltering(query: String?) {
         val filteredContacts = if (query == null || query.isEmpty()) {

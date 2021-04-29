@@ -5,7 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
@@ -49,7 +51,22 @@ class ContactListFragment :
                 adapter = contactAdapter
                 fabAdd.setOnClickListener(addContact())
             }
+
+            val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    contactAdapter?.apply {
+                        val contact = getContactAt(position)
+                        viewModel.delete(contact)
+                    }
+                }
+            }
+
+            ItemTouchHelper(swipeToDeleteCallback).apply {
+                attachToRecyclerView(rvContactList)
+            }
         }
+
         viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
