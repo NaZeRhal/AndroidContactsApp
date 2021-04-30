@@ -1,6 +1,7 @@
 package com.maxrzhe.contacts.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
@@ -41,6 +42,7 @@ class ContactDetailViewModel(private val app: Application) :
                 if (selectedId != null) repository.findById(selectedId) else Contact.New()
             setupFields(contact)
             isLoading.set(false)
+            Log.i("ISLOAD", "manageSelectedId: ${isLoading.get()}")
         }
     }
 

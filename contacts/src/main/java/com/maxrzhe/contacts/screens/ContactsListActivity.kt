@@ -225,6 +225,12 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
 
         val detailFragment = ContactDetailFragment()
         supportFragmentManager.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
             if (isLandscape) {
                 replace(R.id.fl_details, detailFragment, DETAILS_TAG)
             } else {
