@@ -35,10 +35,10 @@
             android:layout_height="@dimen/detail_iv_avatar_height"
             android:layout_marginTop="@dimen/detail_iv_avatar_marginTop"
             android:contentDescription="@string/detail_description_avatar"
-            tools:src="@drawable/person_placeholder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/person_placeholder" />
 
         <TextView
             android:id="@+id/tv_add_image"
@@ -72,11 +72,7 @@
                 android:layout_marginTop="@dimen/detail_ll_edit_marginTop"
                 android:layout_marginEnd="@dimen/detail_ll_edit_marginEnd"
                 android:orientation="vertical"
-                android:padding="@dimen/detail_ll_edit_padding"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_avatar">
-
+                android:padding="@dimen/detail_ll_edit_padding">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_name"
@@ -117,11 +113,68 @@
                         android:theme="@style/EditText" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <androidx.constraintlayout.motion.widget.MotionLayout
+                    android:id="@+id/constraintLayout3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layoutDescription="@xml/fragment_contact_detail_xml_constraintlayout3_scene">
+
+                    <TextView
+                        android:id="@+id/tv_birth_date"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto"
+                        android:hint="@string/detail_hint_enter_birth_date"
+                        android:padding="8dp"
+                        android:text="@{viewModel.date}"
+                        android:textColorHint="@android:color/darker_gray"
+                        android:textSize="@dimen/detail_et_phone_textSize" />
+
+                    <ImageButton
+                        android:id="@+id/ivb_arrow"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/image_arrow"
+                        android:src="@drawable/ic_baseline_arrow_drop_down_24"
+                        android:tint="#666666"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_birth_date"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_birth_date"
+                        app:layout_constraintTop_toTopOf="@id/tv_birth_date" />
+
+                    <View
+                        android:id="@+id/v_divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/purple_500"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_birth_date" />
+
+                    <DatePicker
+                        android:id="@+id/dp_birthday"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:calendarViewShown="false"
+                        android:datePickerMode="spinner"
+                        android:day="@={viewModel.day}"
+                        android:month="@={viewModel.month}"
+                        android:onDateChanged="@{(v, year, month, day) -> viewModel.onDateChanged(year, month, day)}"
+                        android:overScrollMode="always"
+                        android:year="@={viewModel.year}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/v_divider" />
+                </androidx.constraintlayout.motion.widget.MotionLayout>
+
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_email"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     app:hintTextAppearance="@style/HintText"
                     app:hintTextColor="@color/purple_700">
 

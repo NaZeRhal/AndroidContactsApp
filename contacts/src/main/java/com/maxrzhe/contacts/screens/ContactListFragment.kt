@@ -55,8 +55,8 @@ class ContactListFragment :
             val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     val position = viewHolder.adapterPosition
-                    contactAdapter?.apply {
-                        val contact = getContactAt(position)
+                    contactAdapter?.let {
+                        val contact = it.getContactAt(position)
                         viewModel.delete(contact)
                     }
                 }

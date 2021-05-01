@@ -18,4 +18,5 @@
         <item quantity="few">%s контакта найдено</item>
         <item quantity="many">%s контактов найдено</item>
     </plurals>
+    <string name="detail_hint_enter_birth_date">Дата рождения</string>
 </resources>

@@ -22,6 +22,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         const val KEY_PHONE = "phone"
         const val KEY_EMAIL = "email"
         const val KEY_IMAGE = "image"
+        const val KEY_DATE = "date"
 
         @Volatile
         private var INSTANCE: DatabaseHandler? = null
@@ -45,7 +46,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                 "$KEY_NAME TEXT, " +
                 "$KEY_EMAIL TEXT, " +
                 "$KEY_PHONE TEXT, " +
-                "$KEY_IMAGE TEXT)"
+                "$KEY_IMAGE TEXT, " +
+                "$KEY_DATE TEXT)"
         db?.execSQL(sql)
     }
 
@@ -112,7 +114,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
                                 email = getString(getColumnIndex(KEY_EMAIL)),
-                                image = getString(getColumnIndex(KEY_IMAGE))
+                                image = getString(getColumnIndex(KEY_IMAGE)),
+                                birthDate = getString(getColumnIndex(KEY_DATE))
                             )
                             contacts = contacts + listOf(contact)
                         } while (moveToNext())
@@ -137,6 +140,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                 put(KEY_PHONE, phone)
                 put(KEY_EMAIL, email)
                 put(KEY_IMAGE, image)
+                put(KEY_DATE, birthDate)
             }
         }
         return contentValues
@@ -161,7 +165,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
                                 email = getString(getColumnIndex(KEY_EMAIL)),
-                                image = getString(getColumnIndex(KEY_IMAGE))
+                                image = getString(getColumnIndex(KEY_IMAGE)),
+                                birthDate = getString(getColumnIndex(KEY_DATE))
                             )
                         } while (moveToNext())
                     }
