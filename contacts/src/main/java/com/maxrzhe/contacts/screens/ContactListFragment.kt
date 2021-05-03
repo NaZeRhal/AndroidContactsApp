@@ -1,5 +1,6 @@
 package com.maxrzhe.contacts.screens
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.maxrzhe.core.screens.BaseFragment
 class ContactListFragment :
     BaseFragment<FragmentContactListBinding, ContactListViewModel>() {
     private var contactAdapter: ContactAdapter? = null
+    private var isFavorites = false
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
 
@@ -31,6 +33,13 @@ class ContactListFragment :
         FragmentContactListBinding::inflate
 
     override fun getViewModelClass() = ContactListViewModel::class.java
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            isFavorites = it.getBoolean(IS_FAVORITES)
+        }
+    }
 
     override fun bindView() {}
 
@@ -49,7 +58,6 @@ class ContactListFragment :
                     }
                 )
                 adapter = contactAdapter
-                fabAdd.setOnClickListener(addContact())
             }
 
             val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
@@ -66,15 +74,10 @@ class ContactListFragment :
                 attachToRecyclerView(rvContactList)
             }
         }
-
+        viewModel.isFavorites.set(isFavorites)
         viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
-    }
-
-    private fun addContact() = View.OnClickListener {
-        sharedViewModel.select(null)
-        onSelectContactListener?.onSelect()
     }
 
     fun filter(newText: String?) {
@@ -83,5 +86,9 @@ class ContactListFragment :
 
     interface OnSelectContactListener {
         fun onSelect()
+    }
+
+    companion object {
+        const val IS_FAVORITES = "is_favorites"
     }
 }

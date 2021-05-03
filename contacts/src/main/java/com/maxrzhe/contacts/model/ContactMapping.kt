@@ -12,7 +12,8 @@ abstract class ContactMapping {
                     email = email,
                     phone = phone,
                     image = image,
-                    birthDate = birthDate
+                    birthDate = birthDate,
+                    isFavorite = isFavorite
                 )
             } else {
                 ContactRoom(
@@ -20,7 +21,8 @@ abstract class ContactMapping {
                     email = email,
                     phone = phone,
                     image = image,
-                    birthDate = birthDate
+                    birthDate = birthDate,
+                    isFavorite = isFavorite
                 )
             }
         }
@@ -33,7 +35,8 @@ abstract class ContactMapping {
                     email = email,
                     phone = phone,
                     image = image,
-                    birthDate = birthDate
+                    birthDate = birthDate,
+                    isFavorite = isFavorite
                 )
             } else null
         }
@@ -47,7 +50,8 @@ abstract class ContactMapping {
                         email = email,
                         phone = phone,
                         image = image,
-                        birthDate = birthDate
+                        birthDate = birthDate,
+                        isFavorite = isFavorite
                     )
                 }
             }

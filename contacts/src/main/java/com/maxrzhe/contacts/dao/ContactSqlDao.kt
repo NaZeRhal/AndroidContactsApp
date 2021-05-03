@@ -38,7 +38,8 @@ class ContactSqlDao private constructor(context: Context) {
             email = contact.email,
             phone = contact.phone,
             image = contact.image,
-            birthDate = contact.birthDate
+            birthDate = contact.birthDate,
+            isFavorite = contact.isFavorite
         )
         contacts = contacts + listOf(newContact)
         allContacts.value = contacts

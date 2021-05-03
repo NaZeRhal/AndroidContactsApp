@@ -14,6 +14,7 @@ import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
@@ -27,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.ActivityListContactsBinding
@@ -35,16 +37,20 @@ import com.maxrzhe.contacts.screens.ContactListFragment.*
 
 class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
     OnSelectContactListener, OnTakeImageListener,
-    ContactAdapter.OnSearchResultListener {
+    ContactAdapter.OnSearchResultListener, HomeFragment.OnAddContactListener,
+    HomeFragment.OnChangeCurrentPositionListener {
     private lateinit var binding: ActivityListContactsBinding
 
     private var isLandscape: Boolean = false
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
+    private var bottomNavigationView: BottomNavigationView? = null
+    private var currentPosition = 0
 
     companion object {
         private const val DETAILS_TAG = "storage"
-        private const val LIST_TAG = "contact_list"
+        private const val HOME_TAG = "contacts_home"
+        private const val CURRENT_POSITION = "current_position"
     }
 
     private val batteryBroadcastReceiver = object : BroadcastReceiver() {
@@ -104,23 +110,45 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
 
         isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+        val homeFragment =
+            supportFragmentManager.findFragmentByTag(HOME_TAG) as? HomeFragment ?: HomeFragment()
         val detailFragment =
             supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
-        val contactListFragment =
-            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
-                ?: ContactListFragment()
+
+        bottomNavigationView = binding.bnvMain
+        bottomNavigationView?.menu?.getItem(currentPosition)?.isChecked = true
+
+        bottomNavigationView?.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.bottom_menu_home -> {
+                    homeFragment.viewPager?.currentItem = 0
+                }
+                R.id.bottom_menu_fav -> {
+                    homeFragment.viewPager?.currentItem = 1
+                }
+                R.id.bottom_menu_settings -> {
+                    homeFragment.viewPager?.currentItem = 2
+                }
+                else -> {
+                }
+            }
+            true
+        }
+
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                add(R.id.fl_container, contactListFragment, LIST_TAG)
+                add(R.id.fl_container, homeFragment, HOME_TAG)
             }
+        } else {
+            currentPosition = savedInstanceState.getInt(CURRENT_POSITION)
         }
 
         if (isLandscape) {
             supportFragmentManager.apply {
                 popBackStackImmediate()
                 commit {
-                    replace(R.id.fl_container, contactListFragment, LIST_TAG)
+                    replace(R.id.fl_container, homeFragment, HOME_TAG)
 
                     detailFragment?.let {
                         replace(R.id.fl_details, it, DETAILS_TAG)
@@ -167,9 +195,9 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
 
                     override fun onQueryTextChange(newText: String?): Boolean {
                         val contactListFragment =
-                            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
-                                ?: ContactListFragment()
-                        contactListFragment.filter(newText)
+                            supportFragmentManager.findFragmentByTag(HOME_TAG) as? HomeFragment
+                                ?: HomeFragment()
+//                        contactListFragment.filter(newText)
                         return true
                     }
                 })
@@ -190,6 +218,11 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.putInt(CURRENT_POSITION, currentPosition)
     }
 
     override fun onResume() {
@@ -214,6 +247,10 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
             supportFragmentManager.popBackStackImmediate()
         }
         Toast.makeText(this, "Contact saved", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onAdd() {
+        onSelect()
     }
 
     override fun onSelect() {
@@ -308,5 +345,9 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
             binding.tvSearchResult?.text = ""
         }
     }
-}
 
+    override fun onChange(position: Int) {
+        currentPosition = position
+        bottomNavigationView?.menu?.getItem(position)?.isChecked = true
+    }
+}

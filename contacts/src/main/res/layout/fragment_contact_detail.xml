@@ -52,6 +52,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_avatar" />
 
+        <ImageView
+            android:id="@+id/iv_fav"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:onClick="@{() -> viewModel.changeFavorite()}"
+            toggleFavorite="@{viewModel.isFavorite}"
+            android:src="@drawable/ic_baseline_star_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@android:color/darker_gray" />
+
         <ScrollView
             android:id="@+id/sv_detail"
             toggleVisibility="@{!viewModel.isLoading}"

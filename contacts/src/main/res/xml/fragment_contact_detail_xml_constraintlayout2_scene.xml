@@ -24,6 +24,10 @@
                 android:alpha="0.2"
                 motion:framePosition="25"
                 motion:motionTarget="@+id/sv_detail" />
+            <KeyAttribute
+                motion:motionTarget="@+id/iv_fav"
+                motion:framePosition="100"
+                android:alpha="0" />
         </KeyFrameSet>
         <OnClick motion:targetId="@+id/iv_avatar" />
     </Transition>

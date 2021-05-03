@@ -9,6 +9,7 @@ sealed class Contact {
     abstract val phone: String
     abstract val image: String
     abstract val birthDate: String
+    abstract val isFavorite: Int
 
     @Parcelize
     data class New(
@@ -16,7 +17,8 @@ sealed class Contact {
         override val email: String = "",
         override val phone: String = "",
         override val image: String = "",
-        override val birthDate: String = ""
+        override val birthDate: String = "",
+        override val isFavorite: Int = 0
     ) : Contact(), Parcelable
 
     @Parcelize
@@ -26,6 +28,7 @@ sealed class Contact {
         override val email: String,
         override val phone: String,
         override val image: String,
-        override val birthDate: String = ""
+        override val birthDate: String = "",
+        override val isFavorite: Int = 0
     ) : Contact(), Parcelable
 }

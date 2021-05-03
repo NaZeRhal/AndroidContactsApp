@@ -34,6 +34,7 @@ class ContactDetailViewModel(private val app: Application) :
     val phone = ObservableField<String?>()
     val image = ObservableField<String?>()
     val date = ObservableField<String?>()
+    val isFavorite = ObservableBoolean()
     val isLoading = ObservableBoolean(true)
 
     val year = ObservableInt()
@@ -61,6 +62,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set("")
             image.set("")
             date.set("")
+            isFavorite.set(false)
             imageTextRes.set(R.string.detail_tv_add_image_text)
             buttonTextRes.set(R.string.detail_button_add_text)
         } else {
@@ -69,6 +71,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set(contact.phone)
             image.set(contact.image)
             date.set(contact.birthDate)
+            isFavorite.set(contact.isFavorite == 1)
             parseDate(contact.birthDate)
             imageTextRes.set(R.string.detail_tv_change_image_text)
             buttonTextRes.set(R.string.detail_button_save_changes_text)
@@ -82,6 +85,10 @@ class ContactDetailViewModel(private val app: Application) :
     fun manageImageUri(imageUri: String) {
         image.set(imageUri)
         imageTextRes.set(R.string.detail_tv_change_image_text)
+    }
+
+    fun changeFavorite() {
+        isFavorite.set(!isFavorite.get())
     }
 
     private fun add(contact: Contact.New) {
@@ -129,7 +136,8 @@ class ContactDetailViewModel(private val app: Application) :
                         phone = phone.get() ?: "",
                         email = email.get() ?: "",
                         image = image.get() ?: "",
-                        birthDate = date.get() ?: ""
+                        birthDate = date.get() ?: "",
+                        isFavorite = if (isFavorite.get()) 1 else 0
                     )
                     update(contact)
                 }
@@ -140,7 +148,8 @@ class ContactDetailViewModel(private val app: Application) :
                         phone = phone.get() ?: "",
                         email = email.get() ?: "",
                         image = image.get() ?: "",
-                        birthDate = date.get() ?: ""
+                        birthDate = date.get() ?: "",
+                        isFavorite = if (isFavorite.get()) 1 else 0
                     )
                 add(contact)
             }

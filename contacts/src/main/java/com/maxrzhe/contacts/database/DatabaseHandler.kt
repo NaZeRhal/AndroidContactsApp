@@ -23,6 +23,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         const val KEY_EMAIL = "email"
         const val KEY_IMAGE = "image"
         const val KEY_DATE = "date"
+        const val KEY_FAVORITE = "favorite"
 
         @Volatile
         private var INSTANCE: DatabaseHandler? = null
@@ -47,7 +48,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                 "$KEY_EMAIL TEXT, " +
                 "$KEY_PHONE TEXT, " +
                 "$KEY_IMAGE TEXT, " +
-                "$KEY_DATE TEXT)"
+                "$KEY_DATE TEXT, " +
+                "$KEY_FAVORITE INTEGER)"
         db?.execSQL(sql)
     }
 
@@ -115,7 +117,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                                 phone = getString(getColumnIndex(KEY_PHONE)),
                                 email = getString(getColumnIndex(KEY_EMAIL)),
                                 image = getString(getColumnIndex(KEY_IMAGE)),
-                                birthDate = getString(getColumnIndex(KEY_DATE))
+                                birthDate = getString(getColumnIndex(KEY_DATE)),
+                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE))
                             )
                             contacts = contacts + listOf(contact)
                         } while (moveToNext())
@@ -141,6 +144,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                 put(KEY_EMAIL, email)
                 put(KEY_IMAGE, image)
                 put(KEY_DATE, birthDate)
+                put(KEY_FAVORITE, isFavorite)
             }
         }
         return contentValues
@@ -166,7 +170,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                                 phone = getString(getColumnIndex(KEY_PHONE)),
                                 email = getString(getColumnIndex(KEY_EMAIL)),
                                 image = getString(getColumnIndex(KEY_IMAGE)),
-                                birthDate = getString(getColumnIndex(KEY_DATE))
+                                birthDate = getString(getColumnIndex(KEY_DATE)),
+                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE))
                             )
                         } while (moveToNext())
                     }
