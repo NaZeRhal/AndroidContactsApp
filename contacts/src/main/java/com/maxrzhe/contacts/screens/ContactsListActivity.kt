@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -34,12 +35,15 @@ import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.ActivityListContactsBinding
 import com.maxrzhe.contacts.screens.ContactDetailFragment.*
 import com.maxrzhe.contacts.screens.ContactListFragment.*
+import com.maxrzhe.contacts.viewmodel.SearchViewModel
 
 class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
     OnSelectContactListener, OnTakeImageListener,
     ContactAdapter.OnSearchResultListener, HomeFragment.OnAddContactListener,
     HomeFragment.OnChangeCurrentPositionListener {
     private lateinit var binding: ActivityListContactsBinding
+
+    private val searchViewModel by viewModels<SearchViewModel>()
 
     private var isLandscape: Boolean = false
     private var toolbar: ActionBar? = null
@@ -194,10 +198,7 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        val contactListFragment =
-                            supportFragmentManager.findFragmentByTag(HOME_TAG) as? HomeFragment
-                                ?: HomeFragment()
-//                        contactListFragment.filter(newText)
+                        searchViewModel.setQuery(newText)
                         return true
                     }
                 })

@@ -13,6 +13,7 @@ import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactListViewModel
+import com.maxrzhe.contacts.viewmodel.SearchViewModel
 import com.maxrzhe.contacts.viewmodel.SharedViewModel
 import com.maxrzhe.core.screens.BaseFragment
 
@@ -22,6 +23,7 @@ class ContactListFragment :
     private var isFavorites = false
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
+    private val searchViewModel by activityViewModels<SearchViewModel>()
 
     private val onSelectContactListener: OnSelectContactListener?
         get() = (context as? OnSelectContactListener)
@@ -78,10 +80,9 @@ class ContactListFragment :
         viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
-    }
-
-    fun filter(newText: String?) {
-        contactAdapter?.filter = newText
+        searchViewModel.query.observe(viewLifecycleOwner, { query ->
+            contactAdapter?.filter = query
+        })
     }
 
     interface OnSelectContactListener {
