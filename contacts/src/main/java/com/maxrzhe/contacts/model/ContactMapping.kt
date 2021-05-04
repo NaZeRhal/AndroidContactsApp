@@ -6,15 +6,38 @@ abstract class ContactMapping {
     companion object {
         fun contactToContactRoom(contact: Contact): ContactRoom = with(contact) {
             if (this is Contact.Existing) {
-                ContactRoom(id = id, name = name, email = email, phone = phone, image = image)
+                ContactRoom(
+                    id = id,
+                    name = name,
+                    email = email,
+                    phone = phone,
+                    image = image,
+                    birthDate = birthDate,
+                    isFavorite = isFavorite
+                )
             } else {
-                ContactRoom(name = name, email = email, phone = phone, image = image)
+                ContactRoom(
+                    name = name,
+                    email = email,
+                    phone = phone,
+                    image = image,
+                    birthDate = birthDate,
+                    isFavorite = isFavorite
+                )
             }
         }
 
         fun contactRoomToContact(contactRoom: ContactRoom?): Contact.Existing? = with(contactRoom) {
             if (this != null) {
-                Contact.Existing(id = id, name = name, email = email, phone = phone, image = image)
+                Contact.Existing(
+                    id = id,
+                    name = name,
+                    email = email,
+                    phone = phone,
+                    image = image,
+                    birthDate = birthDate,
+                    isFavorite = isFavorite
+                )
             } else null
         }
 
@@ -26,7 +49,9 @@ abstract class ContactMapping {
                         name = name,
                         email = email,
                         phone = phone,
-                        image = image
+                        image = image,
+                        birthDate = birthDate,
+                        isFavorite = isFavorite
                     )
                 }
             }

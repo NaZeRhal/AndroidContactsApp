@@ -7,7 +7,9 @@ import android.database.SQLException
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_DATE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_EMAIL
+import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_FAVORITE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_ID
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_IMAGE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_NAME
@@ -39,7 +41,9 @@ class ContactProviderHandler(private val context: Context) : Repository {
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
                                 email = getString(getColumnIndex(KEY_EMAIL)),
-                                image = getString(getColumnIndex(KEY_IMAGE))
+                                image = getString(getColumnIndex(KEY_IMAGE)),
+                                birthDate = getString(getColumnIndex(KEY_DATE)),
+                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE)) == 1
                             )
                             contacts = contacts + listOf(contact)
                         } while (moveToNext())
@@ -66,7 +70,9 @@ class ContactProviderHandler(private val context: Context) : Repository {
                             name = getString(getColumnIndex(KEY_NAME)),
                             phone = getString(getColumnIndex(KEY_PHONE)),
                             email = getString(getColumnIndex(KEY_EMAIL)),
-                            image = getString(getColumnIndex(KEY_IMAGE))
+                            image = getString(getColumnIndex(KEY_IMAGE)),
+                            birthDate = getString(getColumnIndex(KEY_DATE)),
+                            isFavorite = getInt(getColumnIndex(KEY_FAVORITE)) == 1
                         )
                     }
                 }

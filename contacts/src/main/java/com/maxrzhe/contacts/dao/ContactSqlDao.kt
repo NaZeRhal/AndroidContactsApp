@@ -37,7 +37,9 @@ class ContactSqlDao private constructor(context: Context) {
             name = contact.name,
             email = contact.email,
             phone = contact.phone,
-            image = contact.image
+            image = contact.image,
+            birthDate = contact.birthDate,
+            isFavorite = contact.isFavorite
         )
         contacts = contacts + listOf(newContact)
         allContacts.value = contacts
@@ -55,7 +57,10 @@ class ContactSqlDao private constructor(context: Context) {
     }
 
     fun delete(contact: Contact.Existing) {
+        var contacts = allContacts.value ?: emptyList()
+        contacts = contacts - listOf(contact)
         dbHandler.delete(contact)
+        allContacts.value = contacts
     }
 
     fun findAll(): LiveData<List<Contact.Existing>> {

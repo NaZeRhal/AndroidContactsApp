@@ -24,6 +24,13 @@ fun toggleVisibility(v: View, isVisible: Boolean) {
     v.visibility = if (isVisible) View.VISIBLE else View.GONE
 }
 
+@BindingAdapter("tint")
+fun setTint(v: ImageView, resId: Int?) {
+    if (resId != null) {
+        v.setColorFilter(resId)
+    }
+}
+
 @BindingAdapter("currentValueAttrChanged")
 fun setListener(volumeSlider: VolumeSlider, listener: InverseBindingListener) {
     volumeSlider.setSliderRotationListener(object : VolumeSlider.SliderRotationListener {

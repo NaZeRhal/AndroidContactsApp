@@ -14,37 +14,42 @@ import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.ActivityListContactsBinding
 import com.maxrzhe.contacts.screens.ContactDetailFragment.*
 import com.maxrzhe.contacts.screens.ContactListFragment.*
+import com.maxrzhe.contacts.viewmodel.SearchViewModel
 
 class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
-    OnSelectContactListener, OnTakeImageListener,
-    ContactAdapter.OnSearchResultListener {
+    OnSelectContactListener, OnTakeImageListener, HomeFragment.OnAddContactListener,
+    HomeFragment.OnChangeCurrentPositionListener {
     private lateinit var binding: ActivityListContactsBinding
+
+    private val searchViewModel by viewModels<SearchViewModel>()
 
     private var isLandscape: Boolean = false
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
+    private var currentPosition = 0
 
     companion object {
         private const val DETAILS_TAG = "storage"
-        private const val LIST_TAG = "contact_list"
+        private const val HOME_TAG = "contacts_home"
+        private const val CURRENT_POSITION = "current_position"
     }
 
     private val batteryBroadcastReceiver = object : BroadcastReceiver() {
@@ -104,23 +109,24 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
 
         isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+        val homeFragment =
+            supportFragmentManager.findFragmentByTag(HOME_TAG) as? HomeFragment ?: HomeFragment()
         val detailFragment =
             supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
-        val contactListFragment =
-            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
-                ?: ContactListFragment()
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                add(R.id.fl_container, contactListFragment, LIST_TAG)
+                add(R.id.fl_container, homeFragment, HOME_TAG)
             }
+        } else {
+            currentPosition = savedInstanceState.getInt(CURRENT_POSITION)
         }
 
         if (isLandscape) {
             supportFragmentManager.apply {
                 popBackStackImmediate()
                 commit {
-                    replace(R.id.fl_container, contactListFragment, LIST_TAG)
+                    replace(R.id.fl_container, homeFragment, HOME_TAG)
 
                     detailFragment?.let {
                         replace(R.id.fl_details, it, DETAILS_TAG)
@@ -166,10 +172,7 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        val contactListFragment =
-                            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactListFragment
-                                ?: ContactListFragment()
-                        contactListFragment.filter(newText)
+                        searchViewModel.setQuery(newText)
                         return true
                     }
                 })
@@ -183,13 +186,18 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
                 menuItemSearch?.isVisible = true
                 toolbar?.setDisplayHomeAsUpEnabled(false)
                 onBackPressed()
-                binding.tvSearchResult?.visibility = View.VISIBLE
+//                binding.tvSearchResult?.visibility = View.VISIBLE
             }
             R.id.menu_item_volume -> {
                 startActivity(Intent(this, VolumeSettingActivity::class.java))
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.putInt(CURRENT_POSITION, currentPosition)
     }
 
     override fun onResume() {
@@ -216,8 +224,11 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
         Toast.makeText(this, "Contact saved", Toast.LENGTH_SHORT).show()
     }
 
+    override fun onAdd() {
+        onSelect()
+    }
+
     override fun onSelect() {
-        binding.tvSearchResult?.visibility = View.GONE
         if (!isLandscape) {
             menuItemSearch?.isVisible = false
             toolbar?.setDisplayHomeAsUpEnabled(true)
@@ -225,6 +236,12 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
 
         val detailFragment = ContactDetailFragment()
         supportFragmentManager.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
             if (isLandscape) {
                 replace(R.id.fl_details, detailFragment, DETAILS_TAG)
             } else {
@@ -287,20 +304,7 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
         checkForStoragePermission()
     }
 
-    override fun onSearchResult(resultCount: Int) {
-        if (resultCount >= 0) {
-            binding.tvSearchResult?.visibility = View.VISIBLE
-            val result =
-                resources.getQuantityString(
-                    R.plurals.search_result_plurals,
-                    resultCount,
-                    resultCount
-                )
-            binding.tvSearchResult?.text = result
-        } else {
-            binding.tvSearchResult?.visibility = View.GONE
-            binding.tvSearchResult?.text = ""
-        }
+    override fun onChange(position: Int) {
+        currentPosition = position
     }
 }
-

@@ -23,6 +23,7 @@ import java.io.OutputStream
 import java.util.*
 
 class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
+
     private var imageUri: String? = null
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
