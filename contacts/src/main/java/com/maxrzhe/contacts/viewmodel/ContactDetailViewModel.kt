@@ -28,7 +28,7 @@ class ContactDetailViewModel(private val app: Application) :
     private var calendar = Calendar.getInstance()
 
     private var id: Long? = null
-    private var isFavorite = ObservableBoolean(false)
+    private var isFavorite = false
 
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
@@ -63,7 +63,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set("")
             image.set("")
             date.set("")
-            isFavorite.set(false)
+            isFavorite = false
             toggleTint()
             imageTextRes.set(R.string.detail_tv_add_image_text)
             buttonTextRes.set(R.string.detail_button_add_text)
@@ -73,7 +73,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set(contact.phone)
             image.set(contact.image)
             date.set(contact.birthDate)
-            isFavorite.set(contact.isFavorite)
+            isFavorite = contact.isFavorite
             parseDate(contact.birthDate)
             toggleTint()
             imageTextRes.set(R.string.detail_tv_change_image_text)
@@ -91,12 +91,12 @@ class ContactDetailViewModel(private val app: Application) :
     }
 
     fun onChangeFavorite() {
-        isFavorite.set(!isFavorite.get())
+        isFavorite = !isFavorite
         toggleTint()
     }
 
     private fun toggleTint() {
-        if (!isFavorite.get()) {
+        if (!isFavorite) {
             tint.set(R.color.favorite_false_color)
         } else {
             tint.set(R.color.favorite_true_color)
@@ -149,7 +149,7 @@ class ContactDetailViewModel(private val app: Application) :
                         email = email.get() ?: "",
                         image = image.get() ?: "",
                         birthDate = date.get() ?: "",
-                        isFavorite = isFavorite.get()
+                        isFavorite = isFavorite
                     )
                     update(contact)
                 }
@@ -161,7 +161,7 @@ class ContactDetailViewModel(private val app: Application) :
                         email = email.get() ?: "",
                         image = image.get() ?: "",
                         birthDate = date.get() ?: "",
-                        isFavorite = isFavorite.get()
+                        isFavorite = isFavorite
                     )
                 add(contact)
             }
