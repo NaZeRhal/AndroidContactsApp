@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactViewPagerAdapter
+import com.maxrzhe.contacts.adapters.ZoomOutPageTransformer
 import com.maxrzhe.contacts.databinding.FragmentHomeBinding
 import com.maxrzhe.contacts.viewmodel.SharedViewModel
 
@@ -34,6 +35,7 @@ class HomeFragment : Fragment() {
         val bottomNavigationView = binding?.bnvMain
         val adapter = ContactViewPagerAdapter(childFragmentManager)
         val viewPager = binding?.vpHome
+        viewPager?.setPageTransformer(true, ZoomOutPageTransformer())
 
         viewPager?.let {
             it.adapter = adapter

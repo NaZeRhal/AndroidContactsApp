@@ -1,6 +1,10 @@
 package com.maxrzhe.contacts.viewmodel
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.Application
+import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
@@ -28,7 +32,7 @@ class ContactDetailViewModel(private val app: Application) :
     private var calendar = Calendar.getInstance()
 
     private var id: Long? = null
-    private var isFavorite = ObservableBoolean(false)
+    private var isFavorite = false
 
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
@@ -43,7 +47,7 @@ class ContactDetailViewModel(private val app: Application) :
 
     val imageTextRes = ObservableInt(R.string.detail_tv_add_image_text)
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
-    val tint = ObservableInt(R.color.favorite_false_color)
+    val tint = ObservableInt(ContextCompat.getColor(app, R.color.favorite_false_color))
 
     fun manageSelectedId(selectedId: Long?) {
         isLoading.set(true)
@@ -63,7 +67,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set("")
             image.set("")
             date.set("")
-            isFavorite.set(false)
+            isFavorite = false
             toggleTint()
             imageTextRes.set(R.string.detail_tv_add_image_text)
             buttonTextRes.set(R.string.detail_button_add_text)
@@ -73,7 +77,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set(contact.phone)
             image.set(contact.image)
             date.set(contact.birthDate)
-            isFavorite.set(contact.isFavorite)
+            isFavorite = contact.isFavorite
             parseDate(contact.birthDate)
             toggleTint()
             imageTextRes.set(R.string.detail_tv_change_image_text)
@@ -90,16 +94,49 @@ class ContactDetailViewModel(private val app: Application) :
         imageTextRes.set(R.string.detail_tv_change_image_text)
     }
 
-    fun onChangeFavorite() {
-        isFavorite.set(!isFavorite.get())
+    fun onChangeFavorite(view: View) {
+        isFavorite = !isFavorite
+        animateIcon(view)
         toggleTint()
     }
 
+    private fun animateIcon(view: View) {
+        val fadeOut = ObjectAnimator.ofFloat(view, "alpha", 0f).apply {
+            duration = 150
+        }
+        val fadeIn = ObjectAnimator.ofFloat(view, "alpha", 1f).apply {
+            duration = 150
+        }
+
+        val scaleXIn = ObjectAnimator.ofFloat(view, "scaleX", 1.2f).apply {
+            duration = 150
+        }
+        val scaleYIn = ObjectAnimator.ofFloat(view, "scaleY", 1.2f).apply {
+            duration = 150
+        }
+        val scaleIn = AnimatorSet().apply {
+            play(scaleXIn).with(scaleYIn).with(fadeOut)
+        }
+        val scaleXOut = ObjectAnimator.ofFloat(view, "scaleX", 1f).apply {
+            duration = 150
+        }
+        val scaleYOut = ObjectAnimator.ofFloat(view, "scaleY", 1f).apply {
+            duration = 150
+        }
+        val scaleOut = AnimatorSet().apply {
+            play(scaleXOut).with(scaleYOut).with(fadeIn)
+        }
+        AnimatorSet().apply {
+            play(scaleIn).before(scaleOut)
+            start()
+        }
+    }
+
     private fun toggleTint() {
-        if (!isFavorite.get()) {
-            tint.set(R.color.favorite_false_color)
+        if (!isFavorite) {
+            tint.set(ContextCompat.getColor(app, R.color.favorite_false_color))
         } else {
-            tint.set(R.color.favorite_true_color)
+            tint.set(ContextCompat.getColor(app, R.color.favorite_true_color))
         }
     }
 
@@ -149,7 +186,7 @@ class ContactDetailViewModel(private val app: Application) :
                         email = email.get() ?: "",
                         image = image.get() ?: "",
                         birthDate = date.get() ?: "",
-                        isFavorite = isFavorite.get()
+                        isFavorite = isFavorite
                     )
                     update(contact)
                 }
@@ -161,7 +198,7 @@ class ContactDetailViewModel(private val app: Application) :
                         email = email.get() ?: "",
                         image = image.get() ?: "",
                         birthDate = date.get() ?: "",
-                        isFavorite = isFavorite.get()
+                        isFavorite = isFavorite
                     )
                 add(contact)
             }
