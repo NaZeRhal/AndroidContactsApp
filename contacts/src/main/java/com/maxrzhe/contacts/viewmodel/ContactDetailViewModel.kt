@@ -1,8 +1,9 @@
 package com.maxrzhe.contacts.viewmodel
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.Application
 import android.view.View
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
@@ -93,9 +94,35 @@ class ContactDetailViewModel(private val app: Application) :
         imageTextRes.set(R.string.detail_tv_change_image_text)
     }
 
-    fun onChangeFavorite() {
+    fun onChangeFavorite(view: View) {
         isFavorite = !isFavorite
+        animateIcon(view)
         toggleTint()
+    }
+
+    private fun animateIcon(view: View) {
+        val scaleXIn = ObjectAnimator.ofFloat(view, "scaleX", 1.2f).apply {
+            duration = 150
+        }
+        val scaleYIn = ObjectAnimator.ofFloat(view, "scaleY", 1.2f).apply {
+            duration = 150
+        }
+        val scaleIn = AnimatorSet().apply {
+            play(scaleXIn).with(scaleYIn)
+        }
+        val scaleXOut = ObjectAnimator.ofFloat(view, "scaleX", 1f).apply {
+            duration = 150
+        }
+        val scaleYOut = ObjectAnimator.ofFloat(view, "scaleY", 1f).apply {
+            duration = 150
+        }
+        val scaleOut = AnimatorSet().apply {
+            play(scaleXOut).with(scaleYOut)
+        }
+        AnimatorSet().apply {
+            play(scaleIn).before(scaleOut)
+            start()
+        }
     }
 
     private fun toggleTint() {
