@@ -43,7 +43,7 @@ class ContactProviderHandler(private val context: Context) : Repository {
                                 email = getString(getColumnIndex(KEY_EMAIL)),
                                 image = getString(getColumnIndex(KEY_IMAGE)),
                                 birthDate = getString(getColumnIndex(KEY_DATE)),
-                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE))
+                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE)) == 1
                             )
                             contacts = contacts + listOf(contact)
                         } while (moveToNext())
@@ -72,7 +72,7 @@ class ContactProviderHandler(private val context: Context) : Repository {
                             email = getString(getColumnIndex(KEY_EMAIL)),
                             image = getString(getColumnIndex(KEY_IMAGE)),
                             birthDate = getString(getColumnIndex(KEY_DATE)),
-                            isFavorite = getInt(getColumnIndex(KEY_FAVORITE))
+                            isFavorite = getInt(getColumnIndex(KEY_FAVORITE)) == 1
                         )
                     }
                 }

@@ -18,7 +18,6 @@ import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
@@ -29,17 +28,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.ActivityListContactsBinding
 import com.maxrzhe.contacts.screens.ContactDetailFragment.*
 import com.maxrzhe.contacts.screens.ContactListFragment.*
 import com.maxrzhe.contacts.viewmodel.SearchViewModel
 
 class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
-    OnSelectContactListener, OnTakeImageListener,
-    ContactAdapter.OnSearchResultListener, HomeFragment.OnAddContactListener,
+    OnSelectContactListener, OnTakeImageListener, HomeFragment.OnAddContactListener,
     HomeFragment.OnChangeCurrentPositionListener {
     private lateinit var binding: ActivityListContactsBinding
 
@@ -48,7 +44,6 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
     private var isLandscape: Boolean = false
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
-    private var bottomNavigationView: BottomNavigationView? = null
     private var currentPosition = 0
 
     companion object {
@@ -118,27 +113,6 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
             supportFragmentManager.findFragmentByTag(HOME_TAG) as? HomeFragment ?: HomeFragment()
         val detailFragment =
             supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
-
-        bottomNavigationView = binding.bnvMain
-        bottomNavigationView?.menu?.getItem(currentPosition)?.isChecked = true
-
-        bottomNavigationView?.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.bottom_menu_home -> {
-                    homeFragment.viewPager?.currentItem = 0
-                }
-                R.id.bottom_menu_fav -> {
-                    homeFragment.viewPager?.currentItem = 1
-                }
-                R.id.bottom_menu_settings -> {
-                    homeFragment.viewPager?.currentItem = 2
-                }
-                else -> {
-                }
-            }
-            true
-        }
-
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
@@ -212,7 +186,7 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
                 menuItemSearch?.isVisible = true
                 toolbar?.setDisplayHomeAsUpEnabled(false)
                 onBackPressed()
-                binding.tvSearchResult?.visibility = View.VISIBLE
+//                binding.tvSearchResult?.visibility = View.VISIBLE
             }
             R.id.menu_item_volume -> {
                 startActivity(Intent(this, VolumeSettingActivity::class.java))
@@ -255,7 +229,6 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
     }
 
     override fun onSelect() {
-        binding.tvSearchResult?.visibility = View.GONE
         if (!isLandscape) {
             menuItemSearch?.isVisible = false
             toolbar?.setDisplayHomeAsUpEnabled(true)
@@ -331,24 +304,7 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
         checkForStoragePermission()
     }
 
-    override fun onSearchResult(resultCount: Int) {
-        if (resultCount >= 0) {
-            binding.tvSearchResult?.visibility = View.VISIBLE
-            val result =
-                resources.getQuantityString(
-                    R.plurals.search_result_plurals,
-                    resultCount,
-                    resultCount
-                )
-            binding.tvSearchResult?.text = result
-        } else {
-            binding.tvSearchResult?.visibility = View.GONE
-            binding.tvSearchResult?.text = ""
-        }
-    }
-
     override fun onChange(position: Int) {
         currentPosition = position
-        bottomNavigationView?.menu?.getItem(position)?.isChecked = true
     }
 }

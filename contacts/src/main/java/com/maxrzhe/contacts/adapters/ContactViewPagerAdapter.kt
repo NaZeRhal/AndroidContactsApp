@@ -9,19 +9,17 @@ import com.maxrzhe.contacts.screens.ContactListFragment
 class ContactViewPagerAdapter(fm: FragmentManager) :
     FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-    private var pages: List<Fragment>
+    override fun getCount(): Int = 2
 
-    override fun getCount(): Int = pages.size
-
-    override fun getItem(position: Int): Fragment = pages[position]
-
-    init {
-        val list = ContactListFragment()
-        val favorites = ContactListFragment().apply {
-            arguments = Bundle().apply {
-                putBoolean(ContactListFragment.IS_FAVORITES, true)
+    override fun getItem(position: Int): Fragment {
+        return when (position) {
+            0 -> ContactListFragment()
+            1 -> ContactListFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(ContactListFragment.IS_FAVORITES, true)
+                }
             }
+            else -> throw IllegalArgumentException("No fragment in $position position")
         }
-        pages = listOf(list, favorites)
     }
 }

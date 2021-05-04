@@ -3,7 +3,6 @@ package com.maxrzhe.contacts.adapters
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
@@ -25,12 +24,10 @@ fun toggleVisibility(v: View, isVisible: Boolean) {
     v.visibility = if (isVisible) View.VISIBLE else View.GONE
 }
 
-@BindingAdapter("toggleFavorite")
-fun toggleFavorite(v: ImageView, isFavorite: Boolean) {
-    if (!isFavorite) {
-        v.setColorFilter(ContextCompat.getColor(v.context, android.R.color.darker_gray))
-    } else {
-        v.setColorFilter(ContextCompat.getColor(v.context, android.R.color.holo_orange_light))
+@BindingAdapter("tint")
+fun setTint(v: ImageView, resId: Int?) {
+    if (resId != null) {
+        v.setColorFilter(resId)
     }
 }
 

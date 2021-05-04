@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
+import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactViewPagerAdapter
 import com.maxrzhe.contacts.databinding.FragmentHomeBinding
 import com.maxrzhe.contacts.viewmodel.SharedViewModel
@@ -14,7 +15,6 @@ import com.maxrzhe.contacts.viewmodel.SharedViewModel
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
-    var viewPager: ViewPager? = null
 
     private val onAddContactListener: OnAddContactListener?
         get() = (context as? OnAddContactListener)
@@ -30,20 +30,37 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val view = binding?.root
-        viewPager = binding?.vpHome
+
+        val bottomNavigationView = binding?.bnvMain
         val adapter = ContactViewPagerAdapter(childFragmentManager)
+        val viewPager = binding?.vpHome
+
         viewPager?.let {
             it.adapter = adapter
             it.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
                 override fun onPageSelected(position: Int) {
+                    bottomNavigationView?.menu?.getItem(position)?.isChecked = true
                     onChangeCurrentPositionListener?.onChange(position)
                 }
             })
         }
 
+        bottomNavigationView?.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.bottom_menu_home -> {
+                    viewPager?.currentItem = 0
+                }
+                R.id.bottom_menu_fav -> {
+                    viewPager?.currentItem = 1
+                }
+                else -> {
+                }
+            }
+            true
+        }
+
         binding?.fabAdd?.setOnClickListener(addContact())
-        return view
+        return binding?.root
     }
 
     private fun addContact() = View.OnClickListener {

@@ -118,7 +118,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                                 email = getString(getColumnIndex(KEY_EMAIL)),
                                 image = getString(getColumnIndex(KEY_IMAGE)),
                                 birthDate = getString(getColumnIndex(KEY_DATE)),
-                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE))
+                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE)) == 1
                             )
                             contacts = contacts + listOf(contact)
                         } while (moveToNext())
@@ -144,7 +144,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                 put(KEY_EMAIL, email)
                 put(KEY_IMAGE, image)
                 put(KEY_DATE, birthDate)
-                put(KEY_FAVORITE, isFavorite)
+                put(KEY_FAVORITE, if (isFavorite) 1 else 0)
             }
         }
         return contentValues
@@ -171,7 +171,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                                 email = getString(getColumnIndex(KEY_EMAIL)),
                                 image = getString(getColumnIndex(KEY_IMAGE)),
                                 birthDate = getString(getColumnIndex(KEY_DATE)),
-                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE))
+                                isFavorite = getInt(getColumnIndex(KEY_FAVORITE)) == 1
                             )
                         } while (moveToNext())
                     }

@@ -28,13 +28,13 @@ class ContactDetailViewModel(private val app: Application) :
     private var calendar = Calendar.getInstance()
 
     private var id: Long? = null
+    private var isFavorite = ObservableBoolean(false)
 
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
     val phone = ObservableField<String?>()
     val image = ObservableField<String?>()
     val date = ObservableField<String?>()
-    val isFavorite = ObservableBoolean()
     val isLoading = ObservableBoolean(true)
 
     val year = ObservableInt()
@@ -43,6 +43,7 @@ class ContactDetailViewModel(private val app: Application) :
 
     val imageTextRes = ObservableInt(R.string.detail_tv_add_image_text)
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
+    val tint = ObservableInt(R.color.favorite_false_color)
 
     fun manageSelectedId(selectedId: Long?) {
         isLoading.set(true)
@@ -63,6 +64,7 @@ class ContactDetailViewModel(private val app: Application) :
             image.set("")
             date.set("")
             isFavorite.set(false)
+            toggleTint()
             imageTextRes.set(R.string.detail_tv_add_image_text)
             buttonTextRes.set(R.string.detail_button_add_text)
         } else {
@@ -71,8 +73,9 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set(contact.phone)
             image.set(contact.image)
             date.set(contact.birthDate)
-            isFavorite.set(contact.isFavorite == 1)
+            isFavorite.set(contact.isFavorite)
             parseDate(contact.birthDate)
+            toggleTint()
             imageTextRes.set(R.string.detail_tv_change_image_text)
             buttonTextRes.set(R.string.detail_button_save_changes_text)
         }
@@ -87,8 +90,17 @@ class ContactDetailViewModel(private val app: Application) :
         imageTextRes.set(R.string.detail_tv_change_image_text)
     }
 
-    fun changeFavorite() {
+    fun onChangeFavorite() {
         isFavorite.set(!isFavorite.get())
+        toggleTint()
+    }
+
+    private fun toggleTint() {
+        if (!isFavorite.get()) {
+            tint.set(R.color.favorite_false_color)
+        } else {
+            tint.set(R.color.favorite_true_color)
+        }
     }
 
     private fun add(contact: Contact.New) {
@@ -137,7 +149,7 @@ class ContactDetailViewModel(private val app: Application) :
                         email = email.get() ?: "",
                         image = image.get() ?: "",
                         birthDate = date.get() ?: "",
-                        isFavorite = if (isFavorite.get()) 1 else 0
+                        isFavorite = isFavorite.get()
                     )
                     update(contact)
                 }
@@ -149,7 +161,7 @@ class ContactDetailViewModel(private val app: Application) :
                         email = email.get() ?: "",
                         image = image.get() ?: "",
                         birthDate = date.get() ?: "",
-                        isFavorite = if (isFavorite.get()) 1 else 0
+                        isFavorite = isFavorite.get()
                     )
                 add(contact)
             }

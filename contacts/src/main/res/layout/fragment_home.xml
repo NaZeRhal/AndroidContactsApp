@@ -8,7 +8,7 @@
         android:id="@+id/vp_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bnv_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,7 +21,17 @@
         android:layout_marginBottom="@dimen/fab_add_marginBottom"
         android:contentDescription="@string/fab_add_description_button_add"
         android:src="@android:drawable/ic_input_add"
-        android:tint="@color/teal_700"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:tint="?attr/colorOnSecondary"
+        android:backgroundTint="@color/teal_200"
+        app:layout_constraintBottom_toTopOf="@id/bnv_main"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bnv_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>

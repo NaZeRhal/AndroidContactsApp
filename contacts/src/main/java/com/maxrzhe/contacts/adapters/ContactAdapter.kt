@@ -19,8 +19,7 @@ class ContactAdapter(
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
-    private val onSearchResultListener: OnSearchResultListener?
-        get() = (context as? OnSearchResultListener)
+    private var onSearchResultListener: OnSearchResultListener? = null
 
     var itemList: List<Contact.Existing> = emptyList()
         set(value) {
@@ -149,6 +148,10 @@ class ContactAdapter(
                     email.toLowerCase(Locale.getDefault()).contains(pattern) ||
                     phone.toLowerCase(Locale.getDefault()).contains(pattern)
         }
+    }
+
+    fun setOnSearchResultListener(listener: OnSearchResultListener) {
+        this.onSearchResultListener = listener
     }
 
     interface OnContactClickListener {

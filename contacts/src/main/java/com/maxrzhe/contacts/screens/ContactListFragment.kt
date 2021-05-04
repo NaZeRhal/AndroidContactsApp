@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
@@ -18,7 +19,8 @@ import com.maxrzhe.contacts.viewmodel.SharedViewModel
 import com.maxrzhe.core.screens.BaseFragment
 
 class ContactListFragment :
-    BaseFragment<FragmentContactListBinding, ContactListViewModel>() {
+    BaseFragment<FragmentContactListBinding, ContactListViewModel>(),
+    ContactAdapter.OnSearchResultListener {
     private var contactAdapter: ContactAdapter? = null
     private var isFavorites = false
 
@@ -56,6 +58,7 @@ class ContactListFragment :
                         override fun onClick(contactId: Long) {
                             sharedViewModel.select(contactId)
                             onSelectContactListener?.onSelect()
+                            binding.tvSearchResult.visibility = View.GONE
                         }
                     }
                 )
@@ -76,10 +79,12 @@ class ContactListFragment :
                 attachToRecyclerView(rvContactList)
             }
         }
-        viewModel.isFavorites.set(isFavorites)
+        viewModel.isFavorites = isFavorites
         viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
             contactAdapter?.itemList = contacts
         })
+
+        contactAdapter?.setOnSearchResultListener(this)
         searchViewModel.query.observe(viewLifecycleOwner, { query ->
             contactAdapter?.filter = query
         })
@@ -91,5 +96,21 @@ class ContactListFragment :
 
     companion object {
         const val IS_FAVORITES = "is_favorites"
+    }
+
+    override fun onSearchResult(resultCount: Int) {
+        if (resultCount >= 0) {
+            binding.tvSearchResult.visibility = View.VISIBLE
+            val result =
+                resources.getQuantityString(
+                    R.plurals.search_result_plurals,
+                    resultCount,
+                    resultCount
+                )
+            binding.tvSearchResult.text = result
+        } else {
+            binding.tvSearchResult.visibility = View.GONE
+            binding.tvSearchResult.text = ""
+        }
     }
 }

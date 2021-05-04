@@ -14,4 +14,7 @@
 
     <color name="search_view_text_color">#FFFFFF</color>
     <color name="search_view_hint_color">#DADADA</color>
+
+    <color name="favorite_true_color">#FFCA4D</color>
+    <color name="favorite_false_color">#9C9C9C</color>
 </resources>

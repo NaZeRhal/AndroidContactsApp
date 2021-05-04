@@ -15,5 +15,5 @@ data class ContactRoom(
     val email: String,
     val image: String,
     val birthDate: String,
-    val isFavorite: Int
+    val isFavorite: Boolean
 ) : Parcelable
