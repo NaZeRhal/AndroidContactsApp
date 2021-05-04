@@ -101,6 +101,13 @@ class ContactDetailViewModel(private val app: Application) :
     }
 
     private fun animateIcon(view: View) {
+        val fadeOut = ObjectAnimator.ofFloat(view, "alpha", 0f).apply {
+            duration = 150
+        }
+        val fadeIn = ObjectAnimator.ofFloat(view, "alpha", 1f).apply {
+            duration = 150
+        }
+
         val scaleXIn = ObjectAnimator.ofFloat(view, "scaleX", 1.2f).apply {
             duration = 150
         }
@@ -108,7 +115,7 @@ class ContactDetailViewModel(private val app: Application) :
             duration = 150
         }
         val scaleIn = AnimatorSet().apply {
-            play(scaleXIn).with(scaleYIn)
+            play(scaleXIn).with(scaleYIn).with(fadeOut)
         }
         val scaleXOut = ObjectAnimator.ofFloat(view, "scaleX", 1f).apply {
             duration = 150
@@ -117,7 +124,7 @@ class ContactDetailViewModel(private val app: Application) :
             duration = 150
         }
         val scaleOut = AnimatorSet().apply {
-            play(scaleXOut).with(scaleYOut)
+            play(scaleXOut).with(scaleYOut).with(fadeIn)
         }
         AnimatorSet().apply {
             play(scaleIn).before(scaleOut)
