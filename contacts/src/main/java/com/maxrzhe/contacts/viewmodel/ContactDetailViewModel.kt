@@ -1,6 +1,9 @@
 package com.maxrzhe.contacts.viewmodel
 
 import android.app.Application
+import android.view.View
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
@@ -43,7 +46,7 @@ class ContactDetailViewModel(private val app: Application) :
 
     val imageTextRes = ObservableInt(R.string.detail_tv_add_image_text)
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
-    val tint = ObservableInt(R.color.favorite_false_color)
+    val tint = ObservableInt(ContextCompat.getColor(app, R.color.favorite_false_color))
 
     fun manageSelectedId(selectedId: Long?) {
         isLoading.set(true)
@@ -97,9 +100,9 @@ class ContactDetailViewModel(private val app: Application) :
 
     private fun toggleTint() {
         if (!isFavorite) {
-            tint.set(R.color.favorite_false_color)
+            tint.set(ContextCompat.getColor(app, R.color.favorite_false_color))
         } else {
-            tint.set(R.color.favorite_true_color)
+            tint.set(ContextCompat.getColor(app, R.color.favorite_true_color))
         }
     }
 
