@@ -1,15 +1,17 @@
 package com.maxrzhe.contacts.repository
 
 import androidx.lifecycle.LiveData
-import com.maxrzhe.contacts.model.ContactMapping
+import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.contacts.api.ContactsApi
+import com.maxrzhe.contacts.data.ContactListResponse
+import com.maxrzhe.contacts.model.ContactMapping
 import com.maxrzhe.core.model.Contact
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
-class ContactFirebaseRepository(private val contactsApi: ContactsApi): Repository {
+class ContactFirebaseRepository(private val contactsApi: ContactsApi) : Repository {
     override suspend fun findById(id: Long): Contact.Existing? {
-        TODO("Not yet implemented")
+        val contactItems: ContactListResponse = contactsApi.getContactsListAsync().await()
+        val contact = contactItems.first { it.id == id }
+        return ContactMapping.contactRestToContact(contact)
     }
 
     override suspend fun add(contact: Contact.New) {
@@ -24,22 +26,12 @@ class ContactFirebaseRepository(private val contactsApi: ContactsApi): Repositor
         TODO("Not yet implemented")
     }
 
-    override fun findAll(): LiveData<List<Contact.Existing>> {
-        TODO("Not yet implemented")
-//        compositeDisposable.add(
-//            contactsApi.getContactsList()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(
-//                    { response ->
-//                        val contactItems = response.contacts
-//                        val contacts = ContactMapping.contactRestToContact(contactItems)
-//                        readAllData.postValue(contacts)
-//                    }, {
-//                        readAllData.postValue(null)
-//                    }
-//                )
-//        )
+    override suspend fun findAll(): LiveData<List<Contact.Existing>> {
+        val contactItems: ContactListResponse = contactsApi.getContactsListAsync().await()
+        val contacts = contactItems.mapNotNull { ContactMapping.contactRestToContact(it) }
+        val liveDataContacts: MutableLiveData<List<Contact.Existing>> = MutableLiveData()
+        liveDataContacts.value = contacts
+        return liveDataContacts
     }
 
 }

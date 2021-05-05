@@ -23,7 +23,7 @@ class ContactSQLRepository(private val contactSqlDao: ContactSqlDao) : Repositor
         contactSqlDao.delete(contact)
     }
 
-    override fun findAll(): LiveData<List<Contact.Existing>> {
+    override suspend fun findAll(): LiveData<List<Contact.Existing>> {
         return contactSqlDao.findAll()
     }
 }

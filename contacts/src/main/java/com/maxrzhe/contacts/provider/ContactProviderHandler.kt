@@ -83,7 +83,7 @@ class ContactProviderHandler(private val context: Context) : Repository {
         }
     }
 
-    override fun findAll(): LiveData<List<Contact.Existing>> {
+    override suspend fun findAll(): LiveData<List<Contact.Existing>> {
         if (allContacts.value == null) {
             allContacts.value = loadAllContacts()
         }

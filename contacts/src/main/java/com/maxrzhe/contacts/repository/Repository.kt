@@ -13,5 +13,5 @@ interface Repository {
 
     suspend fun delete(contact: Contact.Existing)
 
-    fun findAll(): LiveData<List<Contact.Existing>>
+    suspend fun findAll(): LiveData<List<Contact.Existing>>
 }

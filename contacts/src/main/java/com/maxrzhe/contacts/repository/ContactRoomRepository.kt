@@ -25,7 +25,7 @@ class ContactRoomRepository(private val contactDao: ContactDao) : Repository {
         contactDao.delete(ContactMapping.contactToContactRoom(contact))
     }
 
-    override fun findAll(): LiveData<List<Contact.Existing>> {
+    override suspend fun findAll(): LiveData<List<Contact.Existing>> {
         val roomContactsLiveData = contactDao.findAll()
         return Transformations.map(roomContactsLiveData) { roomContact ->
             ContactMapping.contactRoomToContact(
