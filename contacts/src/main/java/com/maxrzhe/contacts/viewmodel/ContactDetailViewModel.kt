@@ -3,6 +3,7 @@ package com.maxrzhe.contacts.viewmodel
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Application
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
@@ -12,10 +13,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.repository.Repository
-import com.maxrzhe.contacts.repository.RepositoryFactory
-import com.maxrzhe.contacts.repository.RepositoryType
+import com.maxrzhe.contacts.app.ContactsApp
+import com.maxrzhe.contacts.model.ContactMapping
 import com.maxrzhe.core.model.Contact
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,13 +26,14 @@ import java.util.*
 class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
-    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
+    //    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker
 
     private var calendar = Calendar.getInstance()
+    private val compositeDisposable = CompositeDisposable()
 
     private var id: Long? = null
     private var isFavorite = false
@@ -49,15 +53,45 @@ class ContactDetailViewModel(private val app: Application) :
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(ContextCompat.getColor(app, R.color.favorite_false_color))
 
-    fun manageSelectedId(selectedId: Long?) {
+    override fun onCleared() {
+        compositeDisposable.dispose()
+        super.onCleared()
+    }
+
+    fun fetchContact(contactId: Long?) {
         isLoading.set(true)
-        id = selectedId
-        viewModelScope.launch {
-            val contact =
-                if (selectedId != null) repository.findById(selectedId) else Contact.New()
-            setupFields(contact)
-            isLoading.set(false)
+        id = contactId
+        contactId?.let { id ->
+            val contactsApi = (app as ContactsApp).contactsApi
+            compositeDisposable.add(
+                contactsApi.getContactsList()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        { response ->
+                            val contactsItems = response.contacts_db
+                            val first = contactsItems.first { it.id == id }
+                            val contact = ContactMapping.contactRestToContact(first)
+                            setupFields(contact)
+                            isLoading.set(false)
+                        }, {
+                            setupFields(null)
+                            isLoading.set(false)
+                        }
+                    )
+            )
         }
+    }
+
+    fun manageSelectedId(selectedId: Long?) {
+//        isLoading.set(true)
+//        id = selectedId
+//        viewModelScope.launch {
+//            val contact =
+//                if (selectedId != null) repository.findById(selectedId) else Contact.New()
+//            setupFields(contact)
+//            isLoading.set(false)
+//        }
     }
 
     private fun setupFields(contact: Contact?) {
@@ -142,13 +176,13 @@ class ContactDetailViewModel(private val app: Application) :
 
     private fun add(contact: Contact.New) {
         viewModelScope.launch {
-            repository.add(contact)
+//            repository.add(contact)
         }
     }
 
     private fun update(contact: Contact.Existing) {
         viewModelScope.launch {
-            repository.update(contact)
+//            repository.update(contact)
         }
     }
 

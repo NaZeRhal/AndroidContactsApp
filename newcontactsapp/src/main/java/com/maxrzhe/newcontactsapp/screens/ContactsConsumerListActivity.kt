@@ -164,7 +164,7 @@ class ContactsConsumerListActivity : AppCompatActivity(),
                 menuItemSearch?.isVisible = true
                 toolbar?.setDisplayHomeAsUpEnabled(false)
                 onBackPressed()
-                binding.tvSearchResult?.visibility = View.VISIBLE
+//                binding.tvSearchResult?.visibility = View.VISIBLE
             }
         }
         return super.onOptionsItemSelected(item)
@@ -223,19 +223,19 @@ class ContactsConsumerListActivity : AppCompatActivity(),
     }
 
     override fun onSearchResult(resultCount: Int) {
-        if (resultCount >= 0) {
-            binding.tvSearchResult?.visibility = View.VISIBLE
-            val result =
-                resources.getQuantityString(
-                    R.plurals.search_result_plurals,
-                    resultCount,
-                    resultCount
-                )
-            binding.tvSearchResult?.text = result
-        } else {
-            binding.tvSearchResult?.visibility = View.GONE
-            binding.tvSearchResult?.text = ""
-        }
+//        if (resultCount >= 0) {
+//            binding.tvSearchResult?.visibility = View.VISIBLE
+//            val result =
+//                resources.getQuantityString(
+//                    R.plurals.search_result_plurals,
+//                    resultCount,
+//                    resultCount
+//                )
+//            binding.tvSearchResult?.text = result
+//        } else {
+//            binding.tvSearchResult?.visibility = View.GONE
+//            binding.tvSearchResult?.text = ""
+//        }
     }
 }
 
