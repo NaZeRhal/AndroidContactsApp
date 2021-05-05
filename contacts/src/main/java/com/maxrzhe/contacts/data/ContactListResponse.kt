@@ -1,10 +1,10 @@
-package com.maxrzhe.contacts.rest
+package com.maxrzhe.contacts.data
+
 
 import com.google.gson.annotations.SerializedName
+class ContactListResponse : ArrayList<ContactListResponseItem>()
 
-data class ContactsListResponse(val contacts_db: List<ContactsListItem>)
-
-data class ContactsListItem(
+data class ContactListResponseItem(
     val id: Long,
     val name: String,
     val email: String,

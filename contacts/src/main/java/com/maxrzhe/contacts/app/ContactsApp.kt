@@ -1,7 +1,7 @@
 package com.maxrzhe.contacts.app
 
 import android.app.Application
-import com.maxrzhe.contacts.rest.ContactsApi
+import com.maxrzhe.contacts.api.ContactsApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

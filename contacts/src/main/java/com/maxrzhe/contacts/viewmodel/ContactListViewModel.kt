@@ -1,7 +1,6 @@
 package com.maxrzhe.contacts.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -51,8 +50,7 @@ class ContactListViewModel(private val app: Application) : BaseViewModel(app) {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { response ->
-                        val contactItems = response.contacts_db
-                        val contacts = ContactMapping.contactRestToContact(contactItems)
+                        val contacts = ContactMapping.contactRestToContact(response)
                         readAllData.postValue(contacts)
                     }, {
                         readAllData.postValue(null)

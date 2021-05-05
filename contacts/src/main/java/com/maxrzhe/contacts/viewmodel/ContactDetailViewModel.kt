@@ -3,7 +3,6 @@ package com.maxrzhe.contacts.viewmodel
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Application
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
@@ -69,8 +68,7 @@ class ContactDetailViewModel(private val app: Application) :
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { response ->
-                            val contactsItems = response.contacts_db
-                            val first = contactsItems.first { it.id == id }
+                            val first = response.first { it.id == id }
                             val contact = ContactMapping.contactRestToContact(first)
                             setupFields(contact)
                             isLoading.set(false)

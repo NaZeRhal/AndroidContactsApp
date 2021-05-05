@@ -1,6 +1,6 @@
 package com.maxrzhe.contacts.model
 
-import com.maxrzhe.contacts.rest.ContactsListItem
+import com.maxrzhe.contacts.data.ContactListResponseItem
 import com.maxrzhe.core.model.Contact
 
 abstract class ContactMapping {
@@ -43,21 +43,11 @@ abstract class ContactMapping {
         }
 
         fun contactRoomToContact(contactRoomList: List<ContactRoom>?): List<Contact.Existing>? =
-            contactRoomList?.map {
-                with(it) {
-                    Contact.Existing(
-                        id = id,
-                        name = name,
-                        email = email,
-                        phone = phone,
-                        image = image,
-                        birthDate = birthDate,
-                        isFavorite = isFavorite
-                    )
-                }
+            contactRoomList?.mapNotNull {
+                contactRoomToContact(it)
             }
 
-        fun contactRestToContact(contactItem: ContactsListItem?): Contact.Existing? =
+        fun contactRestToContact(contactItem: ContactListResponseItem?): Contact.Existing? =
             with(contactItem) {
                 if (this != null) {
                     Contact.Existing(
@@ -72,19 +62,9 @@ abstract class ContactMapping {
                 } else null
             }
 
-        fun contactRestToContact(contactItemList: List<ContactsListItem>?): List<Contact.Existing>? =
-            contactItemList?.map {
-                with(it) {
-                    Contact.Existing(
-                        id = id,
-                        name = name,
-                        email = email,
-                        phone = phone,
-                        image = image,
-                        birthDate = birthDate,
-                        isFavorite = isFavorite
-                    )
-                }
+        fun contactRestToContact(contactItemList: List<ContactListResponseItem>?): List<Contact.Existing>? =
+            contactItemList?.mapNotNull {
+                contactRestToContact(it)
             }
     }
 }
