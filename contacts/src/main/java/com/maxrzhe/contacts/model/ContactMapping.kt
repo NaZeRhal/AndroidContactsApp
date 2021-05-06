@@ -9,6 +9,7 @@ abstract class ContactMapping {
             if (this is Contact.Existing) {
                 ContactRoom(
                     id = id,
+                    fbId = fbId,
                     name = name,
                     email = email,
                     phone = phone,
@@ -19,6 +20,7 @@ abstract class ContactMapping {
             } else {
                 ContactRoom(
                     name = name,
+                    fbId = fbId,
                     email = email,
                     phone = phone,
                     image = image,
@@ -32,6 +34,7 @@ abstract class ContactMapping {
             if (this != null) {
                 Contact.Existing(
                     id = id,
+                    fbId = fbId,
                     name = name,
                     email = email,
                     phone = phone,
@@ -47,11 +50,46 @@ abstract class ContactMapping {
                 contactRoomToContact(it)
             }
 
-        fun contactRestToContact(contactItem: ContactListResponseItem?): Contact.Existing? =
+        fun contactRestToContactExisting(
+            fbId: String,
+            contactItem: ContactListResponseItem,
+            contact: Contact.Existing
+        ): Contact.Existing = with(contactItem) {
+            Contact.Existing(
+                id = contact.id,
+                fbId = fbId,
+                name = name,
+                email = email,
+                image = image,
+                phone = phone,
+                isFavorite = isFavorite,
+                birthDate = birthDate
+            )
+        }
+
+        fun contactRestToContactNew(
+            fbId:String,
+            contactItem: ContactListResponseItem,
+        ): Contact.New = with(contactItem) {
+            Contact.New(
+                fbId = fbId,
+                name = name,
+                email = email,
+                image = image,
+                phone = phone,
+                isFavorite = isFavorite,
+                birthDate = birthDate
+            )
+        }
+
+        fun contactRestToContact(
+            fbId: String,
+            contactItem: ContactListResponseItem?
+        ): Contact.New? =
             with(contactItem) {
                 if (this != null) {
-                    Contact.Existing(
-                        id = id,
+                    Contact.New(
+                        fbId = fbId,
                         name = name,
                         email = email,
                         phone = phone,
@@ -62,9 +100,9 @@ abstract class ContactMapping {
                 } else null
             }
 
-        fun contactRestToContact(contactItemList: List<ContactListResponseItem>?): List<Contact.Existing>? =
+        fun contactRestToContact(contactItemList: HashMap<String, ContactListResponseItem>?): List<Contact.New>? =
             contactItemList?.mapNotNull {
-                contactRestToContact(it)
+                contactRestToContact(it.key, it.value)
             }
     }
 }

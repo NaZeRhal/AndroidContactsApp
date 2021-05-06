@@ -12,8 +12,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contacts.R
+import com.maxrzhe.contacts.repository.ContactRepoWithRestApi
 import com.maxrzhe.contacts.repository.Repository
-import com.maxrzhe.contacts.repository.RepositoryFactory
 import com.maxrzhe.contacts.repository.RepositoryType
 import com.maxrzhe.core.model.Contact
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
     private val repository: Repository =
-        RepositoryFactory.create(app, RepositoryType.FIREBASE_REST_API)
+        ContactRepoWithRestApi.getInstance(app, RepositoryType.PLAIN_SQL)
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     private var _savedMarker = MutableLiveData(false)
@@ -34,6 +34,7 @@ class ContactDetailViewModel(private val app: Application) :
 
     private var id: Long? = null
     private var isFavorite = false
+    private var fbId: String = ""
 
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
@@ -55,7 +56,7 @@ class ContactDetailViewModel(private val app: Application) :
         id = selectedId
         viewModelScope.launch {
             val contact =
-                if (selectedId != null) repository.findById(selectedId) else Contact.New()
+                if (selectedId != null) repository.findById(fbId) else Contact.New()
             setupFields(contact)
             isLoading.set(false)
         }
@@ -68,6 +69,7 @@ class ContactDetailViewModel(private val app: Application) :
             phone.set("")
             image.set("")
             date.set("")
+            fbId = ""
             isFavorite = false
             toggleTint()
             imageTextRes.set(R.string.detail_tv_add_image_text)
@@ -79,6 +81,7 @@ class ContactDetailViewModel(private val app: Application) :
             image.set(contact.image)
             date.set(contact.birthDate)
             isFavorite = contact.isFavorite
+            fbId = contact.fbId
             parseDate(contact.birthDate)
             toggleTint()
             imageTextRes.set(R.string.detail_tv_change_image_text)
@@ -182,6 +185,7 @@ class ContactDetailViewModel(private val app: Application) :
                 id?.let {
                     val contact = Contact.Existing(
                         id = it,
+                        fbId = fbId,
                         name = name.get() ?: "",
                         phone = phone.get() ?: "",
                         email = email.get() ?: "",
@@ -194,6 +198,7 @@ class ContactDetailViewModel(private val app: Application) :
             } else {
                 val contact =
                     Contact.New(
+                        fbId = fbId,
                         name = name.get() ?: "",
                         phone = phone.get() ?: "",
                         email = email.get() ?: "",

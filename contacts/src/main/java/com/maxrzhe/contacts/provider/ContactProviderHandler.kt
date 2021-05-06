@@ -1,6 +1,5 @@
 package com.maxrzhe.contacts.provider
 
-import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.database.SQLException
@@ -10,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_DATE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_EMAIL
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_FAVORITE
+import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_FB_ID
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_ID
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_IMAGE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_NAME
@@ -38,6 +38,7 @@ class ContactProviderHandler(private val context: Context) : Repository {
                         do {
                             val contact = Contact.Existing(
                                 id = getLong(getColumnIndex(KEY_ID)),
+                                fbId = getString(getColumnIndex(KEY_FB_ID)),
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
                                 email = getString(getColumnIndex(KEY_EMAIL)),
@@ -56,31 +57,8 @@ class ContactProviderHandler(private val context: Context) : Repository {
         }
     }
 
-    override suspend fun findById(id: Long): Contact.Existing? {
-        var contact: Contact.Existing? = null
-        val uri = ContentUris.withAppendedId(Uri.parse(CONTENT_URI), id)
-
-        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
-        try {
-            cursor?.let { raw ->
-                with(raw) {
-                    if (moveToFirst()) {
-                        contact = Contact.Existing(
-                            id = getLong(getColumnIndex(KEY_ID)),
-                            name = getString(getColumnIndex(KEY_NAME)),
-                            phone = getString(getColumnIndex(KEY_PHONE)),
-                            email = getString(getColumnIndex(KEY_EMAIL)),
-                            image = getString(getColumnIndex(KEY_IMAGE)),
-                            birthDate = getString(getColumnIndex(KEY_DATE)),
-                            isFavorite = getInt(getColumnIndex(KEY_FAVORITE)) == 1
-                        )
-                    }
-                }
-            }
-            return contact
-        } catch (e: SQLException) {
-            return null
-        }
+    override suspend fun findById(fbId: String): Contact.Existing? {
+        TODO("Not yet implemented")
     }
 
     override suspend fun findAll(): LiveData<List<Contact.Existing>> {
@@ -94,11 +72,23 @@ class ContactProviderHandler(private val context: Context) : Repository {
         TODO("Not yet implemented")
     }
 
+    override suspend fun addAll(contacts: List<Contact.New>) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun update(contact: Contact.Existing) {
         TODO("Not yet implemented")
     }
 
+    override suspend fun updateAll(contacts: List<Contact.Existing>) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun delete(contact: Contact.Existing) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteAll(contacts: List<Contact.Existing>) {
         TODO("Not yet implemented")
     }
 

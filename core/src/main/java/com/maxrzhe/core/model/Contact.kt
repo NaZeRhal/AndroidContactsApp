@@ -4,6 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 sealed class Contact {
+    abstract val fbId: String
     abstract val name: String
     abstract val email: String
     abstract val phone: String
@@ -13,6 +14,7 @@ sealed class Contact {
 
     @Parcelize
     data class New(
+        override val fbId: String = "",
         override val name: String = "",
         override val email: String = "",
         override val phone: String = "",
@@ -24,6 +26,7 @@ sealed class Contact {
     @Parcelize
     data class Existing(
         val id: Long,
+        override val fbId: String,
         override val name: String,
         override val email: String,
         override val phone: String,

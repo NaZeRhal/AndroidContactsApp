@@ -34,6 +34,7 @@ class ContactSqlDao private constructor(context: Context) {
         val id = dbHandler.add(contact)
         val newContact = Contact.Existing(
             id = id,
+            fbId = contact.fbId,
             name = contact.name,
             email = contact.email,
             phone = contact.phone,
@@ -43,6 +44,24 @@ class ContactSqlDao private constructor(context: Context) {
         )
         contacts = contacts + listOf(newContact)
         allContacts.value = contacts
+    }
+
+    fun addAll(contacts: List<Contact.New>) {
+        var oldContacts = allContacts.value ?: emptyList()
+        val ids = dbHandler.addAll(contacts)
+        for (index in contacts.indices) {
+            val newContact = Contact.Existing(
+                id = ids[index],
+                fbId = contacts[index].fbId,
+                name = contacts[index].name,
+                email = contacts[index].email,
+                phone = contacts[index].phone,
+                image = contacts[index].image,
+                birthDate = contacts[index].birthDate,
+                isFavorite = contacts[index].isFavorite
+            )
+            oldContacts = oldContacts + listOf(newContact)
+        }
     }
 
     fun update(contact: Contact.Existing) {
@@ -70,7 +89,15 @@ class ContactSqlDao private constructor(context: Context) {
         return allContacts
     }
 
-    fun findById(id: Long): Contact.Existing? {
-        return dbHandler.findById(id)
+    fun findById(fbId: String): Contact.Existing? {
+        return dbHandler.findById(fbId)
+    }
+
+    fun updateAll(contacts: List<Contact.Existing>) {
+        dbHandler.updateAll(contacts)
+    }
+
+    fun deleteAll(contacts: List<Contact.Existing>) {
+        dbHandler.deleteAll(contacts)
     }
 }

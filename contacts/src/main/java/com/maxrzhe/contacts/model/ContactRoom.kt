@@ -10,6 +10,7 @@ import kotlinx.parcelize.Parcelize
 data class ContactRoom(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val fbId: String,
     val name: String,
     val phone: String,
     val email: String,

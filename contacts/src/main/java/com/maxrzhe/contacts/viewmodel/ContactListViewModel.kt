@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
+import com.maxrzhe.contacts.repository.ContactRepoWithRestApi
 import com.maxrzhe.contacts.repository.Repository
-import com.maxrzhe.contacts.repository.RepositoryFactory
 import com.maxrzhe.contacts.repository.RepositoryType
 import com.maxrzhe.core.model.Contact
 import com.maxrzhe.core.viewmodel.BaseViewModel
@@ -17,7 +17,7 @@ class ContactListViewModel(app: Application) : BaseViewModel(app) {
     private val readAllData: MutableLiveData<List<Contact.Existing>> = MutableLiveData()
 
     private val repository: Repository =
-        RepositoryFactory.create(app, RepositoryType.FIREBASE_REST_API)
+        ContactRepoWithRestApi.getInstance(app, RepositoryType.PLAIN_SQL)
     var isFavorites: Boolean = false
 
     init {

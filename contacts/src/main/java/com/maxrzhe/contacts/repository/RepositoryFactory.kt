@@ -18,10 +18,6 @@ abstract class RepositoryFactory {
                     val contactSqlDao = ContactSqlDao.getInstance(application)
                     ContactSQLRepository(contactSqlDao)
                 }
-                RepositoryType.FIREBASE_REST_API -> {
-                    val contactsApi = (application as ContactsApp).contactsApi
-                    ContactFirebaseRepository(contactsApi)
-                }
             }
         }
     }
