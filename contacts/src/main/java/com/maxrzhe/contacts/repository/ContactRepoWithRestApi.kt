@@ -1,6 +1,7 @@
 package com.maxrzhe.contacts.repository
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.contacts.app.ContactsApp
@@ -21,8 +22,19 @@ class ContactRepoWithRestApi private constructor(app: Application, type: Reposit
 
     override suspend fun add(contact: Contact.New) {
         val response = contactsApi.postContactAsync(contact).await()
-        if (response.isNotEmpty()) {
-            repository.add(contact)
+        if (response.name.isNotEmpty()) {
+            with(contact) {
+                val newContact = Contact.New(
+                    fbId = response.name,
+                    name = name,
+                    email = email,
+                    phone = phone,
+                    image = image,
+                    birthDate = birthDate,
+                    isFavorite = isFavorite
+                )
+                repository.add(newContact)
+            }
         }
     }
 

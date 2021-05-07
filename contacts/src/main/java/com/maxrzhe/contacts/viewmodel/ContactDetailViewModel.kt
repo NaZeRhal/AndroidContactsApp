@@ -3,6 +3,7 @@ package com.maxrzhe.contacts.viewmodel
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Application
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
@@ -17,6 +18,7 @@ import com.maxrzhe.contacts.repository.Repository
 import com.maxrzhe.contacts.repository.RepositoryType
 import com.maxrzhe.core.model.Contact
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -55,10 +57,15 @@ class ContactDetailViewModel(private val app: Application) :
         isLoading.set(true)
         id = selectedId
         viewModelScope.launch {
-            val contact =
-                if (selectedId != null) repository.findById(fbId) else Contact.New()
-            setupFields(contact)
-            isLoading.set(false)
+            try {
+                val contact =
+                    if (selectedId != null) repository.findById(fbId) else Contact.New()
+                setupFields(contact)
+            } catch (e: Exception) {
+                Log.i("RE_SP", "manageSelectedId: $e")
+            } finally {
+                isLoading.set(false)
+            }
         }
     }
 
@@ -146,7 +153,11 @@ class ContactDetailViewModel(private val app: Application) :
 
     private fun add(contact: Contact.New) {
         viewModelScope.launch {
-            repository.add(contact)
+            try {
+                repository.add(contact)
+            } catch (e: Exception) {
+                Log.i("RE_SP", "add: ${e.message}")
+            }
         }
     }
 

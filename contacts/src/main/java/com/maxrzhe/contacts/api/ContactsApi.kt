@@ -1,5 +1,6 @@
 package com.maxrzhe.contacts.api
 
+import com.maxrzhe.contacts.data.ContactFbIdResponse
 import com.maxrzhe.contacts.data.ContactListResponse
 import com.maxrzhe.core.model.Contact
 import kotlinx.coroutines.Deferred
@@ -13,6 +14,6 @@ interface ContactsApi {
     fun getContactsListAsync(): Deferred<ContactListResponse>
 
     @POST("contacts_db.json")
-    fun postContactAsync(@Body contact: Contact.New) : Deferred<String>
+    fun postContactAsync(@Body contact: Contact.New) : Deferred<ContactFbIdResponse>
 
 }

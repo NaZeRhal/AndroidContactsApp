@@ -10,3 +10,5 @@ data class ContactListResponseItem(
     val birthDate: String,
     val isFavorite: Boolean
 )
+
+data class ContactFbIdResponse(val name: String)
