@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.maxrzhe.contacts.model.ContactSql
 import com.maxrzhe.core.model.Contact
 
 class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
@@ -60,7 +61,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         onCreate(db)
     }
 
-    fun add(contact: Contact.New): Long {
+    fun add(contact: ContactSql): Long {
         val db = this.writableDatabase
         val contentValues = getContentValue(contact)
 
@@ -73,29 +74,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         return success
     }
 
-    fun addAll(contacts: List<Contact.New>): List<Long> {
-        var ids: List<Long> = emptyList()
-        val db = this.writableDatabase
-        db.beginTransaction()
-        try {
-            for (contact in contacts) {
-                val contentValues = getContentValue(contact)
-                val success = db.insert(
-                    TABLE_CONTACTS,
-                    null,
-                    contentValues
-                )
-                ids = ids + listOf(success)
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
-        }
-        db.close()
-        return ids
-    }
-
-    fun update(contact: Contact.Existing): Int {
+    fun update(contact: ContactSql): Int {
         val db = this.writableDatabase
         val contentValues = getContentValue(contact)
 
@@ -109,27 +88,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         return success
     }
 
-    fun updateAll(contacts: List<Contact.Existing>) {
-        val db = this.writableDatabase
-        db.beginTransaction()
-        try {
-            for (contact in contacts) {
-                val contentValues = getContentValue(contact)
-                db.update(
-                    TABLE_CONTACTS,
-                    contentValues,
-                    "$KEY_ID=${contact.id}",
-                    null
-                )
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
-        }
-        db.close()
-    }
-
-    fun delete(contact: Contact.Existing): Int {
+    fun delete(contact: ContactSql): Int {
         val db = this.writableDatabase
 
         val success = db.delete(
@@ -141,26 +100,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         return success
     }
 
-    fun deleteAll(contacts: List<Contact.Existing>) {
-        val db = this.writableDatabase
-        db.beginTransaction()
-        try {
-            for (contact in contacts) {
-                db.delete(
-                    TABLE_CONTACTS,
-                    "$KEY_ID=${contact.id}",
-                    null
-                )
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
-        }
-        db.close()
-    }
-
-    fun findAll(): List<Contact.Existing> {
-        var contacts: List<Contact.Existing> = emptyList()
+    fun findAll(): List<ContactSql> {
+        var contacts: List<ContactSql> = emptyList()
         val query = "SELECT * FROM $TABLE_CONTACTS"
 
         val db = this.readableDatabase
@@ -173,7 +114,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                 with(raw) {
                     if (moveToFirst()) {
                         do {
-                            val contact = Contact.Existing(
+                            val contact = ContactSql(
                                 id = getLong(getColumnIndex(KEY_ID)),
                                 fbId = getString(getColumnIndex(KEY_FB_ID)),
                                 name = getString(getColumnIndex(KEY_NAME)),
@@ -197,7 +138,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         }
     }
 
-    private fun getContentValue(contact: Contact): ContentValues {
+    private fun getContentValue(contact: ContactSql): ContentValues {
         val contentValues = ContentValues()
 
         with(contact) {
@@ -214,12 +155,12 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
         return contentValues
     }
 
-    fun findById(fbId: String): Contact.Existing? {
+    fun findById(fbId: String): ContactSql? {
         val query = "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_FB_ID=$fbId"
 
         val db = this.readableDatabase
         val cursor: Cursor?
-        var contact: Contact.Existing? = null
+        var contact: ContactSql? = null
 
         try {
             cursor = db.rawQuery(query, null)
@@ -228,7 +169,7 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
                 with(raw) {
                     if (moveToFirst()) {
                         do {
-                            contact = Contact.Existing(
+                            contact = ContactSql(
                                 id = getLong(getColumnIndex(KEY_ID)),
                                 fbId = getString(getColumnIndex(KEY_FB_ID)),
                                 name = getString(getColumnIndex(KEY_NAME)),

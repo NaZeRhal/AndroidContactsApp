@@ -9,34 +9,47 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.repository.ContactRepoWithRestApi
-import com.maxrzhe.contacts.repository.Repository
-import com.maxrzhe.contacts.repository.RepositoryType
+import com.maxrzhe.contacts.remote.RemoteDataSourceImpl
+import com.maxrzhe.contacts.remote.Result
+import com.maxrzhe.contacts.repository.ContactMainRepository
+import com.maxrzhe.contacts.repository.RoomRepositoryImpl
 import com.maxrzhe.core.model.Contact
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
-    private val repository: Repository =
-        ContactRepoWithRestApi.getInstance(app, RepositoryType.PLAIN_SQL)
+    private val remoteDataSource = RemoteDataSourceImpl.getInstance(app)
+    private val dbRepository = RoomRepositoryImpl(app)
+    private val mainRepo = ContactMainRepository.getInstance(remoteDataSource, dbRepository)
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker
 
     private var calendar = Calendar.getInstance()
-
-    private var id: Long? = null
     private var isFavorite = false
-    private var fbId: String = ""
+    private var _fbId = MutableLiveData<String?>(null)
+
+    private val _contact: LiveData<Result<Contact>> = _fbId.distinctUntilChanged().switchMap {
+        Log.i("IDC", "_contact: $it")
+        liveData {
+            mainRepo.findById(it).onStart {
+                emit(Result.loading())
+            }.collect { resultContact ->
+                Log.i("IDC", "result: ${resultContact.data}")
+                Log.i("IDC", "result: ${resultContact.status}")
+                emit(resultContact)
+            }
+        }
+    }
+    val contact = _contact
 
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
@@ -53,30 +66,17 @@ class ContactDetailViewModel(private val app: Application) :
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(ContextCompat.getColor(app, R.color.favorite_false_color))
 
-    fun manageSelectedId(selectedId: Long?) {
-        isLoading.set(true)
-        id = selectedId
-        viewModelScope.launch {
-            try {
-                val contact =
-                    if (selectedId != null) repository.findById(fbId) else Contact.New()
-                setupFields(contact)
-            } catch (e: Exception) {
-                Log.i("RE_SP", "manageSelectedId: $e")
-            } finally {
-                isLoading.set(false)
-            }
-        }
+    fun setSelectedId(selectedId: String?) {
+        _fbId.value = selectedId
     }
 
-    private fun setupFields(contact: Contact?) {
-        if (contact == null || contact is Contact.New) {
+    fun setupFields(contact: Contact?) {
+        if (contact == null) {
             name.set("")
             email.set("")
             phone.set("")
             image.set("")
             date.set("")
-            fbId = ""
             isFavorite = false
             toggleTint()
             imageTextRes.set(R.string.detail_tv_add_image_text)
@@ -88,7 +88,6 @@ class ContactDetailViewModel(private val app: Application) :
             image.set(contact.image)
             date.set(contact.birthDate)
             isFavorite = contact.isFavorite
-            fbId = contact.fbId
             parseDate(contact.birthDate)
             toggleTint()
             imageTextRes.set(R.string.detail_tv_change_image_text)
@@ -151,19 +150,16 @@ class ContactDetailViewModel(private val app: Application) :
         }
     }
 
-    private fun add(contact: Contact.New) {
+    private fun add(contact: Contact) {
         viewModelScope.launch {
-            try {
-                repository.add(contact)
-            } catch (e: Exception) {
-                Log.i("RE_SP", "add: ${e.message}")
-            }
+            Log.i("SVC", "add: $contact")
+            mainRepo.add(contact).collect()
         }
     }
 
-    private fun update(contact: Contact.Existing) {
+    private fun update(contact: Contact) {
         viewModelScope.launch {
-            repository.update(contact)
+            mainRepo.update(contact)
         }
     }
 
@@ -192,35 +188,22 @@ class ContactDetailViewModel(private val app: Application) :
 
     fun addOrUpdate() {
         if (validateInput()) {
-            if (id != null) {
-                id?.let {
-                    val contact = Contact.Existing(
-                        id = it,
-                        fbId = fbId,
-                        name = name.get() ?: "",
-                        phone = phone.get() ?: "",
-                        email = email.get() ?: "",
-                        image = image.get() ?: "",
-                        birthDate = date.get() ?: "",
-                        isFavorite = isFavorite
-                    )
-                    update(contact)
-                }
+            val contact = Contact(
+                fbId = _fbId.value ?: "",
+                name = name.get() ?: "",
+                phone = phone.get() ?: "",
+                email = email.get() ?: "",
+                image = image.get() ?: "",
+                birthDate = date.get() ?: "",
+                isFavorite = isFavorite
+            )
+            if (_fbId.value != null) {
+                update(contact)
             } else {
-                val contact =
-                    Contact.New(
-                        fbId = fbId,
-                        name = name.get() ?: "",
-                        phone = phone.get() ?: "",
-                        email = email.get() ?: "",
-                        image = image.get() ?: "",
-                        birthDate = date.get() ?: "",
-                        isFavorite = isFavorite
-                    )
                 add(contact)
             }
-            _savedMarker.value = true
         }
+        _savedMarker.value = true
     }
 
     private fun validateInput(): Boolean {

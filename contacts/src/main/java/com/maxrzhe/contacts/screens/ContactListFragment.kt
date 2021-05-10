@@ -1,6 +1,7 @@
 package com.maxrzhe.contacts.screens
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +10,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
+import com.maxrzhe.contacts.remote.Status
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactListViewModel
 import com.maxrzhe.contacts.viewmodel.SearchViewModel
@@ -21,6 +24,11 @@ import com.maxrzhe.core.screens.BaseFragment
 class ContactListFragment :
     BaseFragment<FragmentContactListBinding, ContactListViewModel>(),
     ContactAdapter.OnSearchResultListener {
+
+    companion object {
+        const val IS_FAVORITES = "is_favorites"
+    }
+
     private var contactAdapter: ContactAdapter? = null
     private var isFavorites = false
 
@@ -45,7 +53,10 @@ class ContactListFragment :
         }
     }
 
-    override fun bindView() {}
+    override fun bindView() {
+        binding.listViewModel = viewModel
+        binding.lifecycleOwner = requireActivity()
+    }
 
     override fun initView() {
         with(binding) {
@@ -55,8 +66,8 @@ class ContactListFragment :
                 contactAdapter = ContactAdapter(
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
-                        override fun onClick(contactId: Long) {
-                            sharedViewModel.select(contactId)
+                        override fun onClick(fbId: String) {
+                            sharedViewModel.select(fbId)
                             onSelectContactListener?.onSelect()
                             binding.tvSearchResult.visibility = View.GONE
                         }
@@ -79,23 +90,13 @@ class ContactListFragment :
                 attachToRecyclerView(rvContactList)
             }
         }
-        viewModel.isFavorites = isFavorites
-        viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
-            contactAdapter?.itemList = contacts
-        })
-
         contactAdapter?.setOnSearchResultListener(this)
+
+        subscribeUi()
+
         searchViewModel.query.observe(viewLifecycleOwner, { query ->
             contactAdapter?.filter = query
         })
-    }
-
-    interface OnSelectContactListener {
-        fun onSelect()
-    }
-
-    companion object {
-        const val IS_FAVORITES = "is_favorites"
     }
 
     override fun onSearchResult(resultCount: Int) {
@@ -112,5 +113,46 @@ class ContactListFragment :
             binding.tvSearchResult.visibility = View.GONE
             binding.tvSearchResult.text = ""
         }
+    }
+
+    private fun subscribeUi() {
+        viewModel.isFavorites = isFavorites
+        viewModel.allContacts.observe(viewLifecycleOwner, { result ->
+
+            when (result.status) {
+                Status.SUCCESS -> {
+                    result.data?.let {
+                        for (c in it) {
+                            Log.i("DBG", "subscribeUi: ${c.name}")
+                        }
+                        contactAdapter?.itemList = it
+                    }
+                    viewModel.isLoading.set(false)
+                }
+
+                Status.LOADING -> {
+                    viewModel.isLoading.set(true)
+                }
+
+                Status.ERROR -> {
+                    result.error?.let {
+                        showErrorMessage(it)
+                    }
+                    viewModel.isLoading.set(false)
+                }
+            }
+
+        })
+    }
+
+    private fun showErrorMessage(msg: String) {
+        view?.let {
+            Snackbar.make(it, msg, Snackbar.LENGTH_INDEFINITE).setAction("DISMISS") {
+            }.show()
+        }
+    }
+
+    interface OnSelectContactListener {
+        fun onSelect()
     }
 }

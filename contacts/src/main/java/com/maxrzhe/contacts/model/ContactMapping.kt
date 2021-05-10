@@ -1,62 +1,68 @@
 package com.maxrzhe.contacts.model
 
-import com.maxrzhe.contacts.data.ContactListResponseItem
+import com.maxrzhe.contacts.data.ContactResponseItem
 import com.maxrzhe.core.model.Contact
 
 abstract class ContactMapping {
     companion object {
         fun contactToContactRoom(contact: Contact): ContactRoom = with(contact) {
-            if (this is Contact.Existing) {
-                ContactRoom(
-                    id = id,
-                    fbId = fbId,
-                    name = name,
-                    email = email,
-                    phone = phone,
-                    image = image,
-                    birthDate = birthDate,
-                    isFavorite = isFavorite
-                )
-            } else {
-                ContactRoom(
-                    name = name,
-                    fbId = fbId,
-                    email = email,
-                    phone = phone,
-                    image = image,
-                    birthDate = birthDate,
-                    isFavorite = isFavorite
-                )
-            }
+            ContactRoom(
+                id = 0,
+                fbId = fbId,
+                name = name,
+                email = email,
+                phone = phone,
+                image = image,
+                birthDate = birthDate,
+                isFavorite = isFavorite
+            )
         }
 
-        fun contactRoomToContact(contactRoom: ContactRoom?): Contact.Existing? = with(contactRoom) {
-            if (this != null) {
-                Contact.Existing(
-                    id = id,
+        fun contactRoomToContact(contactRoom: ContactRoom): Contact = with(contactRoom) {
+            Contact(
+                fbId = fbId,
+                name = name,
+                email = email,
+                phone = phone,
+                image = image,
+                birthDate = birthDate,
+                isFavorite = isFavorite
+            )
+        }
+
+
+        fun contactRestToContact(
+            fbId: String?,
+            contactItem: ContactResponseItem,
+        ): Contact? = with(contactItem) {
+            if (fbId != null) {
+                Contact(
                     fbId = fbId,
                     name = name,
                     email = email,
-                    phone = phone,
                     image = image,
-                    birthDate = birthDate,
-                    isFavorite = isFavorite
+                    phone = phone,
+                    isFavorite = isFavorite,
+                    birthDate = birthDate
                 )
             } else null
         }
 
-        fun contactRoomToContact(contactRoomList: List<ContactRoom>?): List<Contact.Existing>? =
-            contactRoomList?.mapNotNull {
-                contactRoomToContact(it)
+        fun contactToContactRest(contact: Contact): ContactResponseItem = with(contact) {
+            ContactResponseItem(name, email, phone, image, birthDate, isFavorite)
+        }
+
+        fun contactRoomToContactRest(contactRoom: ContactRoom): ContactResponseItem =
+            with(contactRoom) {
+                ContactResponseItem(name, email, phone, image, birthDate, isFavorite)
             }
 
-        fun contactRestToContactExisting(
+        fun contactRestToContactRoom(
             fbId: String,
-            contactItem: ContactListResponseItem,
-            contact: Contact.Existing
-        ): Contact.Existing = with(contactItem) {
-            Contact.Existing(
-                id = contact.id,
+            contactItem: ContactResponseItem
+        ): ContactRoom = with(contactItem) {
+            ContactRoom(
+                id = 0,
                 fbId = fbId,
                 name = name,
                 email = email,
@@ -66,43 +72,5 @@ abstract class ContactMapping {
                 birthDate = birthDate
             )
         }
-
-        fun contactRestToContactNew(
-            fbId:String,
-            contactItem: ContactListResponseItem,
-        ): Contact.New = with(contactItem) {
-            Contact.New(
-                fbId = fbId,
-                name = name,
-                email = email,
-                image = image,
-                phone = phone,
-                isFavorite = isFavorite,
-                birthDate = birthDate
-            )
-        }
-
-        fun contactRestToContact(
-            fbId: String,
-            contactItem: ContactListResponseItem?
-        ): Contact.New? =
-            with(contactItem) {
-                if (this != null) {
-                    Contact.New(
-                        fbId = fbId,
-                        name = name,
-                        email = email,
-                        phone = phone,
-                        image = image,
-                        birthDate = birthDate,
-                        isFavorite = isFavorite
-                    )
-                } else null
-            }
-
-        fun contactRestToContact(contactItemList: HashMap<String, ContactListResponseItem>?): List<Contact.New>? =
-            contactItemList?.mapNotNull {
-                contactRestToContact(it.key, it.value)
-            }
     }
 }

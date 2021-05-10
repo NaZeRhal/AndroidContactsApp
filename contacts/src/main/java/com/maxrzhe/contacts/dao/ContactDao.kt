@@ -1,6 +1,5 @@
 package com.maxrzhe.contacts.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.maxrzhe.contacts.model.ContactRoom
 
@@ -8,24 +7,24 @@ import com.maxrzhe.contacts.model.ContactRoom
 interface ContactDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun add(contactRoom: ContactRoom)
+    fun add(contactRoom: ContactRoom)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addAll(contacts: List<ContactRoom>)
+    fun addAll(contacts: List<ContactRoom>)
 
     @Update
-    suspend fun update(contactRoom: ContactRoom)
+    fun update(contactRoom: ContactRoom)
 
     @Delete
-    suspend fun delete(contactRoom: ContactRoom)
+    fun delete(contactRoom: ContactRoom)
 
-    @Delete
-    suspend fun deleteAll(contacts: List<ContactRoom>)
+    @Query("DELETE FROM contacts_table WHERE fbId IN (:fbIds)")
+    fun deleteByFbIds(fbIds: List<String>)
 
     @Query("SELECT * FROM contacts_table WHERE fbId=:fbId")
-    suspend fun findById(fbId: String): ContactRoom?
+    fun findById(fbId: String): ContactRoom
 
     @Query("SELECT * FROM contacts_table")
-    fun findAll(): LiveData<List<ContactRoom>>
+    fun findAll(): List<ContactRoom>
 
 }

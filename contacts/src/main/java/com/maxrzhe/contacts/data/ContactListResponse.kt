@@ -1,8 +1,10 @@
 package com.maxrzhe.contacts.data
 
-class ContactListResponse : HashMap<String, ContactListResponseItem>()
+import com.google.gson.annotations.SerializedName
 
-data class ContactListResponseItem(
+class ContactListResponse : HashMap<String, ContactResponseItem>()
+
+data class ContactResponseItem(
     val name: String,
     val email: String,
     val phone: String,
@@ -11,4 +13,6 @@ data class ContactListResponseItem(
     val isFavorite: Boolean
 )
 
-data class ContactFbIdResponse(val name: String)
+data class ContactFbIdResponse(
+    @SerializedName("name")
+    val fbId: String)

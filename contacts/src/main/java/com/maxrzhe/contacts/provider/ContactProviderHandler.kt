@@ -15,20 +15,20 @@ import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_IMAGE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_NAME
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_PHONE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.TABLE_CONTACTS
-import com.maxrzhe.contacts.repository.Repository
+import com.maxrzhe.contacts.model.ContactSql
 import com.maxrzhe.core.model.Contact
 
-class ContactProviderHandler(private val context: Context) : Repository {
+class ContactProviderHandler(private val context: Context) {
 
-    private val allContacts = MutableLiveData<List<Contact.Existing>>()
+    private val allContacts = MutableLiveData<List<Contact>>()
 
     companion object {
         private const val CONTENT_URI =
             "content://com.maxrzhe.contacts.provider.ContactContentProvider/$TABLE_CONTACTS"
     }
 
-    private fun loadAllContacts(): List<Contact.Existing> {
-        var contacts: List<Contact.Existing> = emptyList()
+    private fun loadAllContacts(): List<Contact> {
+        var contacts: List<Contact> = emptyList()
         val cursor: Cursor? =
             context.contentResolver.query(Uri.parse(CONTENT_URI), null, null, null, null)
         try {
@@ -36,8 +36,7 @@ class ContactProviderHandler(private val context: Context) : Repository {
                 with(raw) {
                     if (moveToFirst()) {
                         do {
-                            val contact = Contact.Existing(
-                                id = getLong(getColumnIndex(KEY_ID)),
+                            val contact = Contact(
                                 fbId = getString(getColumnIndex(KEY_FB_ID)),
                                 name = getString(getColumnIndex(KEY_NAME)),
                                 phone = getString(getColumnIndex(KEY_PHONE)),
@@ -57,40 +56,11 @@ class ContactProviderHandler(private val context: Context) : Repository {
         }
     }
 
-    override suspend fun findById(fbId: String): Contact.Existing? {
-        TODO("Not yet implemented")
-    }
 
-    override suspend fun findAll(): LiveData<List<Contact.Existing>> {
+    fun findAll(): LiveData<List<Contact>> {
         if (allContacts.value == null) {
             allContacts.value = loadAllContacts()
         }
         return allContacts
     }
-
-    override suspend fun add(contact: Contact.New) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addAll(contacts: List<Contact.New>) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun update(contact: Contact.Existing) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun updateAll(contacts: List<Contact.Existing>) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun delete(contact: Contact.Existing) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteAll(contacts: List<Contact.Existing>) {
-        TODO("Not yet implemented")
-    }
-
-
 }

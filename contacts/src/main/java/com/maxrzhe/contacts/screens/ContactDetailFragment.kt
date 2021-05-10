@@ -11,10 +11,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.databinding.FragmentContactDetailBinding
+import com.maxrzhe.contacts.remote.Status
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactDetailViewModel
 import com.maxrzhe.contacts.viewmodel.SharedViewModel
+import com.maxrzhe.core.model.Contact
 import com.maxrzhe.core.screens.BaseFragment
 import java.io.File
 import java.io.FileOutputStream
@@ -49,7 +52,8 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
 
     override fun initView() {
         sharedViewModel.contactId.observe(viewLifecycleOwner, {
-            viewModel.manageSelectedId(it)
+            viewModel.setSelectedId(it)
+            subscribeUi()
         })
         viewModel.savedMarker.observe(viewLifecycleOwner, {
             if (it) {
@@ -58,6 +62,37 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
             }
         })
         binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
+    }
+
+    private fun subscribeUi() {
+        viewModel.contact.observe(viewLifecycleOwner, { result ->
+            when (result.status) {
+                Status.SUCCESS -> {
+                    updateUI(result.data)
+                    viewModel.isLoading.set(false)
+                }
+                Status.LOADING -> {
+                    viewModel.isLoading.set(true)
+                }
+                Status.ERROR -> {
+                    result.error?.let {
+                        showErrorMessage(it)
+                    }
+                    viewModel.isLoading.set(true)
+                }
+            }
+        })
+    }
+
+    private fun updateUI(contact: Contact?) {
+        viewModel.setupFields(contact)
+    }
+
+    private fun showErrorMessage(msg: String) {
+        view?.let {
+            Snackbar.make(it, msg, Snackbar.LENGTH_INDEFINITE).setAction("DISMISS") {
+            }.show()
+        }
     }
 
     fun setupImage(contentUri: Uri) {

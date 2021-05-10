@@ -38,7 +38,7 @@ class ContactConsumerListFragment :
                 contactAdapter = ContactAdapter(
                     requireContext(),
                     object : ContactAdapter.OnContactClickListener {
-                        override fun onClick(contactId: Long) {
+                        override fun onClick(fbId: String) {
                             //NOTHING TO DO
                         }
                     }

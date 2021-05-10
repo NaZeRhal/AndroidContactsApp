@@ -2,6 +2,7 @@ package com.maxrzhe.contacts.adapters
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -21,8 +22,11 @@ class ContactAdapter(
 
     private var onSearchResultListener: OnSearchResultListener? = null
 
-    var itemList: List<Contact.Existing> = emptyList()
+    var itemList: List<Contact> = emptyList()
         set(value) {
+            for (c in value) {
+                Log.i("DBG", "setItemList: ${c.name}")
+            }
             field = value
             performFiltering(filter)
         }
@@ -34,12 +38,12 @@ class ContactAdapter(
         }
 
     private val sortedList = SortedList(
-        Contact.Existing::class.java,
-        object : SortedList.Callback<Contact.Existing>() {
+        Contact::class.java,
+        object : SortedList.Callback<Contact>() {
 
             override fun compare(
-                contact1: Contact.Existing?,
-                contact2: Contact.Existing?
+                contact1: Contact?,
+                contact2: Contact?
             ): Int {
                 return if (contact1?.name != null && contact2?.name != null) {
                     contact1.name.toLowerCase(Locale.getDefault())
@@ -64,8 +68,8 @@ class ContactAdapter(
             }
 
             override fun areContentsTheSame(
-                oldContact: Contact.Existing?,
-                newContact: Contact.Existing?
+                oldContact: Contact?,
+                newContact: Contact?
             ): Boolean {
                 return if (oldContact != null && newContact != null) {
                     oldContact == newContact
@@ -73,11 +77,11 @@ class ContactAdapter(
             }
 
             override fun areItemsTheSame(
-                contact1: Contact.Existing?,
-                contact2: Contact.Existing?
+                contact1: Contact?,
+                contact2: Contact?
             ): Boolean {
                 return if (contact1 != null && contact2 != null) {
-                    contact1.id == contact2.id
+                    contact1.fbId == contact2.fbId
                 } else false
             }
 
@@ -103,14 +107,14 @@ class ContactAdapter(
                 .into(ivContactImage)
 
             root.setOnClickListener {
-                onContactClickListener.onClick(contact.id)
+                onContactClickListener.onClick(contact.fbId)
             }
         }
     }
 
     override fun getItemCount(): Int = sortedList.size()
 
-    fun getContactAt(position: Int): Contact.Existing {
+    fun getContactAt(position: Int): Contact {
         return sortedList[position]
     }
 
@@ -130,7 +134,10 @@ class ContactAdapter(
         replaceAll(filteredContacts)
     }
 
-    private fun replaceAll(contacts: List<Contact.Existing>) {
+    private fun replaceAll(contacts: List<Contact>) {
+        for (c in contacts) {
+            Log.i("DBG", "replaceAll: ${c.name}")
+        }
         sortedList.beginBatchedUpdates()
         (sortedList.size() - 1 downTo 0 step 1).forEach { i ->
             val contact = sortedList[i]
@@ -140,6 +147,9 @@ class ContactAdapter(
         }
         sortedList.addAll(contacts)
         sortedList.endBatchedUpdates()
+        for (c in 0 until sortedList.size()) {
+            Log.i("DBG", "sortedList: ${sortedList.get(c).name}")
+        }
     }
 
     private fun anyMatches(contact: Contact, pattern: String): Boolean {
@@ -155,7 +165,7 @@ class ContactAdapter(
     }
 
     interface OnContactClickListener {
-        fun onClick(contactId: Long)
+        fun onClick(fbId: String)
     }
 
     interface OnSearchResultListener {

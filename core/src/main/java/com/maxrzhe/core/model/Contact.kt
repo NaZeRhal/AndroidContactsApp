@@ -3,35 +3,13 @@ package com.maxrzhe.core.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-sealed class Contact {
-    abstract val fbId: String
-    abstract val name: String
-    abstract val email: String
-    abstract val phone: String
-    abstract val image: String
-    abstract val birthDate: String
-    abstract val isFavorite: Boolean
-
-    @Parcelize
-    data class New(
-        override val fbId: String = "",
-        override val name: String = "",
-        override val email: String = "",
-        override val phone: String = "",
-        override val image: String = "",
-        override val birthDate: String = "",
-        override val isFavorite: Boolean = false
-    ) : Contact(), Parcelable
-
-    @Parcelize
-    data class Existing(
-        val id: Long,
-        override val fbId: String,
-        override val name: String,
-        override val email: String,
-        override val phone: String,
-        override val image: String,
-        override val birthDate: String = "",
-        override val isFavorite: Boolean = false
-    ) : Contact(), Parcelable
-}
+@Parcelize
+data class Contact(
+    val fbId: String,
+    val name: String,
+    val email: String,
+    val phone: String,
+    val image: String,
+    val birthDate: String,
+    val isFavorite: Boolean
+) : Parcelable
