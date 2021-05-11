@@ -10,12 +10,10 @@ import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_DATE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_EMAIL
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_FAVORITE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_FB_ID
-import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_ID
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_IMAGE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_NAME
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.KEY_PHONE
 import com.maxrzhe.contacts.database.DatabaseHandler.Companion.TABLE_CONTACTS
-import com.maxrzhe.contacts.model.ContactSql
 import com.maxrzhe.core.model.Contact
 
 class ContactProviderHandler(private val context: Context) {

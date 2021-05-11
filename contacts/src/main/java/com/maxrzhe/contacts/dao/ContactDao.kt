@@ -2,15 +2,16 @@ package com.maxrzhe.contacts.dao
 
 import androidx.room.*
 import com.maxrzhe.contacts.model.ContactRoom
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ContactDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun add(contactRoom: ContactRoom)
+    suspend fun add(contactRoom: ContactRoom)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addAll(contacts: List<ContactRoom>)
+    suspend fun addAll(contacts: List<ContactRoom>)
 
     @Update
     fun update(contactRoom: ContactRoom)
@@ -25,6 +26,6 @@ interface ContactDao {
     fun findById(fbId: String): ContactRoom
 
     @Query("SELECT * FROM contacts_table")
-    fun findAll(): List<ContactRoom>
+    fun findAll(): Flow<List<ContactRoom>>
 
 }

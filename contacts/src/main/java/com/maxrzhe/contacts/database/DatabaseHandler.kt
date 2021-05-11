@@ -7,7 +7,6 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.maxrzhe.contacts.model.ContactSql
-import com.maxrzhe.core.model.Contact
 
 class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(
     context, DATABASE_NAME, null, DATABASE_VERSION

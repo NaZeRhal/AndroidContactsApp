@@ -1,6 +1,5 @@
 package com.maxrzhe.contacts.repository
 
-import android.util.Log
 import com.maxrzhe.contacts.data.ContactFbIdResponse
 import com.maxrzhe.contacts.data.ContactListResponse
 import com.maxrzhe.contacts.data.ContactResponseItem
@@ -10,9 +9,7 @@ import com.maxrzhe.contacts.remote.Result
 import com.maxrzhe.contacts.remote.Status
 import com.maxrzhe.core.model.Contact
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 
 class ContactMainRepository private constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
@@ -22,7 +19,6 @@ class ContactMainRepository private constructor(
     suspend fun findById(fbId: String?): Flow<Result<Contact>> {
         return flow {
             emit(Result.loading())
-            Log.i("SVC", "findByFlow: kuku")
             val result: Result<ContactResponseItem> = remoteDataSource.findById(fbId)
             var contact: Contact? = null
             if (result.status == Status.SUCCESS) {
@@ -34,10 +30,16 @@ class ContactMainRepository private constructor(
         }.flowOn(Dispatchers.IO)
     }
 
+    private fun cachedContactsFlow(): Flow<Result<List<Contact>>> =
+        dbRepository.findAll()
+            .map { Result.success(it) }
+            .catch { emit(Result.error(it.message)) }
+            .flowOn(Dispatchers.IO)
+            .onStart { emit(Result.loading()) }
+
     suspend fun add(contact: Contact): Flow<Result<Contact>> {
         return flow {
             emit(Result.loading())
-            Log.i("SVC", "addFlow: kuku")
             val result: Result<ContactFbIdResponse> = remoteDataSource.add(contact)
             var newContact: Contact? = null
             if (result.status == Status.SUCCESS) {
@@ -51,58 +53,35 @@ class ContactMainRepository private constructor(
                         birthDate = contact.birthDate,
                         isFavorite = contact.isFavorite
                     )
-                    storeToDb(newContact)
+                    dbRepository.add(newContact)
                 }
             }
             emit(Result.success(newContact))
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun getContacts(): Flow<Result<List<Contact>>?> {
-        return flow {
-            emit(getCachedContacts())
-            emit(Result.loading())
-            val result: Result<ContactListResponse> = remoteDataSource.getAllContacts()
-            var fetchedContacts: List<Contact>? = null
-            if (result.status == Status.SUCCESS) {
-                result.data?.let {
-                    for (c in it) {
-                        Log.i("DBG", "getContacts: ${c.key} ${c.value.name}")
+
+    fun getContacts() = cachedContactsFlow().map { cachedContacts ->
+        val result: Result<ContactListResponse> = remoteDataSource.getAllContacts()
+        var fetchedContacts: List<Contact>? = null
+        if (result.status == Status.SUCCESS) {
+            result.data?.let {
+                fetchedContacts = it.mapNotNull { entry ->
+                    ContactMapping.contactRestToContact(entry.key, entry.value)
+                }
+                fetchedContacts?.let { contacts ->
+                    cachedContacts.data?.let { cached ->
+                        dbRepository.deleteByQuery(cached)
                     }
-                    fetchedContacts = it.mapNotNull { entry ->
-                        ContactMapping.contactRestToContact(entry.key, entry.value)
-                    }
-                    fetchedContacts?.let { contacts ->
-                        dbRepository.deleteByQuery(contacts)
-                        dbRepository.addAll(contacts)
-                    }
+                    dbRepository.addAll(contacts)
                 }
             }
-            for (c in fetchedContacts ?: emptyList()) {
-                Log.i("DBG", "fetchedContacts: ${c.name}")
-            }
-            emit(Result.success(fetchedContacts))
-        }.flowOn(Dispatchers.IO)
-    }
-
-    private fun getCachedContacts(): Result<List<Contact>>? =
-        dbRepository.findAll()?.let {
-            for (c in it) {
-                Log.i("DBG", "getCachedContacts: ${c.name}")
-            }
-            Result.success(it)
         }
-
-    private fun storeToDb(contact: Contact?) {
-        dbRepository.add(contact)
+        Result.success(fetchedContacts)
     }
-
-
-    private fun List<Contact>?.exist(
-        fbId: String,
-    ): Contact? {
-        return this?.firstOrNull { it.fbId == fbId }
-    }
+        .catch { emit(Result.error(it.message)) }
+        .flowOn(Dispatchers.IO)
+        .onStart { emit(Result.loading()) }
 
     suspend fun update(contact: Contact) {
         TODO("Not yet implemented")
@@ -111,7 +90,6 @@ class ContactMainRepository private constructor(
     suspend fun delete(contact: Contact) {
         TODO("Not yet implemented")
     }
-
 
     companion object {
         @Volatile

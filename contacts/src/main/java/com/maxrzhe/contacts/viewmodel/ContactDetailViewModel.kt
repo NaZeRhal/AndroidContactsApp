@@ -3,7 +3,6 @@ package com.maxrzhe.contacts.viewmodel
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Application
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
@@ -26,7 +25,7 @@ class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
     private val remoteDataSource = RemoteDataSourceImpl.getInstance(app)
-    private val dbRepository = RoomRepositoryImpl(app)
+    private val dbRepository = RoomRepositoryImpl.getInstance(app)
     private val mainRepo = ContactMainRepository.getInstance(remoteDataSource, dbRepository)
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
@@ -38,14 +37,11 @@ class ContactDetailViewModel(private val app: Application) :
     private var _fbId = MutableLiveData<String?>(null)
 
     private val _contact: LiveData<Result<Contact>> = _fbId.distinctUntilChanged().switchMap {
-        Log.i("IDC", "_contact: $it")
         liveData {
             mainRepo.findById(it).onStart {
                 emit(Result.loading())
-            }.collect { resultContact ->
-                Log.i("IDC", "result: ${resultContact.data}")
-                Log.i("IDC", "result: ${resultContact.status}")
-                emit(resultContact)
+            }.collect {
+                emit(it)
             }
         }
     }
@@ -152,7 +148,6 @@ class ContactDetailViewModel(private val app: Application) :
 
     private fun add(contact: Contact) {
         viewModelScope.launch {
-            Log.i("SVC", "add: $contact")
             mainRepo.add(contact).collect()
         }
     }

@@ -30,6 +30,9 @@ abstract class ContactMapping {
             )
         }
 
+        fun contactRoomToContact(contactsRoom: List<ContactRoom>): List<Contact> =
+            contactsRoom.map { contactRoomToContact(it) }
+
 
         fun contactRestToContact(
             fbId: String?,

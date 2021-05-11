@@ -1,22 +1,23 @@
 package com.maxrzhe.contacts.repository
 
 import com.maxrzhe.core.model.Contact
+import kotlinx.coroutines.flow.Flow
 
 interface DatabaseRepository {
 
     fun findById(fbId: String): Contact
 
-    fun add(contact: Contact?)
+    suspend  fun add(contact: Contact?)
 
-    fun addAll(contacts: List<Contact>)
+    suspend fun addAll(contacts: List<Contact>)
 
-    fun update(contact: Contact)
+    suspend fun update(contact: Contact)
 
-    fun updateAll(contacts: List<Contact>)
+    suspend fun updateAll(contacts: List<Contact>)
 
     fun delete(contact: Contact)
 
-    fun deleteByQuery(contacts: List<Contact>)
+    suspend fun deleteByQuery(contacts: List<Contact>)
 
-    fun findAll(): List<Contact>?
+    fun findAll(): Flow<List<Contact>>
 }

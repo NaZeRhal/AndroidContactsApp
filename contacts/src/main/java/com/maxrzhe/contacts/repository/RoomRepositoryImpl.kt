@@ -1,12 +1,13 @@
 package com.maxrzhe.contacts.repository
 
 import android.app.Application
-import android.util.Log
 import com.maxrzhe.contacts.app.ContactsApp
 import com.maxrzhe.contacts.model.ContactMapping
 import com.maxrzhe.core.model.Contact
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class RoomRepositoryImpl(app: Application) : DatabaseRepository {
+class RoomRepositoryImpl private constructor(app: Application) : DatabaseRepository {
 
     private val contactDao = (app as ContactsApp).contactDao
 
@@ -15,21 +16,21 @@ class RoomRepositoryImpl(app: Application) : DatabaseRepository {
         return ContactMapping.contactRoomToContact(roomContact)
     }
 
-    override fun add(contact: Contact?) {
+    override suspend fun add(contact: Contact?) {
         contact?.let {
             contactDao.add(ContactMapping.contactToContactRoom(contact))
         }
     }
 
-    override fun addAll(contacts: List<Contact>) {
+    override suspend fun addAll(contacts: List<Contact>) {
         contactDao.addAll(contacts.map { ContactMapping.contactToContactRoom(it) })
     }
 
-    override fun update(contact: Contact) {
+    override suspend fun update(contact: Contact) {
         contactDao.update(ContactMapping.contactToContactRoom(contact))
     }
 
-    override fun updateAll(contacts: List<Contact>) {
+    override suspend fun updateAll(contacts: List<Contact>) {
         contactDao.addAll(contacts.map { ContactMapping.contactToContactRoom(it) })
     }
 
@@ -37,15 +38,28 @@ class RoomRepositoryImpl(app: Application) : DatabaseRepository {
         contactDao.delete(ContactMapping.contactToContactRoom(contact))
     }
 
-    override fun deleteByQuery(contacts: List<Contact>) {
+    override suspend fun deleteByQuery(contacts: List<Contact>) {
         contactDao.deleteByFbIds(contacts.map { it.fbId })
     }
 
-    override fun findAll(): List<Contact> {
-        val roomContacts = contactDao.findAll()
-        for (c in roomContacts) {
-            Log.i("DBG", "findAll: ${c.name}")
+    override fun findAll(): Flow<List<Contact>> {
+        return contactDao.findAll().map { ContactMapping.contactRoomToContact(it) }
+    }
+
+    companion object {
+        @Volatile
+        private var INSTANCE: RoomRepositoryImpl? = null
+
+        fun getInstance(app: Application): RoomRepositoryImpl {
+            val tmpInstance = INSTANCE
+            if (tmpInstance != null) {
+                return tmpInstance
+            }
+            synchronized(this) {
+                val instance = RoomRepositoryImpl(app)
+                INSTANCE = instance
+                return instance
+            }
         }
-        return roomContacts.map { ContactMapping.contactRoomToContact(it) }
     }
 }
