@@ -24,9 +24,7 @@ import java.util.*
 class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
-    private val remoteDataSource = RemoteDataSourceImpl.getInstance(app)
-    private val dbRepository = RoomRepositoryImpl.getInstance(app)
-    private val mainRepo = ContactMainRepository.getInstance(remoteDataSource, dbRepository)
+    private val mainRepo = ContactMainRepository.getInstance(app)
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     private var _savedMarker = MutableLiveData(false)

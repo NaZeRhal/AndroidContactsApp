@@ -1,5 +1,6 @@
 package com.maxrzhe.contacts.repository
 
+import android.app.Application
 import com.maxrzhe.contacts.data.ContactFbIdResponse
 import com.maxrzhe.contacts.data.ContactListResponse
 import com.maxrzhe.contacts.data.ContactResponseItem
@@ -11,10 +12,10 @@ import com.maxrzhe.core.model.Contact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 
-class ContactMainRepository private constructor(
-    private val remoteDataSource: RemoteDataSourceImpl,
-    private val dbRepository: DatabaseRepository
-) {
+class ContactMainRepository private constructor(app: Application) {
+
+    private val remoteDataSource: RemoteDataSourceImpl = RemoteDataSourceImpl(app)
+    private val dbRepository: DatabaseRepository = RoomRepositoryImpl.getInstance(app)
 
     suspend fun findById(fbId: String?): Flow<Result<Contact>> {
         return flow {
@@ -29,13 +30,6 @@ class ContactMainRepository private constructor(
             emit(Result.success(contact))
         }.flowOn(Dispatchers.IO)
     }
-
-    private fun cachedContactsFlow(): Flow<Result<List<Contact>>> =
-        dbRepository.findAll()
-            .map { Result.success(it) }
-            .catch { emit(Result.error(it.message)) }
-            .flowOn(Dispatchers.IO)
-            .onStart { emit(Result.loading()) }
 
     suspend fun add(contact: Contact): Flow<Result<Contact>> {
         return flow {
@@ -60,25 +54,29 @@ class ContactMainRepository private constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-
-    fun getContacts() = cachedContactsFlow().map { cachedContacts ->
-        val result: Result<ContactListResponse> = remoteDataSource.getAllContacts()
-        var fetchedContacts: List<Contact>? = null
-        if (result.status == Status.SUCCESS) {
-            result.data?.let {
-                fetchedContacts = it.mapNotNull { entry ->
-                    ContactMapping.contactRestToContact(entry.key, entry.value)
-                }
-                fetchedContacts?.let { contacts ->
-                    cachedContacts.data?.let { cached ->
-                        dbRepository.deleteByQuery(cached)
+    fun getContacts() = dbRepository.findAll()
+        .map { Result.success(it) }
+        .map { cachedContacts ->
+            val result: Result<ContactListResponse> = remoteDataSource.getAllContacts()
+            var fetchedContacts: List<Contact>? = null
+            if (result.status == Status.SUCCESS) {
+                result.data?.let {
+                    fetchedContacts = it.mapNotNull { entry ->
+                        ContactMapping.contactRestToContact(entry.key, entry.value)
                     }
-                    dbRepository.addAll(contacts)
+                    fetchedContacts?.let { contacts ->
+                        cachedContacts.data?.let { cached ->
+                            dbRepository.deleteByQuery(cached)
+                        }
+                        dbRepository.addAll(contacts)
+                    }
                 }
+                Result.success(fetchedContacts)
+            } else {
+                Result.success(cachedContacts.data)
             }
+
         }
-        Result.success(fetchedContacts)
-    }
         .catch { emit(Result.error(it.message)) }
         .flowOn(Dispatchers.IO)
         .onStart { emit(Result.loading()) }
@@ -96,15 +94,14 @@ class ContactMainRepository private constructor(
         private var INSTANCE: ContactMainRepository? = null
 
         fun getInstance(
-            networkService: RemoteDataSourceImpl,
-            dbRepository: DatabaseRepository
+            app: Application
         ): ContactMainRepository {
             val tmpInstance = INSTANCE
             if (tmpInstance != null) {
                 return tmpInstance
             }
             synchronized(this) {
-                val instance = ContactMainRepository(networkService, dbRepository)
+                val instance = ContactMainRepository(app)
                 INSTANCE = instance
                 return instance
             }

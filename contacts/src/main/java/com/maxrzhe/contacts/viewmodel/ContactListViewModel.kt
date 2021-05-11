@@ -17,12 +17,9 @@ import kotlinx.coroutines.launch
 
 class ContactListViewModel(app: Application) : BaseViewModel(app) {
 
-    private val remoteDataSource = RemoteDataSourceImpl(app)
-    private val dbRepository = RoomRepositoryImpl.getInstance(app)
-    private val mainRepo = ContactMainRepository.getInstance(remoteDataSource, dbRepository)
+    private val mainRepo = ContactMainRepository.getInstance(app)
     val isLoading = ObservableBoolean(true)
     var isFavorites: Boolean = false
-
 
     private val _allContacts =
         mainRepo.getContacts().onStart { emit(Result.loading()) }.asLiveData()
