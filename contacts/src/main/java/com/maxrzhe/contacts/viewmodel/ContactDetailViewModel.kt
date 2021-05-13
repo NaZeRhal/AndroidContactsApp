@@ -10,13 +10,10 @@ import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.*
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.remote.RemoteDataSourceImpl
-import com.maxrzhe.contacts.remote.Result
-import com.maxrzhe.contacts.repository.ContactMainRepository
-import com.maxrzhe.contacts.repository.RoomRepositoryImpl
+import com.maxrzhe.contacts.remote.Resource
+import com.maxrzhe.contacts.repository.ContactRepository
 import com.maxrzhe.core.model.Contact
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,7 +21,7 @@ import java.util.*
 class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
-    private val mainRepo = ContactMainRepository.getInstance(app)
+    private val mainRepo = ContactRepository.getInstance(app)
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     private var _savedMarker = MutableLiveData(false)
@@ -34,16 +31,22 @@ class ContactDetailViewModel(private val app: Application) :
     private var isFavorite = false
     private var _fbId = MutableLiveData<String?>(null)
 
-    private val _contact: LiveData<Result<Contact>> = _fbId.distinctUntilChanged().switchMap {
-        liveData {
-            mainRepo.findById(it).onStart {
-                emit(Result.loading())
-            }.collect {
-                emit(it)
+    private val _contact: LiveData<Resource<Contact>> =
+        _fbId.distinctUntilChanged().switchMap { id ->
+            liveData {
+                if (id != null) {
+                    mainRepo.findById(id)
+                        .collect { emit(it) }
+                } else {
+                    emit(Resource.Success(null))
+                }
             }
         }
-    }
-    val contact = _contact
+    val contact: LiveData<Resource<Contact>> = _contact
+
+    private val _errorMessage: MutableLiveData<String?> =
+        MutableLiveData(null)
+    val errorMessage: LiveData<String?> = _errorMessage
 
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
@@ -146,13 +149,21 @@ class ContactDetailViewModel(private val app: Application) :
 
     private fun add(contact: Contact) {
         viewModelScope.launch {
-            mainRepo.add(contact).collect()
+            mainRepo.add(contact)
+                .collect {
+                    if (it is Resource.Success) {
+                        _savedMarker.value = true
+                    } else {
+                        _errorMessage.value = it.error?.message
+                    }
+                }
         }
     }
 
     private fun update(contact: Contact) {
         viewModelScope.launch {
             mainRepo.update(contact)
+            _savedMarker.value = true
         }
     }
 
@@ -196,7 +207,6 @@ class ContactDetailViewModel(private val app: Application) :
                 add(contact)
             }
         }
-        _savedMarker.value = true
     }
 
     private fun validateInput(): Boolean {

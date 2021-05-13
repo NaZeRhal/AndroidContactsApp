@@ -13,17 +13,17 @@ interface ContactDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAll(contacts: List<ContactRoom>)
 
-    @Update
-    fun update(contactRoom: ContactRoom)
-
     @Delete
     fun delete(contactRoom: ContactRoom)
+
+    @Query("DELETE FROM contacts_table")
+    fun deleteAll()
 
     @Query("DELETE FROM contacts_table WHERE fbId IN (:fbIds)")
     fun deleteByFbIds(fbIds: List<String>)
 
     @Query("SELECT * FROM contacts_table WHERE fbId=:fbId")
-    fun findById(fbId: String): ContactRoom
+    fun findById(fbId: String): Flow<ContactRoom>
 
     @Query("SELECT * FROM contacts_table")
     fun findAll(): Flow<List<ContactRoom>>

@@ -1,7 +1,6 @@
 package com.maxrzhe.contacts.screens
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
-import com.maxrzhe.contacts.remote.Status
+import com.maxrzhe.contacts.remote.Resource
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactListViewModel
 import com.maxrzhe.contacts.viewmodel.SearchViewModel
@@ -118,30 +117,26 @@ class ContactListFragment :
     private fun subscribeUi() {
         viewModel.isFavorites = isFavorites
         viewModel.allContacts.observe(viewLifecycleOwner, { result ->
-
-            when (result.status) {
-                Status.SUCCESS -> {
+            when (result) {
+                is Resource.Success -> {
                     result.data?.let {
-                        for (c in it) {
-                            Log.i("DBG", "subscribeUi: ${c.name}")
-                        }
                         contactAdapter?.itemList = it
                     }
                     viewModel.isLoading.set(false)
                 }
-
-                Status.LOADING -> {
+                is Resource.Loading -> {
                     viewModel.isLoading.set(true)
                 }
-
-                Status.ERROR -> {
-                    result.error?.let {
+                is Resource.Error -> {
+                    result.data?.let {
+                        contactAdapter?.itemList = it
+                    }
+                    result.error?.message?.let {
                         showErrorMessage(it)
                     }
                     viewModel.isLoading.set(false)
                 }
             }
-
         })
     }
 

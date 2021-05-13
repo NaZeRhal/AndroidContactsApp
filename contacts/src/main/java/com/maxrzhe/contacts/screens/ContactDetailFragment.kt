@@ -13,7 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.databinding.FragmentContactDetailBinding
-import com.maxrzhe.contacts.remote.Status
+import com.maxrzhe.contacts.remote.Resource
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactDetailViewModel
 import com.maxrzhe.contacts.viewmodel.SharedViewModel
@@ -66,20 +66,26 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
 
     private fun subscribeUi() {
         viewModel.contact.observe(viewLifecycleOwner, { result ->
-            when (result.status) {
-                Status.SUCCESS -> {
+            when (result) {
+                is Resource.Success -> {
                     updateUI(result.data)
                     viewModel.isLoading.set(false)
                 }
-                Status.LOADING -> {
+                is Resource.Loading -> {
                     viewModel.isLoading.set(true)
                 }
-                Status.ERROR -> {
-                    result.error?.let {
+                is Resource.Error -> {
+                    result.error?.message?.let {
                         showErrorMessage(it)
                     }
-                    viewModel.isLoading.set(true)
+                    updateUI(result.data)
+                    viewModel.isLoading.set(false)
                 }
+            }
+        })
+        viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
+            if (msg != null) {
+                showErrorMessage(msg)
             }
         })
     }
