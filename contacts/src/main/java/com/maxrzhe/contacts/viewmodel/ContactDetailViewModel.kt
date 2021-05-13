@@ -3,6 +3,7 @@ package com.maxrzhe.contacts.viewmodel
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Application
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
@@ -163,7 +164,13 @@ class ContactDetailViewModel(private val app: Application) :
     private fun update(contact: Contact) {
         viewModelScope.launch {
             mainRepo.update(contact)
-            _savedMarker.value = true
+                .collect {
+                    if (it is Resource.Success) {
+                        _savedMarker.value = true
+                    } else {
+                        _errorMessage.value = it.error?.message
+                    }
+                }
         }
     }
 

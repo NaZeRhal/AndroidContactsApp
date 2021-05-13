@@ -1,6 +1,7 @@
 package com.maxrzhe.contacts.repository
 
 import android.app.Application
+import android.util.Log
 import androidx.room.withTransaction
 import com.maxrzhe.contacts.app.ContactsApp
 import com.maxrzhe.contacts.data.ContactFbIdResponse
@@ -116,16 +117,14 @@ class ContactRepository private constructor(app: Application) {
         } else {
             emit(Resource.Error(Throwable("Error updating contact in remote source"), contact))
         }
-
-    }
+    }.flowOn(Dispatchers.IO)
 
     suspend fun delete(contact: Contact) {
         withContext(Dispatchers.Main) {
             val result = getResponse(
                 request = { contactApi.deleteContact(contact.fbId) },
-                defaultErrorMessage = "Error updating contact ${contact.fbId}"
+                defaultErrorMessage = "Error deleting contact ${contact.fbId}"
             )
-
             withContext(Dispatchers.IO) {
                 if (result is Resource.Success) {
                     contactDao.deleteByFbIds(listOf(contact.fbId))

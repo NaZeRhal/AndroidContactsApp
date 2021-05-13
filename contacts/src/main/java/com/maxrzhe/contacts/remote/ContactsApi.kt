@@ -9,13 +9,18 @@ import retrofit2.http.*
 
 interface ContactsApi {
 
+    companion object {
+        const val BASE_URL =
+            "https://contacts-app-ef170-default-rtdb.europe-west1.firebasedatabase.app/"
+    }
+
     @GET("contacts_db.json")
     suspend fun fetchContactsList(): Response<ContactListResponse>
 
     @POST("contacts_db.json")
     suspend fun addContact(@Body contact: Contact): Response<ContactFbIdResponse>
 
-    @PUT("contacts_db/{fbId}/.json")
+    @PUT("contacts_db/{fbId}.json")
     suspend fun updateContact(
         @Path("fbId") fbId: String,
         @Body contact: Contact

@@ -25,7 +25,7 @@ class ContactsApp : Application() {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://contacts-app-ef170-default-rtdb.europe-west1.firebasedatabase.app/")
+            .baseUrl(ContactsApi.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
