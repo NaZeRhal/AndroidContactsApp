@@ -2,7 +2,6 @@ package com.maxrzhe.contacts.adapters
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -24,9 +23,6 @@ class ContactAdapter(
 
     var itemList: List<Contact> = emptyList()
         set(value) {
-            for (c in value) {
-                Log.i("DBG", "setItemList: ${c.name}")
-            }
             field = value
             performFiltering(filter)
         }
@@ -96,20 +92,11 @@ class ContactAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val contact = sortedList[position]
-        with(holder.binding) {
-            tvContactName.text = contact.name
-
-            Glide
-                .with(context)
-                .load(Uri.fromFile(File(contact.image)))
-                .placeholder(R.drawable.person_placeholder)
-                .circleCrop()
-                .into(ivContactImage)
-
-            root.setOnClickListener {
-                onContactClickListener.onClick(contact.fbId)
-            }
+        holder.binding.contact = contact
+        holder.binding.root.setOnClickListener {
+            onContactClickListener.onClick(contact.fbId)
         }
+        holder.binding.executePendingBindings()
     }
 
     override fun getItemCount(): Int = sortedList.size()
@@ -135,9 +122,6 @@ class ContactAdapter(
     }
 
     private fun replaceAll(contacts: List<Contact>) {
-        for (c in contacts) {
-            Log.i("DBG", "replaceAll: ${c.name}")
-        }
         sortedList.beginBatchedUpdates()
         (sortedList.size() - 1 downTo 0 step 1).forEach { i ->
             val contact = sortedList[i]
@@ -147,9 +131,6 @@ class ContactAdapter(
         }
         sortedList.addAll(contacts)
         sortedList.endBatchedUpdates()
-        for (c in 0 until sortedList.size()) {
-            Log.i("DBG", "sortedList: ${sortedList.get(c).name}")
-        }
     }
 
     private fun anyMatches(contact: Contact, pattern: String): Boolean {

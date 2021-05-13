@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.R
@@ -57,41 +56,39 @@ class ContactListFragment :
     }
 
     override fun initView() {
-        with(binding) {
-            rvContactList.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                setHasFixedSize(true)
-                contactAdapter = ContactAdapter(
-                    requireContext(),
-                    object : ContactAdapter.OnContactClickListener {
-                        override fun onClick(fbId: String) {
-                            sharedViewModel.select(fbId)
-                            onSelectContactListener?.onSelect()
-                            binding.tvSearchResult.visibility = View.GONE
-                        }
-                    }
-                )
-                adapter = contactAdapter
-            }
-
-            val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    contactAdapter?.let {
-                        val contact = it.getContactAt(position)
-                        viewModel.delete(contact)
-                    }
+        contactAdapter = ContactAdapter(
+            requireContext(),
+            object : ContactAdapter.OnContactClickListener {
+                override fun onClick(fbId: String) {
+                    sharedViewModel.select(fbId)
+                    onSelectContactListener?.onSelect()
+                    binding.tvSearchResult.visibility = View.GONE
                 }
             }
+        )
+        binding.adapter = contactAdapter
 
-            ItemTouchHelper(swipeToDeleteCallback).apply {
-                attachToRecyclerView(rvContactList)
+        val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                contactAdapter?.let {
+                    val contact = it.getContactAt(position)
+                    viewModel.delete(contact)
+                }
             }
+        }
+
+        ItemTouchHelper(swipeToDeleteCallback).apply {
+            attachToRecyclerView(binding.rvContactList)
         }
         contactAdapter?.setOnSearchResultListener(this)
         viewModel.isFavoritesPage = isFavoritesPage
 
-        subscribeUi()
+        viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
+            if (msg != null) {
+                showErrorMessage(msg)
+            }
+        })
 
         searchViewModel.query.observe(viewLifecycleOwner, { query ->
             contactAdapter?.filter = query
@@ -112,19 +109,6 @@ class ContactListFragment :
             binding.tvSearchResult.visibility = View.GONE
             binding.tvSearchResult.text = ""
         }
-    }
-
-    private fun subscribeUi() {
-        viewModel.allContacts.observe(viewLifecycleOwner, { result ->
-            result.data?.let {
-                contactAdapter?.itemList = it
-            }
-        })
-        viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
-            if (msg != null) {
-                showErrorMessage(msg)
-            }
-        })
     }
 
     private fun showErrorMessage(msg: String) {

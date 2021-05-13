@@ -28,19 +28,18 @@ class ContactListViewModel(app: Application) : BaseViewModel(app) {
                     emit(false)
                 }
                 is Resource.Success -> {
-                    _allContacts.value = it
+                    _allContacts.value = it.data
                     emit(false)
                 }
             }
         }
     }
 
-    private val _allContacts: MutableLiveData<Resource<List<Contact>>> = MutableLiveData()
-    val allContacts: LiveData<Resource<List<Contact>>>
+    private val _allContacts: MutableLiveData<List<Contact>> = MutableLiveData()
+    val allContacts: LiveData<List<Contact>>
         get() {
             return if (!isFavoritesPage) _allContacts else Transformations.map(_allContacts) { items ->
-                val data: List<Contact>? = items.data?.filter { it.isFavorite }
-                Resource.Success(data)
+                items.filter { it.isFavorite }
             }
         }
 
