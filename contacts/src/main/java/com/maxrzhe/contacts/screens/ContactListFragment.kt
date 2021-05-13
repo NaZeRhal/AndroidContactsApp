@@ -13,7 +13,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
-import com.maxrzhe.contacts.remote.Resource
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactListViewModel
 import com.maxrzhe.contacts.viewmodel.SearchViewModel
@@ -29,7 +28,7 @@ class ContactListFragment :
     }
 
     private var contactAdapter: ContactAdapter? = null
-    private var isFavorites = false
+    private var isFavoritesPage = false
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
     private val searchViewModel by activityViewModels<SearchViewModel>()
@@ -48,7 +47,7 @@ class ContactListFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            isFavorites = it.getBoolean(IS_FAVORITES)
+            isFavoritesPage = it.getBoolean(IS_FAVORITES)
         }
     }
 
@@ -90,6 +89,7 @@ class ContactListFragment :
             }
         }
         contactAdapter?.setOnSearchResultListener(this)
+        viewModel.isFavoritesPage = isFavoritesPage
 
         subscribeUi()
 
@@ -115,27 +115,14 @@ class ContactListFragment :
     }
 
     private fun subscribeUi() {
-        viewModel.isFavorites = isFavorites
         viewModel.allContacts.observe(viewLifecycleOwner, { result ->
-            when (result) {
-                is Resource.Success -> {
-                    result.data?.let {
-                        contactAdapter?.itemList = it
-                    }
-                    viewModel.isLoading.set(false)
-                }
-                is Resource.Loading -> {
-                    viewModel.isLoading.set(true)
-                }
-                is Resource.Error -> {
-                    result.data?.let {
-                        contactAdapter?.itemList = it
-                    }
-                    result.error?.message?.let {
-                        showErrorMessage(it)
-                    }
-                    viewModel.isLoading.set(false)
-                }
+            result.data?.let {
+                contactAdapter?.itemList = it
+            }
+        })
+        viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
+            if (msg != null) {
+                showErrorMessage(msg)
             }
         })
     }

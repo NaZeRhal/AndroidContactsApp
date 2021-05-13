@@ -5,7 +5,6 @@ import android.animation.ObjectAnimator
 import android.app.Application
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.*
@@ -31,18 +30,26 @@ class ContactDetailViewModel(private val app: Application) :
     private var isFavorite = false
     private var _fbId = MutableLiveData<String?>(null)
 
-    private val _contact: LiveData<Resource<Contact>> =
-        _fbId.distinctUntilChanged().switchMap { id ->
-            liveData {
-                if (id != null) {
-                    mainRepo.findById(id)
-                        .collect { emit(it) }
-                } else {
-                    emit(Resource.Success(null))
-                }
+    val isLoading = _fbId.distinctUntilChanged().switchMap { id ->
+        liveData {
+            emit(true)
+            if (id != null) {
+                mainRepo.findById(id)
+                    .collect {
+                        if (it is Resource.Success) {
+                            setupFields(it.data)
+                        }
+                        if (it is Resource.Error) {
+                            _errorMessage.value = it.error?.message
+                        }
+                        emit(false)
+                    }
+            } else {
+                setupFields(null)
+                emit(false)
             }
         }
-    val contact: LiveData<Resource<Contact>> = _contact
+    }
 
     private val _errorMessage: MutableLiveData<String?> =
         MutableLiveData(null)
@@ -53,7 +60,6 @@ class ContactDetailViewModel(private val app: Application) :
     val phone = ObservableField<String?>()
     val image = ObservableField<String?>()
     val date = ObservableField<String?>()
-    val isLoading = ObservableBoolean(true)
 
     val year = ObservableInt()
     val month = ObservableInt()
@@ -67,7 +73,7 @@ class ContactDetailViewModel(private val app: Application) :
         _fbId.value = selectedId
     }
 
-    fun setupFields(contact: Contact?) {
+    private fun setupFields(contact: Contact?) {
         if (contact == null) {
             name.set("")
             email.set("")
@@ -153,7 +159,7 @@ class ContactDetailViewModel(private val app: Application) :
                 .collect {
                     if (it is Resource.Success) {
                         _savedMarker.value = true
-                    } else if (it is Resource.Error){
+                    } else if (it is Resource.Error) {
                         _errorMessage.value = it.error?.message
                     }
                 }
@@ -166,7 +172,7 @@ class ContactDetailViewModel(private val app: Application) :
                 .collect {
                     if (it is Resource.Success) {
                         _savedMarker.value = true
-                    } else if (it is Resource.Error){
+                    } else if (it is Resource.Error) {
                         _errorMessage.value = it.error?.message
                     }
                 }

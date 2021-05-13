@@ -65,33 +65,11 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
     }
 
     private fun subscribeUi() {
-        viewModel.contact.observe(viewLifecycleOwner, { result ->
-            when (result) {
-                is Resource.Success -> {
-                    updateUI(result.data)
-                    viewModel.isLoading.set(false)
-                }
-                is Resource.Loading -> {
-                    viewModel.isLoading.set(true)
-                }
-                is Resource.Error -> {
-                    result.error?.message?.let {
-                        showErrorMessage(it)
-                    }
-                    updateUI(result.data)
-                    viewModel.isLoading.set(false)
-                }
-            }
-        })
         viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
             if (msg != null) {
                 showErrorMessage(msg)
             }
         })
-    }
-
-    private fun updateUI(contact: Contact?) {
-        viewModel.setupFields(contact)
     }
 
     private fun showErrorMessage(msg: String) {
