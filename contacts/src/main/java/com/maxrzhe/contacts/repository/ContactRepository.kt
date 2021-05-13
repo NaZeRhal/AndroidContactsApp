@@ -66,7 +66,7 @@ class ContactRepository private constructor(app: Application) {
 
     fun add(contact: Contact): Flow<Resource<Contact>> {
         return flow {
-            emit(Resource.Loading())
+            emit(Resource.Loading<Contact>())
             val result: Resource<ContactFbIdResponse> = getResponse(
                 request = { contactApi.addContact(contact) },
                 defaultErrorMessage = "Error adding contact to remote data source"
@@ -90,10 +90,7 @@ class ContactRepository private constructor(app: Application) {
                 emit(Resource.Success(emittingContact))
             } else {
                 emit(
-                    Resource.Error(
-                        Throwable("Unable to add contact to remote data source"),
-                        emittingContact
-                    )
+                    Resource.Error<Contact>(Throwable("Unable to add contact to remote data source"))
                 )
             }
 
@@ -115,7 +112,7 @@ class ContactRepository private constructor(app: Application) {
             }
             emit(Resource.Success(contact))
         } else {
-            emit(Resource.Error(Throwable("Error updating contact in remote source"), contact))
+            emit(Resource.Error<Contact>(Throwable("Error updating contact in remote source")))
         }
     }.flowOn(Dispatchers.IO)
 

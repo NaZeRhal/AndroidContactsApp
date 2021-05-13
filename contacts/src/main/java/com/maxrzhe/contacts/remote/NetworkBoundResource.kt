@@ -9,15 +9,15 @@ inline fun <ResultType, RequestType> networkBoundResource(
     crossinline saveFetchResult: suspend (Resource<RequestType>) -> Unit,
     crossinline shouldFetch: (ResultType) -> Boolean = { true },
 ) = flow {
-    val data = query().first()
+    val data: ResultType = query().first()
     if (shouldFetch(data)) {
-        emit(Resource.Loading(data))
+        emit(Resource.Loading<ResultType>())
         val response = fetch()
         if (response is Resource.Success) {
             saveFetchResult(response)
             emitAll(query().map { Resource.Success(it) })
         } else if (response is Resource.Error) {
-            emitAll(query().map { Resource.Error(response.error, it) })
+            emitAll(query().map { Resource.Error(response.error) })
         }
     } else {
         emitAll(query().map { Resource.Success(it) })
@@ -34,11 +34,10 @@ suspend fun <T> getResponse(
             Resource.Success(result.body())
         } else {
             Resource.Error(
-                Throwable(result.errorBody()?.toString() ?: defaultErrorMessage),
-                null
+                Throwable(result.errorBody()?.toString() ?: defaultErrorMessage)
             )
         }
     } catch (e: Throwable) {
-        Resource.Error(e, null)
+        Resource.Error(e)
     }
 }

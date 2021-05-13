@@ -1,10 +1,15 @@
 package com.maxrzhe.contacts.remote
 
-sealed class Resource<out T>(
-    val data: T? = null,
-    val error: Throwable? = null
-) {
-    class Success<T>(data: T?): Resource<T>(data)
-    class Loading<T>(data: T? = null): Resource<T>(data)
-    class Error<T>(throwable: Throwable?, data: T?): Resource<T>(data, throwable)
+sealed class Resource<out T> {
+    abstract val data: T?
+
+    class Success<T>(override val data: T?) : Resource<T>()
+
+    class Loading<T> : Resource<T>() {
+        override val data: T? get() = null
+    }
+
+    class Error<T>(val error: Throwable?) : Resource<T>() {
+        override val data: T? get() = null
+    }
 }
