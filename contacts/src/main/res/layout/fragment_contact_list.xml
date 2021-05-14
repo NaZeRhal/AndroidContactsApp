@@ -6,10 +6,6 @@
     <data>
 
         <variable
-            name="adapter"
-            type="com.maxrzhe.contacts.adapters.ContactAdapter" />
-
-        <variable
             name="listViewModel"
             type="com.maxrzhe.contacts.viewmodel.ContactListViewModel" />
     </data>
@@ -44,7 +40,6 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_contact_list"
-            bindAdapter="@{adapter}"
             data="@{listViewModel.allContacts}"
             toggleVisibility="@{!listViewModel.isLoading}"
             android:layout_width="match_parent"

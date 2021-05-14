@@ -13,11 +13,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.databinding.FragmentContactDetailBinding
-import com.maxrzhe.contacts.remote.Resource
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactDetailViewModel
 import com.maxrzhe.contacts.viewmodel.SharedViewModel
-import com.maxrzhe.core.model.Contact
 import com.maxrzhe.core.screens.BaseFragment
 import java.io.File
 import java.io.FileOutputStream

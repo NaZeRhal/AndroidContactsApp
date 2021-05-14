@@ -36,7 +36,6 @@ class ContactConsumerListFragment :
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
                 contactAdapter = ContactAdapter(
-                    requireContext(),
                     object : ContactAdapter.OnContactClickListener {
                         override fun onClick(fbId: String) {
                             //NOTHING TO DO

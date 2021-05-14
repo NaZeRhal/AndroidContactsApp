@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
+import com.maxrzhe.contacts.adapters.bindAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactListViewModel
@@ -62,7 +62,6 @@ class ContactListFragment :
 
     override fun initView() {
         contactAdapter = ContactAdapter(
-            requireContext(),
             object : ContactAdapter.OnContactClickListener {
                 override fun onClick(fbId: String) {
                     sharedViewModel.select(fbId)
@@ -71,7 +70,7 @@ class ContactListFragment :
                 }
             }
         )
-        binding.adapter = contactAdapter
+        binding.rvContactList.bindAdapter(contactAdapter)
 
         val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -89,14 +88,14 @@ class ContactListFragment :
         contactAdapter?.setOnSearchResultListener(this)
 
         viewModel.errorMessage.observe(viewLifecycleOwner,
-            Observer<String> { msg ->
+            { msg ->
                 if (msg != null) {
                     showErrorMessage(msg)
                 }
             })
 
         searchViewModel.query.observe(viewLifecycleOwner,
-            Observer<String> { query ->
+            { query ->
                 if (query != null) {
                     contactAdapter?.filter = query
                 }
