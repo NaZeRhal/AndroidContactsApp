@@ -1,18 +1,15 @@
 package com.maxrzhe.contacts.adapters
 
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
-import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.remote.Resource
 import com.maxrzhe.core.model.Contact
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
@@ -55,10 +52,10 @@ fun RecyclerView.bindAdapter(contactAdapter: ContactAdapter?) {
 }
 
 @BindingAdapter("data")
-fun RecyclerView.setData(contactsList: List<Contact>?) {
-    if (this.adapter is ContactAdapter) {
+fun setData(rv: RecyclerView, contactsList: List<Contact>?) {
+    if (rv.adapter is ContactAdapter) {
         contactsList?.let {
-            (this.adapter as? ContactAdapter)?.itemList = it
+            (rv.adapter as? ContactAdapter)?.itemList = it
         }
     }
 }

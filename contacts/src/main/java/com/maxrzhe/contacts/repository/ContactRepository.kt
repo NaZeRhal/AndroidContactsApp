@@ -1,7 +1,6 @@
 package com.maxrzhe.contacts.repository
 
 import android.app.Application
-import android.util.Log
 import androidx.room.withTransaction
 import com.maxrzhe.contacts.app.ContactsApp
 import com.maxrzhe.contacts.data.ContactFbIdResponse

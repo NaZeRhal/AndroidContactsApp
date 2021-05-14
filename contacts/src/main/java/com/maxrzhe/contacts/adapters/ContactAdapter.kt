@@ -1,20 +1,14 @@
 package com.maxrzhe.contacts.adapters
 
-import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
-import com.bumptech.glide.Glide
-import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.databinding.ItemContactBinding
 import com.maxrzhe.core.model.Contact
-import java.io.File
 import java.util.*
 
 class ContactAdapter(
-    private val context: Context,
     private val onContactClickListener: OnContactClickListener
 ) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
