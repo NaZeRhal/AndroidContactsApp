@@ -5,17 +5,14 @@ import android.animation.ObjectAnimator
 import android.app.Application
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.repository.Repository
-import com.maxrzhe.contacts.repository.RepositoryFactory
-import com.maxrzhe.contacts.repository.RepositoryType
+import com.maxrzhe.contacts.remote.Resource
+import com.maxrzhe.contacts.repository.ContactRepository
 import com.maxrzhe.core.model.Contact
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,23 +20,46 @@ import java.util.*
 class ContactDetailViewModel(private val app: Application) :
     com.maxrzhe.core.viewmodel.BaseViewModel(app) {
 
-    private val repository: Repository = RepositoryFactory.create(app, RepositoryType.PLAIN_SQL)
+    private val mainRepo = ContactRepository.getInstance(app)
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     private var _savedMarker = MutableLiveData(false)
     val savedMarker: LiveData<Boolean> = _savedMarker
 
     private var calendar = Calendar.getInstance()
-
-    private var id: Long? = null
     private var isFavorite = false
+    private var _fbId = MutableLiveData<String?>(null)
+
+    val isLoading = _fbId.distinctUntilChanged().switchMap { id ->
+        liveData {
+            emit(true)
+            if (id != null) {
+                mainRepo.findById(id)
+                    .collect {
+                        if (it is Resource.Success) {
+                            setupFields(it.data)
+                        }
+                        if (it is Resource.Error) {
+                            _errorMessage.value = it.error.message
+                        }
+                        emit(false)
+                    }
+            } else {
+                setupFields(null)
+                emit(false)
+            }
+        }
+    }
+
+    private val _errorMessage: MutableLiveData<String?> =
+        MutableLiveData(null)
+    val errorMessage: LiveData<String?> = _errorMessage
 
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
     val phone = ObservableField<String?>()
     val image = ObservableField<String?>()
     val date = ObservableField<String?>()
-    val isLoading = ObservableBoolean(true)
 
     val year = ObservableInt()
     val month = ObservableInt()
@@ -49,19 +69,12 @@ class ContactDetailViewModel(private val app: Application) :
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(ContextCompat.getColor(app, R.color.favorite_false_color))
 
-    fun manageSelectedId(selectedId: Long?) {
-        isLoading.set(true)
-        id = selectedId
-        viewModelScope.launch {
-            val contact =
-                if (selectedId != null) repository.findById(selectedId) else Contact.New()
-            setupFields(contact)
-            isLoading.set(false)
-        }
+    fun setSelectedId(selectedId: String?) {
+        _fbId.value = selectedId
     }
 
     private fun setupFields(contact: Contact?) {
-        if (contact == null || contact is Contact.New) {
+        if (contact == null) {
             name.set("")
             email.set("")
             phone.set("")
@@ -140,15 +153,29 @@ class ContactDetailViewModel(private val app: Application) :
         }
     }
 
-    private fun add(contact: Contact.New) {
+    private fun add(contact: Contact) {
         viewModelScope.launch {
-            repository.add(contact)
+            mainRepo.add(contact)
+                .collect {
+                    if (it is Resource.Success) {
+                        _savedMarker.value = true
+                    } else if (it is Resource.Error) {
+                        _errorMessage.value = it.error?.message
+                    }
+                }
         }
     }
 
-    private fun update(contact: Contact.Existing) {
+    private fun update(contact: Contact) {
         viewModelScope.launch {
-            repository.update(contact)
+            mainRepo.update(contact)
+                .collect {
+                    if (it is Resource.Success) {
+                        _savedMarker.value = true
+                    } else if (it is Resource.Error) {
+                        _errorMessage.value = it.error?.message
+                    }
+                }
         }
     }
 
@@ -177,32 +204,20 @@ class ContactDetailViewModel(private val app: Application) :
 
     fun addOrUpdate() {
         if (validateInput()) {
-            if (id != null) {
-                id?.let {
-                    val contact = Contact.Existing(
-                        id = it,
-                        name = name.get() ?: "",
-                        phone = phone.get() ?: "",
-                        email = email.get() ?: "",
-                        image = image.get() ?: "",
-                        birthDate = date.get() ?: "",
-                        isFavorite = isFavorite
-                    )
-                    update(contact)
-                }
+            val contact = Contact(
+                fbId = _fbId.value ?: "",
+                name = name.get() ?: "",
+                phone = phone.get() ?: "",
+                email = email.get() ?: "",
+                image = image.get() ?: "",
+                birthDate = date.get() ?: "",
+                isFavorite = isFavorite
+            )
+            if (_fbId.value != null) {
+                update(contact)
             } else {
-                val contact =
-                    Contact.New(
-                        name = name.get() ?: "",
-                        phone = phone.get() ?: "",
-                        email = email.get() ?: "",
-                        image = image.get() ?: "",
-                        birthDate = date.get() ?: "",
-                        isFavorite = isFavorite
-                    )
                 add(contact)
             }
-            _savedMarker.value = true
         }
     }
 

@@ -6,7 +6,11 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.maxrzhe.contacts.R
+import com.maxrzhe.core.model.Contact
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
 
@@ -16,6 +20,43 @@ fun imageUri(view: ImageView, imageUriString: String?) {
         view.setImageResource(R.drawable.person_placeholder)
     } else {
         view.setImageURI(Uri.fromFile(File(imageUriString)))
+    }
+}
+
+@BindingAdapter("circleImageUri")
+fun circleImageUri(view: ImageView, imageUriString: String?) {
+    if (imageUriString == null || imageUriString.isEmpty()) {
+        Glide.with(view)
+            .load(R.drawable.person_placeholder)
+            .placeholder(R.drawable.person_placeholder)
+            .circleCrop()
+            .into(view)
+    } else {
+        Glide.with(view)
+            .load(Uri.fromFile(File(imageUriString)))
+            .placeholder(R.drawable.person_placeholder)
+            .circleCrop()
+            .into(view)
+    }
+}
+
+@BindingAdapter("bindAdapter")
+fun RecyclerView.bindAdapter(contactAdapter: ContactAdapter?) {
+    this.run {
+        hasFixedSize()
+        layoutManager = LinearLayoutManager(this.context)
+        contactAdapter?.let {
+            adapter = contactAdapter
+        }
+    }
+}
+
+@BindingAdapter("data")
+fun setData(rv: RecyclerView, contactsList: List<Contact>?) {
+    if (rv.adapter is ContactAdapter) {
+        contactsList?.let {
+            (rv.adapter as? ContactAdapter)?.itemList = it
+        }
     }
 }
 

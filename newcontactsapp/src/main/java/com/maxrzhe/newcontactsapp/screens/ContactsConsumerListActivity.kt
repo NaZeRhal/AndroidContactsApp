@@ -19,22 +19,24 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
 import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.adapters.ContactAdapter
 import com.maxrzhe.contacts.databinding.ActivityListContactsBinding
+import com.maxrzhe.contacts.viewmodel.SearchViewModel
 
-class ContactsConsumerListActivity : AppCompatActivity(),
-    ContactAdapter.OnSearchResultListener {
+class ContactsConsumerListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListContactsBinding
 
     private var isLandscape: Boolean = false
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
+
+    private val searchViewModel by viewModels<SearchViewModel>()
 
     companion object {
         private const val LIST_TAG = "contact_list"
@@ -146,11 +148,8 @@ class ContactsConsumerListActivity : AppCompatActivity(),
                         return false
                     }
 
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        val contactListFragment =
-                            supportFragmentManager.findFragmentByTag(LIST_TAG) as? ContactConsumerListFragment
-                                ?: ContactConsumerListFragment()
-                        contactListFragment.filter(newText)
+                    override fun onQueryTextChange(newText: String): Boolean {
+                        searchViewModel.setQuery(newText)
                         return true
                     }
                 })
@@ -164,7 +163,7 @@ class ContactsConsumerListActivity : AppCompatActivity(),
                 menuItemSearch?.isVisible = true
                 toolbar?.setDisplayHomeAsUpEnabled(false)
                 onBackPressed()
-                binding.tvSearchResult?.visibility = View.VISIBLE
+//                binding.tvSearchResult?.visibility = View.VISIBLE
             }
         }
         return super.onOptionsItemSelected(item)
@@ -220,22 +219,6 @@ class ContactsConsumerListActivity : AppCompatActivity(),
             }
         }
             .show()
-    }
-
-    override fun onSearchResult(resultCount: Int) {
-        if (resultCount >= 0) {
-            binding.tvSearchResult?.visibility = View.VISIBLE
-            val result =
-                resources.getQuantityString(
-                    R.plurals.search_result_plurals,
-                    resultCount,
-                    resultCount
-                )
-            binding.tvSearchResult?.text = result
-        } else {
-            binding.tvSearchResult?.visibility = View.GONE
-            binding.tvSearchResult?.text = ""
-        }
     }
 }
 

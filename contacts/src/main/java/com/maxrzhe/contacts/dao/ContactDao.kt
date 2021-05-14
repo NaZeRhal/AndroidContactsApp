@@ -1,8 +1,8 @@
 package com.maxrzhe.contacts.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.maxrzhe.contacts.model.ContactRoom
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ContactDao {
@@ -10,16 +10,22 @@ interface ContactDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun add(contactRoom: ContactRoom)
 
-    @Update
-    suspend fun update(contactRoom: ContactRoom)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addAll(contacts: List<ContactRoom>)
 
     @Delete
-    suspend fun delete(contactRoom: ContactRoom)
+    fun delete(contactRoom: ContactRoom)
 
-    @Query("SELECT * FROM contacts_table WHERE id=:id")
-    suspend fun findById(id: Long): ContactRoom?
+    @Query("DELETE FROM contacts_table")
+    fun deleteAll()
+
+    @Query("DELETE FROM contacts_table WHERE fbId IN (:fbIds)")
+    suspend fun deleteByFbIds(fbIds: List<String>)
+
+    @Query("SELECT * FROM contacts_table WHERE fbId=:fbId")
+    fun findById(fbId: String): Flow<ContactRoom>
 
     @Query("SELECT * FROM contacts_table")
-    fun findAll(): LiveData<List<ContactRoom>>
+    fun findAll(): Flow<List<ContactRoom>>
 
 }

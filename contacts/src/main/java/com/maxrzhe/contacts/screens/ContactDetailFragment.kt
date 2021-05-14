@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.databinding.FragmentContactDetailBinding
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactDetailViewModel
@@ -49,7 +50,8 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
 
     override fun initView() {
         sharedViewModel.contactId.observe(viewLifecycleOwner, {
-            viewModel.manageSelectedId(it)
+            viewModel.setSelectedId(it)
+            subscribeUi()
         })
         viewModel.savedMarker.observe(viewLifecycleOwner, {
             if (it) {
@@ -58,6 +60,21 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
             }
         })
         binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
+    }
+
+    private fun subscribeUi() {
+        viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
+            if (msg != null) {
+                showErrorMessage(msg)
+            }
+        })
+    }
+
+    private fun showErrorMessage(msg: String) {
+        view?.let {
+            Snackbar.make(it, msg, Snackbar.LENGTH_INDEFINITE).setAction("DISMISS") {
+            }.show()
+        }
     }
 
     fun setupImage(contentUri: Uri) {

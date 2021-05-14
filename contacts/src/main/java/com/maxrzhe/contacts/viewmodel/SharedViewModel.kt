@@ -7,10 +7,10 @@ import com.maxrzhe.core.viewmodel.BaseViewModel
 
 class SharedViewModel(app: Application) : BaseViewModel(app) {
 
-    private var _contactId = MutableLiveData<Long?>(null)
-    val contactId: LiveData<Long?> = _contactId
+    private var _contactId = MutableLiveData<String?>(null)
+    val contactId: LiveData<String?> = _contactId
 
-    fun select(selectedContactId: Long?) {
+    fun select(selectedContactId: String?) {
         _contactId.value = selectedContactId
     }
 }

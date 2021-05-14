@@ -7,10 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.contacts.R
 import com.maxrzhe.contacts.adapters.ContactAdapter
+import com.maxrzhe.contacts.adapters.bindAdapter
 import com.maxrzhe.contacts.databinding.FragmentContactListBinding
 import com.maxrzhe.contacts.viewmodel.BaseViewModelFactory
 import com.maxrzhe.contacts.viewmodel.ContactListViewModel
@@ -21,8 +22,19 @@ import com.maxrzhe.core.screens.BaseFragment
 class ContactListFragment :
     BaseFragment<FragmentContactListBinding, ContactListViewModel>(),
     ContactAdapter.OnSearchResultListener {
+
+    companion object {
+        private const val IS_FAVORITES = "is_favorites"
+
+        fun createInstance(isFavorite: Boolean): ContactListFragment =
+            ContactListFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(IS_FAVORITES, isFavorite)
+                }
+            }
+    }
+
     private var contactAdapter: ContactAdapter? = null
-    private var isFavorites = false
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
     private val searchViewModel by activityViewModels<SearchViewModel>()
@@ -40,62 +52,54 @@ class ContactListFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            isFavorites = it.getBoolean(IS_FAVORITES)
-        }
+        viewModel.isFavoritesPage = arguments?.getBoolean(IS_FAVORITES) ?: false
     }
 
-    override fun bindView() {}
+    override fun bindView() {
+        binding.listViewModel = viewModel
+        binding.lifecycleOwner = requireActivity()
+    }
 
     override fun initView() {
-        with(binding) {
-            rvContactList.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                setHasFixedSize(true)
-                contactAdapter = ContactAdapter(
-                    requireContext(),
-                    object : ContactAdapter.OnContactClickListener {
-                        override fun onClick(contactId: Long) {
-                            sharedViewModel.select(contactId)
-                            onSelectContactListener?.onSelect()
-                            binding.tvSearchResult.visibility = View.GONE
-                        }
-                    }
-                )
-                adapter = contactAdapter
-            }
-
-            val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    contactAdapter?.let {
-                        val contact = it.getContactAt(position)
-                        viewModel.delete(contact)
-                    }
+        contactAdapter = ContactAdapter(
+            object : ContactAdapter.OnContactClickListener {
+                override fun onClick(fbId: String) {
+                    sharedViewModel.select(fbId)
+                    onSelectContactListener?.onSelect()
+                    binding.tvSearchResult.visibility = View.GONE
                 }
             }
+        )
+        binding.rvContactList.bindAdapter(contactAdapter)
 
-            ItemTouchHelper(swipeToDeleteCallback).apply {
-                attachToRecyclerView(rvContactList)
+        val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                contactAdapter?.let {
+                    val contact = it.getContactAt(position)
+                    viewModel.delete(contact)
+                }
             }
         }
-        viewModel.isFavorites = isFavorites
-        viewModel.findAll().observe(viewLifecycleOwner, { contacts ->
-            contactAdapter?.itemList = contacts
-        })
 
+        ItemTouchHelper(swipeToDeleteCallback).apply {
+            attachToRecyclerView(binding.rvContactList)
+        }
         contactAdapter?.setOnSearchResultListener(this)
-        searchViewModel.query.observe(viewLifecycleOwner, { query ->
-            contactAdapter?.filter = query
-        })
-    }
 
-    interface OnSelectContactListener {
-        fun onSelect()
-    }
+        viewModel.errorMessage.observe(viewLifecycleOwner,
+            { msg ->
+                if (msg != null) {
+                    showErrorMessage(msg)
+                }
+            })
 
-    companion object {
-        const val IS_FAVORITES = "is_favorites"
+        searchViewModel.query.observe(viewLifecycleOwner,
+            { query ->
+                if (query != null) {
+                    contactAdapter?.filter = query
+                }
+            })
     }
 
     override fun onSearchResult(resultCount: Int) {
@@ -112,5 +116,16 @@ class ContactListFragment :
             binding.tvSearchResult.visibility = View.GONE
             binding.tvSearchResult.text = ""
         }
+    }
+
+    private fun showErrorMessage(msg: String) {
+        view?.let {
+            Snackbar.make(it, msg, Snackbar.LENGTH_INDEFINITE).setAction("DISMISS") {
+            }.show()
+        }
+    }
+
+    interface OnSelectContactListener {
+        fun onSelect()
     }
 }

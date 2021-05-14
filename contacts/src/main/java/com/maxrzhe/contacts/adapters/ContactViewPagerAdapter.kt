@@ -1,6 +1,5 @@
 package com.maxrzhe.contacts.adapters
 
-import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -13,12 +12,8 @@ class ContactViewPagerAdapter(fm: FragmentManager) :
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> ContactListFragment()
-            1 -> ContactListFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(ContactListFragment.IS_FAVORITES, true)
-                }
-            }
+            0 -> ContactListFragment.createInstance(false)
+            1 -> ContactListFragment.createInstance(true)
             else -> throw IllegalArgumentException("No fragment in $position position")
         }
     }

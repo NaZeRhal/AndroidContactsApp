@@ -171,7 +171,7 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
                         return false
                     }
 
-                    override fun onQueryTextChange(newText: String?): Boolean {
+                    override fun onQueryTextChange(newText: String): Boolean {
                         searchViewModel.setQuery(newText)
                         return true
                     }
