@@ -32,7 +32,7 @@ class ContactListViewModel(app: Application) : BaseViewModel(app) {
                     _errorMessage.value = it.error?.message
                     emit(false)
                 }
-                is Resource.Success -> {
+                is Resource.Success.Data -> {
                     _allContacts = it.data
                     emit(false)
                 }

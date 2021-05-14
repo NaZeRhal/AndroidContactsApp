@@ -20,7 +20,7 @@ interface ContactDao {
     fun deleteAll()
 
     @Query("DELETE FROM contacts_table WHERE fbId IN (:fbIds)")
-    fun deleteByFbIds(fbIds: List<String>)
+    suspend fun deleteByFbIds(fbIds: List<String>)
 
     @Query("SELECT * FROM contacts_table WHERE fbId=:fbId")
     fun findById(fbId: String): Flow<ContactRoom>

@@ -72,7 +72,7 @@ class ContactRepository private constructor(app: Application) {
                 defaultErrorMessage = "Error adding contact to remote data source"
             )
             var emittingContact: Contact
-            if (result is Resource.Success) {
+            if (result is Resource.Success.Data) {
                 result.data.let {
                     val newContact = ContactRoom(
                         id = 0,
@@ -87,7 +87,7 @@ class ContactRepository private constructor(app: Application) {
                     contactDao.add(newContact)
                     emittingContact = ContactMapping.contactRoomToContact(newContact)
                 }
-                emit(Resource.Success(emittingContact))
+                emit(Resource.Success.Data(emittingContact))
             } else {
                 emit(
                     Resource.Error<Contact>(Throwable("Unable to add contact to remote data source"))
@@ -103,14 +103,14 @@ class ContactRepository private constructor(app: Application) {
             request = { contactApi.updateContact(contact.fbId, contact) },
             defaultErrorMessage = "Error updating contact ${contact.fbId}"
         )
-        if (result is Resource.Success) {
+        if (result is Resource.Success.Data) {
             result.data.let {
                 db.withTransaction {
                     contactDao.deleteByFbIds(listOf(contact.fbId))
                     contactDao.add(ContactMapping.contactRestToContactRoom(contact.fbId, it))
                 }
             }
-            emit(Resource.Success(contact))
+            emit(Resource.Success.Data(contact))
         } else {
             emit(Resource.Error<Contact>(Throwable("Error updating contact in remote source")))
         }

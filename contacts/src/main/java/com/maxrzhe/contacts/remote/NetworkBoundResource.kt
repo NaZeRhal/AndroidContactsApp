@@ -15,12 +15,12 @@ inline fun <reified ResultType, reified RequestType> networkBoundResource(
         val response = fetch()
         if (response is Resource.Success) {
             saveFetchResult(response)
-            emitAll(query().map { Resource.Success(it) })
+            emitAll(query().map { Resource.Success.Data(it) })
         } else if (response is Resource.Error) {
             emitAll(query().map { Resource.Error<ResultType>(response.error) })
         }
     } else {
-        emitAll(query().map { Resource.Success(it) })
+        emitAll(query().map { Resource.Success.Data(it) })
     }
 }
 
@@ -31,10 +31,10 @@ suspend fun <T> getResponse(
     return try {
         val result = request.invoke()
         val resultData = result.body()
-        if (result.isSuccessful && resultData != null) {
-            Resource.Success(resultData)
-        } else {
-            Resource.Error(
+        when {
+            result.isSuccessful && resultData != null -> Resource.Success.Data(resultData)
+            result.isSuccessful -> Resource.Success.Completed()
+            else -> Resource.Error<T>(
                 Throwable(result.errorBody()?.toString() ?: defaultErrorMessage)
             )
         }
