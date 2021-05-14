@@ -23,11 +23,17 @@ class ContactListFragment :
     ContactAdapter.OnSearchResultListener {
 
     companion object {
-        const val IS_FAVORITES = "is_favorites"
+        private const val IS_FAVORITES = "is_favorites"
+
+        fun createInstance(isFavorite: Boolean): ContactListFragment =
+            ContactListFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(IS_FAVORITES, isFavorite)
+                }
+            }
     }
 
     private var contactAdapter: ContactAdapter? = null
-    private var isFavoritesPage = false
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
     private val searchViewModel by activityViewModels<SearchViewModel>()
@@ -45,9 +51,7 @@ class ContactListFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            isFavoritesPage = it.getBoolean(IS_FAVORITES)
-        }
+        viewModel.isFavoritesPage = arguments?.getBoolean(IS_FAVORITES) ?: false
     }
 
     override fun bindView() {
@@ -82,7 +86,6 @@ class ContactListFragment :
             attachToRecyclerView(binding.rvContactList)
         }
         contactAdapter?.setOnSearchResultListener(this)
-        viewModel.isFavoritesPage = isFavoritesPage
 
         viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
             if (msg != null) {

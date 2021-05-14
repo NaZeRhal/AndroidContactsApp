@@ -1,8 +1,10 @@
 package com.maxrzhe.contacts.viewmodel
 
 import android.app.Application
-import androidx.databinding.ObservableBoolean
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.maxrzhe.contacts.remote.Resource
 import com.maxrzhe.contacts.repository.ContactRepository
 import com.maxrzhe.core.model.Contact
@@ -14,6 +16,9 @@ class ContactListViewModel(app: Application) : BaseViewModel(app) {
 
     private val mainRepo = ContactRepository.getInstance(app)
     var isFavoritesPage: Boolean = false
+        set(value) {
+            field = value
+        }
 
     private val _errorMessage: MutableLiveData<String?> =
         MutableLiveData(null)
@@ -28,20 +33,19 @@ class ContactListViewModel(app: Application) : BaseViewModel(app) {
                     emit(false)
                 }
                 is Resource.Success -> {
-                    _allContacts.value = it.data
+                    _allContacts = it.data
                     emit(false)
                 }
             }
         }
     }
 
-    private val _allContacts: MutableLiveData<List<Contact>> = MutableLiveData()
-    val allContacts: LiveData<List<Contact>>
-        get() {
-            return if (!isFavoritesPage) _allContacts else Transformations.map(_allContacts) { items ->
-                items.filter { it.isFavorite }
-            }
+    private var _allContacts: List<Contact> = emptyList()
+        set(value) {
+            field = value
+            allContacts.value = value.filter { if (isFavoritesPage) it.isFavorite else true }
         }
+    val allContacts: MutableLiveData<List<Contact>> = MutableLiveData(emptyList())
 
     fun delete(contact: Contact) {
         viewModelScope.launch {
