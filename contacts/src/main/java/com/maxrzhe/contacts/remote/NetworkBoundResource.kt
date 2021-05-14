@@ -3,7 +3,7 @@ package com.maxrzhe.contacts.remote
 import kotlinx.coroutines.flow.*
 import retrofit2.Response
 
-inline fun <ResultType, RequestType> networkBoundResource(
+inline fun <reified ResultType, reified RequestType> networkBoundResource(
     crossinline query: () -> Flow<ResultType>,
     crossinline fetch: suspend () -> Resource<RequestType>,
     crossinline saveFetchResult: suspend (Resource<RequestType>) -> Unit,
@@ -11,13 +11,13 @@ inline fun <ResultType, RequestType> networkBoundResource(
 ) = flow {
     val data: ResultType = query().first()
     if (shouldFetch(data)) {
-        emit(Resource.Loading<ResultType>())
+        emit(Resource.Loading())
         val response = fetch()
         if (response is Resource.Success) {
             saveFetchResult(response)
             emitAll(query().map { Resource.Success(it) })
         } else if (response is Resource.Error) {
-            emitAll(query().map { Resource.Error(response.error) })
+            emitAll(query().map { Resource.Error<ResultType>(response.error) })
         }
     } else {
         emitAll(query().map { Resource.Success(it) })
@@ -30,8 +30,9 @@ suspend fun <T> getResponse(
 ): Resource<T> {
     return try {
         val result = request.invoke()
-        if (result.isSuccessful) {
-            Resource.Success(result.body())
+        val resultData = result.body()
+        if (result.isSuccessful && resultData != null) {
+            Resource.Success(resultData)
         } else {
             Resource.Error(
                 Throwable(result.errorBody()?.toString() ?: defaultErrorMessage)

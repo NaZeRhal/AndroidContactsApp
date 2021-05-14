@@ -65,15 +65,15 @@ class ContactRepository private constructor(app: Application) {
     )
 
     fun add(contact: Contact): Flow<Resource<Contact>> {
-        return flow {
+        return flow<Resource<Contact>> {
             emit(Resource.Loading<Contact>())
             val result: Resource<ContactFbIdResponse> = getResponse(
                 request = { contactApi.addContact(contact) },
                 defaultErrorMessage = "Error adding contact to remote data source"
             )
-            var emittingContact: Contact? = null
+            var emittingContact: Contact
             if (result is Resource.Success) {
-                result.data?.let {
+                result.data.let {
                     val newContact = ContactRoom(
                         id = 0,
                         fbId = it.fbId,
@@ -104,7 +104,7 @@ class ContactRepository private constructor(app: Application) {
             defaultErrorMessage = "Error updating contact ${contact.fbId}"
         )
         if (result is Resource.Success) {
-            result.data?.let {
+            result.data.let {
                 db.withTransaction {
                     contactDao.deleteByFbIds(listOf(contact.fbId))
                     contactDao.add(ContactMapping.contactRestToContactRoom(contact.fbId, it))

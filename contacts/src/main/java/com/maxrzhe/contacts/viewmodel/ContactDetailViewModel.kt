@@ -40,7 +40,7 @@ class ContactDetailViewModel(private val app: Application) :
                             setupFields(it.data)
                         }
                         if (it is Resource.Error) {
-                            _errorMessage.value = it.error?.message
+                            _errorMessage.value = it.error.message
                         }
                         emit(false)
                     }
