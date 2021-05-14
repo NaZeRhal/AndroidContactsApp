@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -87,15 +88,19 @@ class ContactListFragment :
         }
         contactAdapter?.setOnSearchResultListener(this)
 
-        viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
-            if (msg != null) {
-                showErrorMessage(msg)
-            }
-        })
+        viewModel.errorMessage.observe(viewLifecycleOwner,
+            Observer<String> { msg ->
+                if (msg != null) {
+                    showErrorMessage(msg)
+                }
+            })
 
-        searchViewModel.query.observe(viewLifecycleOwner, { query ->
-            contactAdapter?.filter = query
-        })
+        searchViewModel.query.observe(viewLifecycleOwner,
+            Observer<String> { query ->
+                if (query != null) {
+                    contactAdapter?.filter = query
+                }
+            })
     }
 
     override fun onSearchResult(resultCount: Int) {

@@ -148,7 +148,7 @@ class ContactsConsumerListActivity : AppCompatActivity() {
                         return false
                     }
 
-                    override fun onQueryTextChange(newText: String?): Boolean {
+                    override fun onQueryTextChange(newText: String): Boolean {
                         searchViewModel.setQuery(newText)
                         return true
                     }

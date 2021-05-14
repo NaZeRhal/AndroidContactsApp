@@ -20,9 +20,9 @@ class ContactListViewModel(app: Application) : BaseViewModel(app) {
             field = value
         }
 
-    private val _errorMessage: MutableLiveData<String?> =
-        MutableLiveData(null)
-    val errorMessage: LiveData<String?> = _errorMessage
+    private val _errorMessage: MutableLiveData<String> =
+        MutableLiveData()
+    val errorMessage: LiveData<String> = _errorMessage
 
     val isLoading = liveData {
         mainRepo.getContacts().collect {
