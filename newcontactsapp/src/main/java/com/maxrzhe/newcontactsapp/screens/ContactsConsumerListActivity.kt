@@ -25,9 +25,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
-import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.databinding.ActivityListContactsBinding
-import com.maxrzhe.contacts.viewmodel.SearchViewModel
+import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
+import com.maxrzhe.presentation.viewmodel.SearchViewModel
 
 class ContactsConsumerListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListContactsBinding

@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.maxrzhe.contacts.R
-import com.maxrzhe.contacts.adapters.ContactAdapter
-import com.maxrzhe.contacts.databinding.FragmentContactListBinding
-import com.maxrzhe.contacts.viewmodel.SearchViewModel
-import com.maxrzhe.core.screens.BaseFragment
+import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.adapters.ContactAdapter
+import com.maxrzhe.presentation.databinding.FragmentContactListBinding
+import com.maxrzhe.presentation.viewmodel.SearchViewModel
+import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerListViewModel
 import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerViewModelFactory
 
