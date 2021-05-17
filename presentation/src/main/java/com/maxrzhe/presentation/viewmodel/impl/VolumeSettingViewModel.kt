@@ -1,10 +1,10 @@
-package com.maxrzhe.presentation.viewmodel
+package com.maxrzhe.presentation.viewmodel.impl
 
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import androidx.lifecycle.ViewModel
+import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
-class VolumeSettingViewModel : ViewModel() {
+class VolumeSettingViewModel : BaseViewModel() {
 
     val volumeValue = ObservableInt(0)
     val currentVolume = object : ObservableField<String>(volumeValue) {

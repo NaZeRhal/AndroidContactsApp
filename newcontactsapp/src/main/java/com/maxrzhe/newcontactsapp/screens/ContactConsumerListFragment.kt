@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.ContactAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
-import com.maxrzhe.presentation.viewmodel.SearchViewModel
+import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
 import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerListViewModel
 import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerViewModelFactory

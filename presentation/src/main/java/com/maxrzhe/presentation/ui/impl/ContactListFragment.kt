@@ -14,9 +14,9 @@ import com.maxrzhe.presentation.adapters.ContactAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
-import com.maxrzhe.presentation.viewmodel.factory.BaseViewModelFactory
+//import com.maxrzhe.presentation.viewmodel.factory.BaseViewModelFactory
 import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
-import com.maxrzhe.presentation.viewmodel.SearchViewModel
+import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
 import com.maxrzhe.presentation.ui.base.BaseFragment
 
@@ -43,8 +43,8 @@ class ContactListFragment :
     private val onSelectContactListener: OnSelectContactListener?
         get() = (context as? OnSelectContactListener)
 
-    override val viewModelFactory: ViewModelProvider.Factory
-        get() = BaseViewModelFactory(requireActivity().application)
+//    override val viewModelFactory: ViewModelProvider.Factory
+//        get() = BaseViewModelFactory(requireActivity().application)
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
@@ -129,4 +129,6 @@ class ContactListFragment :
     interface OnSelectContactListener {
         fun onSelect()
     }
+
+    override val viewModel: ContactListViewModel by viewModel()
 }

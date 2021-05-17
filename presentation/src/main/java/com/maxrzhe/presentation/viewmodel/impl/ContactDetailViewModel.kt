@@ -9,28 +9,24 @@ import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.*
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.data.repository.ContactRepositoryImpl
 import com.maxrzhe.domain.model.Contact
-import com.maxrzhe.domain.repositories.ContactRepository
 import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
 import com.maxrzhe.presentation.R
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ContactDetailViewModel(private val app: Application) :
-    BaseViewModel(app) {
-
-    private val repository: ContactRepository = ContactRepositoryImpl.getInstance(app)
-
-    private val findByIdUseCase = FindByIdUseCase(repository)
-    private val addContactUseCase = AddContactUseCase(repository)
-    private val updateContactUseCase = UpdateContactUseCase(repository)
+class ContactDetailViewModel internal constructor(
+    private val app: Application,
+    private val findByIdUseCase: FindByIdUseCase,
+    private val addContactUseCase: AddContactUseCase,
+    private val updateContactUseCase: UpdateContactUseCase
+) :
+    AndroidViewModel(app) {
 
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 

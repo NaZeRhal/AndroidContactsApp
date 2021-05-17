@@ -1,15 +1,12 @@
 package com.maxrzhe.data.repository
 
-import android.app.Application
-import androidx.room.withTransaction
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.data.app.ContactsApp
 import com.maxrzhe.data.entities.ContactMapping
 import com.maxrzhe.data.entities.api.ContactFbIdResponse
 import com.maxrzhe.data.entities.api.ContactResponseItem
 import com.maxrzhe.data.entities.room.ContactRoom
-import com.maxrzhe.data.local.room.ContactRoomDatabase
-import com.maxrzhe.data.remote.ContactsApi
+import com.maxrzhe.data.local.ContactDatabase
+import com.maxrzhe.data.remote.ContactApi
 import com.maxrzhe.data.remote.getResponse
 import com.maxrzhe.data.remote.networkBoundResource
 import com.maxrzhe.domain.model.Contact
@@ -20,14 +17,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
-class ContactRepositoryImpl private constructor(app: Application) : ContactRepository {
-
-    private val contactApi: ContactsApi = (app as ContactsApp).contactsApi
-    private val db: ContactRoomDatabase = ContactRoomDatabase.getInstance(app)
-    private val contactDao = db.contactDao()
+class ContactRepositoryImpl(
+    private val contactApi: ContactApi,
+    private val contactDatabase: ContactDatabase
+) : ContactRepository {
 
     override fun getContacts(): Flow<Resource<List<Contact>>> = networkBoundResource(
-        query = { contactDao.findAll().map { ContactMapping.contactRoomToContact(it) } },
+        query = { contactDatabase.findAll().map { ContactMapping.contactRoomToContact(it) } },
         fetch = {
             getResponse(
                 request = { contactApi.fetchContactsList() },
@@ -36,22 +32,20 @@ class ContactRepositoryImpl private constructor(app: Application) : ContactRepos
         },
         saveFetchResult = { response ->
             response.data?.let { data ->
-                db.withTransaction {
-                    contactDao.deleteAll()
-                    contactDao.addAll(data.map {
-                        ContactMapping.contactRestToContactRoom(
-                            it.key,
-                            it.value
-                        )
-                    })
+                val contacts = data.map {
+                    ContactMapping.contactRestToContactRoom(
+                        it.key,
+                        it.value
+                    )
                 }
+                contactDatabase.refreshAll(contacts)
             }
         }
     )
 
     override fun findById(fbId: String): Flow<Resource<Contact>> = networkBoundResource(
         query = {
-            contactDao.findById(fbId)
+            contactDatabase.findById(fbId)
                 .map { ContactMapping.contactRoomToContact(it) }
         },
         fetch = {
@@ -83,7 +77,7 @@ class ContactRepositoryImpl private constructor(app: Application) : ContactRepos
                         birthDate = contact.birthDate,
                         isFavorite = contact.isFavorite
                     )
-                    contactDao.add(newContact)
+                    contactDatabase.add(newContact)
                     emittingContact = ContactMapping.contactRoomToContact(newContact)
                 }
                 emit(Resource.Success.Data(emittingContact))
@@ -104,10 +98,8 @@ class ContactRepositoryImpl private constructor(app: Application) : ContactRepos
         )
         if (result is Resource.Success.Data) {
             result.data.let {
-                db.withTransaction {
-                    contactDao.deleteByFbIds(listOf(contact.fbId))
-                    contactDao.add(ContactMapping.contactRestToContactRoom(contact.fbId, it))
-                }
+                val contactRoom = ContactMapping.contactRestToContactRoom(contact.fbId, it)
+                contactDatabase.refreshByIds(listOf(contact.fbId), listOf(contactRoom))
             }
             emit(Resource.Success.Data(contact))
         } else {
@@ -121,26 +113,7 @@ class ContactRepositoryImpl private constructor(app: Application) : ContactRepos
             defaultErrorMessage = "Error deleting contact ${contact.fbId}"
         )
         if (result is Resource.Success) {
-            contactDao.deleteByFbIds(listOf(contact.fbId))
-        }
-    }
-
-    companion object {
-        @Volatile
-        private var INSTANCE: ContactRepositoryImpl? = null
-
-        fun getInstance(
-            app: Application
-        ): ContactRepositoryImpl {
-            val tmpInstance = INSTANCE
-            if (tmpInstance != null) {
-                return tmpInstance
-            }
-            synchronized(this) {
-                val instance = ContactRepositoryImpl(app)
-                INSTANCE = instance
-                return instance
-            }
+            contactDatabase.deleteByFbIds(listOf(contact.fbId))
         }
     }
 }

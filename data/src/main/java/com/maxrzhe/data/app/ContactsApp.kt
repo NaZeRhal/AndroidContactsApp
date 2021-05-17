@@ -1,35 +1,17 @@
 package com.maxrzhe.data.app
 
 import android.app.Application
-import com.maxrzhe.data.remote.ContactsApi
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.maxrzhe.data.di.dataModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class ContactsApp : Application() {
 
-    lateinit var contactsApi: ContactsApi
-
     override fun onCreate() {
         super.onCreate()
-        configureRetrofit()
-    }
-
-    private fun configureRetrofit() {
-        val httpLoggingInterceptor = HttpLoggingInterceptor()
-        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(httpLoggingInterceptor)
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(ContactsApi.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        contactsApi = retrofit.create(ContactsApi::class.java)
+        startKoin {
+            androidContext(this@ContactsApp)
+            modules(listOf(dataModule, ))
+        }
     }
 }
