@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.maxrzhe.common.util.Resource
 import com.maxrzhe.data.repository.ContactRepositoryImpl
 import com.maxrzhe.domain.model.Contact
+import com.maxrzhe.domain.repositories.ContactRepository
 import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
@@ -17,8 +18,10 @@ import kotlinx.coroutines.launch
 
 class ContactListViewModel(app: Application) : BaseViewModel(app) {
 
-    private val getContactsUseCase = GetContactsUseCase(ContactRepositoryImpl.getInstance(app))
-    private val deleteContactUseCase = DeleteContactUseCase(ContactRepositoryImpl.getInstance(app))
+    private val repository: ContactRepository = ContactRepositoryImpl.getInstance(app)
+
+    private val getContactsUseCase = GetContactsUseCase(repository)
+    private val deleteContactUseCase = DeleteContactUseCase(repository)
 
     var isFavoritesPage: Boolean = false
 
@@ -27,13 +30,13 @@ class ContactListViewModel(app: Application) : BaseViewModel(app) {
     val errorMessage: LiveData<String> = _errorMessage
 
     val isLoading = liveData {
-        val flow: Flow<com.maxrzhe.common.util.Resource<List<Contact>>> =
+        val flow: Flow<Resource<List<Contact>>> =
             getContactsUseCase.execute()
         flow.collect {
             when (it) {
                 is Resource.Loading -> emit(true)
                 is Resource.Error -> {
-                    _errorMessage.value = it.error?.message
+                    _errorMessage.value = it.error.message
                     emit(false)
                 }
                 is Resource.Success.Data -> {

@@ -11,6 +11,7 @@ import androidx.lifecycle.*
 import com.maxrzhe.common.util.Resource
 import com.maxrzhe.data.repository.ContactRepositoryImpl
 import com.maxrzhe.domain.model.Contact
+import com.maxrzhe.domain.repositories.ContactRepository
 import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
@@ -25,9 +26,11 @@ import java.util.*
 class ContactDetailViewModel(private val app: Application) :
     BaseViewModel(app) {
 
-    private val findByIdUseCase = FindByIdUseCase(ContactRepositoryImpl.getInstance(app))
-    private val addContactUseCase = AddContactUseCase(ContactRepositoryImpl.getInstance(app))
-    private val updateContactUseCase = UpdateContactUseCase(ContactRepositoryImpl.getInstance(app))
+    private val repository: ContactRepository = ContactRepositoryImpl.getInstance(app)
+
+    private val findByIdUseCase = FindByIdUseCase(repository)
+    private val addContactUseCase = AddContactUseCase(repository)
+    private val updateContactUseCase = UpdateContactUseCase(repository)
 
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
