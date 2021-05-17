@@ -1,6 +1,5 @@
 package com.maxrzhe.presentation.viewmodel.impl
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ContactListViewModel internal constructor(
-    private val application: Application,
     private val getContactsUseCase: GetContactsUseCase,
     private val deleteContactUseCase: DeleteContactUseCase
 ) : BaseViewModel() {

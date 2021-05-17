@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
-import com.maxrzhe.presentation.databinding.ItemContactBinding
 import com.maxrzhe.domain.model.Contact
+import com.maxrzhe.presentation.databinding.ItemContactBinding
 import java.util.*
 
 class ContactAdapter(

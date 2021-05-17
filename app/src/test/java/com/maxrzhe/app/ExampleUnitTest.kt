@@ -1,4 +1,4 @@
-package com.maxrzhe.common
+package com.maxrzhe.app
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

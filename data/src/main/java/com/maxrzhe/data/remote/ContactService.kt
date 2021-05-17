@@ -1,9 +1,9 @@
 package com.maxrzhe.data.remote
 
-import com.maxrzhe.domain.model.Contact
 import com.maxrzhe.data.entities.api.ContactFbIdResponse
 import com.maxrzhe.data.entities.api.ContactListResponse
 import com.maxrzhe.data.entities.api.ContactResponseItem
+import com.maxrzhe.domain.model.Contact
 import retrofit2.Response
 import retrofit2.http.*
 

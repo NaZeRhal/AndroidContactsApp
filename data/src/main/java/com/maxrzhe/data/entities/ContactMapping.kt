@@ -1,8 +1,8 @@
 package com.maxrzhe.data.entities
 
-import com.maxrzhe.domain.model.Contact
 import com.maxrzhe.data.entities.api.ContactResponseItem
 import com.maxrzhe.data.entities.room.ContactRoom
+import com.maxrzhe.domain.model.Contact
 
 abstract class ContactMapping {
     companion object {

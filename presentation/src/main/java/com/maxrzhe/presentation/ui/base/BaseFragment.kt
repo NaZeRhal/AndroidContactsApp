@@ -5,13 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
+import org.koin.android.viewmodel.ext.android.getViewModel
+import kotlin.reflect.KClass
 
 abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
 
-    protected abstract val viewModel: VM
+    protected lateinit var viewModel: VM
 
     private var _binding: ViewBinding? = null
 
@@ -19,18 +20,18 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
     protected val binding: VB
         get() = _binding as VB
 
-//    protected abstract val viewModelFactory: ViewModelProvider.Factory
     protected abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
 
-    protected abstract fun getViewModelClass(): Class<VM>
+    protected abstract val viewModelClass: KClass<VM>
+
     protected abstract fun initView()
     protected abstract fun bindView()
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        viewModel =
-//            ViewModelProvider(this, viewModelFactory).get(getViewModelClass())
-//    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel =
+            getViewModel(clazz = viewModelClass)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

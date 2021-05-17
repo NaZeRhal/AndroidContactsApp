@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -14,11 +13,11 @@ import com.maxrzhe.presentation.adapters.ContactAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
-//import com.maxrzhe.presentation.viewmodel.factory.BaseViewModelFactory
+import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
-import com.maxrzhe.presentation.ui.base.BaseFragment
+import kotlin.reflect.KClass
 
 class ContactListFragment :
     BaseFragment<FragmentContactListBinding, ContactListViewModel>(),
@@ -43,13 +42,10 @@ class ContactListFragment :
     private val onSelectContactListener: OnSelectContactListener?
         get() = (context as? OnSelectContactListener)
 
-//    override val viewModelFactory: ViewModelProvider.Factory
-//        get() = BaseViewModelFactory(requireActivity().application)
-
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
 
-    override fun getViewModelClass() = ContactListViewModel::class.java
+    override val viewModelClass: KClass<ContactListViewModel> = ContactListViewModel::class
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,6 +125,4 @@ class ContactListFragment :
     interface OnSelectContactListener {
         fun onSelect()
     }
-
-    override val viewModel: ContactListViewModel by viewModel()
 }
