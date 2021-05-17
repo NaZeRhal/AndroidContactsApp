@@ -2,9 +2,9 @@ package com.maxrzhe.newcontactsapp.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import com.maxrzhe.contacts.provider.ContactProviderHandler
-import com.maxrzhe.core.model.Contact
-import com.maxrzhe.core.viewmodel.BaseViewModel
+import com.maxrzhe.data.provider.ContactProviderHandler
+import com.maxrzhe.domain.model.Contact
+import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
 class ContactConsumerListViewModel(app: Application) : BaseViewModel(app) {
 

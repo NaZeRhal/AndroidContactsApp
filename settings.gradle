@@ -1,6 +1,8 @@
+include ':common'
+include ':data'
 include ':volumeslider'
 include ':newcontactsapp'
-include ':contacts'
-include ':core'
+include ':presentation'
+include ':domain'
 include ':app'
 rootProject.name = "ContactsApp"
