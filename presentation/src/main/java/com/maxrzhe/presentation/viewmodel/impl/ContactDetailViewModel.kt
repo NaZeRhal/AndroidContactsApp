@@ -3,15 +3,17 @@ package com.maxrzhe.presentation.viewmodel.impl
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.*
-import com.maxrzhe.common.util.Resource
 import com.example.data_api.model.Contact
+import com.maxrzhe.common.util.Resource
 import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
 import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -20,6 +22,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ContactDetailViewModel internal constructor(
+    private val appResources: AppResources,
     private val findByIdUseCase: FindByIdUseCase,
     private val addContactUseCase: AddContactUseCase,
     private val updateContactUseCase: UpdateContactUseCase
@@ -76,7 +79,7 @@ class ContactDetailViewModel internal constructor(
 
     val imageTextRes = ObservableInt(R.string.detail_tv_add_image_text)
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
-//    val tint = ObservableInt(ContextCompat.getColor(app, R.color.favorite_false_color))
+    val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
     fun setSelectedId(selectedId: String?) {
         _fbId.value = selectedId
@@ -155,11 +158,11 @@ class ContactDetailViewModel internal constructor(
     }
 
     private fun toggleTint() {
-//        if (!isFavorite) {
-//            tint.set(ContextCompat.getColor(app, R.color.favorite_false_color))
-//        } else {
-//            tint.set(ContextCompat.getColor(app, R.color.favorite_true_color))
-//        }
+        if (!isFavorite) {
+            tint.set(appResources.getColor(R.color.favorite_false_color))
+        } else {
+            tint.set(appResources.getColor(R.color.favorite_true_color))
+        }
     }
 
     private fun add(contact: Contact) {
