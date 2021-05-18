@@ -14,7 +14,7 @@ import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_IMAGE
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_NAME
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_PHONE
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.TABLE_CONTACTS
-import com.maxrzhe.domain.model.Contact
+import com.example.data_api.model.Contact
 
 class ContactProviderHandler(private val context: Context) {
 

@@ -9,7 +9,7 @@ import androidx.databinding.InverseBindingListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.maxrzhe.domain.model.Contact
+import com.example.data_api.model.Contact
 import com.maxrzhe.presentation.R
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
@@ -52,7 +52,7 @@ fun RecyclerView.bindAdapter(contactAdapter: ContactAdapter?) {
 }
 
 @BindingAdapter("data")
-fun setData(rv: RecyclerView, contactsList: List<Contact>?) {
+fun setData(rv: RecyclerView, contactsList: List<com.example.data_api.model.Contact>?) {
     if (rv.adapter is ContactAdapter) {
         contactsList?.let {
             (rv.adapter as? ContactAdapter)?.itemList = it

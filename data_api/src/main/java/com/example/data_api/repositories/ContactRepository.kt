@@ -1,7 +1,7 @@
-package com.maxrzhe.domain.repositories
+package com.example.data_api.repositories
 
+import com.example.data_api.model.Contact
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.domain.model.Contact
 import kotlinx.coroutines.flow.Flow
 
 interface ContactRepository {

@@ -15,12 +15,12 @@ import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
 import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.presentation.viewmodel.impl.ContactDetailViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.util.*
-import kotlin.reflect.KClass
 
 class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
 
@@ -28,13 +28,13 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
 
+    override val viewModel: ContactDetailViewModel by viewModel()
+
     private val onSaveContactListener: OnSaveContactListener?
         get() = (context as? OnSaveContactListener)
 
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
-
-    override val viewModelClass: KClass<ContactDetailViewModel> = ContactDetailViewModel::class
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
         FragmentContactDetailBinding::inflate

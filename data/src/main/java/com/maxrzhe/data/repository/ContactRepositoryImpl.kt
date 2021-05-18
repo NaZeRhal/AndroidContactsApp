@@ -1,5 +1,7 @@
 package com.maxrzhe.data.repository
 
+import com.example.data_api.model.Contact
+import com.example.data_api.repositories.ContactRepository
 import com.maxrzhe.common.util.Resource
 import com.maxrzhe.data.entities.ContactMapping
 import com.maxrzhe.data.entities.api.ContactFbIdResponse
@@ -9,15 +11,13 @@ import com.maxrzhe.data.local.ContactDatabase
 import com.maxrzhe.data.remote.ContactApi
 import com.maxrzhe.data.remote.getResponse
 import com.maxrzhe.data.remote.networkBoundResource
-import com.maxrzhe.domain.model.Contact
-import com.maxrzhe.domain.repositories.ContactRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
-class ContactRepositoryImpl(
+internal class ContactRepositoryImpl(
     private val contactApi: ContactApi,
     private val contactDatabase: ContactDatabase
 ) : ContactRepository {
@@ -43,19 +43,20 @@ class ContactRepositoryImpl(
         }
     )
 
-    override fun findById(fbId: String): Flow<Resource<Contact>> = networkBoundResource(
-        query = {
-            contactDatabase.findById(fbId)
-                .map { ContactMapping.contactRoomToContact(it) }
-        },
-        fetch = {
-            getResponse(
-                request = { contactApi.fetchContactById(fbId) },
-                defaultErrorMessage = "Error fetching contact by id"
-            )
-        },
-        saveFetchResult = {}
-    )
+    override fun findById(fbId: String): Flow<Resource<Contact>> =
+        networkBoundResource(
+            query = {
+                contactDatabase.findById(fbId)
+                    .map { ContactMapping.contactRoomToContact(it) }
+            },
+            fetch = {
+                getResponse(
+                    request = { contactApi.fetchContactById(fbId) },
+                    defaultErrorMessage = "Error fetching contact by id"
+                )
+            },
+            saveFetchResult = {}
+        )
 
     override fun add(contact: Contact): Flow<Resource<Contact>> {
         return flow<Resource<Contact>> {
@@ -90,22 +91,23 @@ class ContactRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun update(contact: Contact): Flow<Resource<Contact>> = flow {
-        emit(Resource.Loading())
-        val result: Resource<ContactResponseItem> = getResponse(
-            request = { contactApi.updateContact(contact.fbId, contact) },
-            defaultErrorMessage = "Error updating contact ${contact.fbId}"
-        )
-        if (result is Resource.Success.Data) {
-            result.data.let {
-                val contactRoom = ContactMapping.contactRestToContactRoom(contact.fbId, it)
-                contactDatabase.refreshByIds(listOf(contact.fbId), listOf(contactRoom))
+    override fun update(contact: Contact): Flow<Resource<Contact>> =
+        flow {
+            emit(Resource.Loading())
+            val result: Resource<ContactResponseItem> = getResponse(
+                request = { contactApi.updateContact(contact.fbId, contact) },
+                defaultErrorMessage = "Error updating contact ${contact.fbId}"
+            )
+            if (result is Resource.Success.Data) {
+                result.data.let {
+                    val contactRoom = ContactMapping.contactRestToContactRoom(contact.fbId, it)
+                    contactDatabase.refreshByIds(listOf(contact.fbId), listOf(contactRoom))
+                }
+                emit(Resource.Success.Data(contact))
+            } else {
+                emit(Resource.Error<Contact>(Throwable("Error updating contact in remote source")))
             }
-            emit(Resource.Success.Data(contact))
-        } else {
-            emit(Resource.Error<Contact>(Throwable("Error updating contact in remote source")))
-        }
-    }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun delete(contact: Contact) {
         val result = getResponse(

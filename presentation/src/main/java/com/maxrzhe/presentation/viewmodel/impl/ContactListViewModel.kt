@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.domain.model.Contact
+import com.example.data_api.model.Contact
 import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel

@@ -1,11 +1,10 @@
 package com.maxrzhe.newcontactsapp.screens
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.maxrzhe.data.provider.ContactProviderHandler
 import com.maxrzhe.newcontactsapp.viewmodel.ContactConsumerListViewModel
@@ -15,7 +14,6 @@ import com.maxrzhe.presentation.adapters.ContactAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
 import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
-import kotlin.reflect.KClass
 
 class ContactConsumerListFragment :
     BaseFragment<FragmentContactListBinding, ContactConsumerListViewModel>(),
@@ -24,17 +22,14 @@ class ContactConsumerListFragment :
 
     private val searchViewModel by activityViewModels<SearchViewModel>()
 
+    override val viewModel by viewModels<ContactConsumerListViewModel> {
+        ContactConsumerViewModelFactory(
+            ContactProviderHandler(requireContext())
+        )
+    }
+
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val providerHandler = ContactProviderHandler(requireContext())
-        viewModel = ViewModelProvider(
-            viewModelStore,
-            ContactConsumerViewModelFactory(providerHandler)
-        ).get(ContactConsumerListViewModel::class.java)
-    }
 
     override fun bindView() {}
 
@@ -77,7 +72,4 @@ class ContactConsumerListFragment :
             binding.tvSearchResult.text = ""
         }
     }
-
-    override val viewModelClass: KClass<ContactConsumerListViewModel> =
-        ContactConsumerListViewModel::class
 }

@@ -7,7 +7,7 @@ import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.*
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.domain.model.Contact
+import com.example.data_api.model.Contact
 import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase

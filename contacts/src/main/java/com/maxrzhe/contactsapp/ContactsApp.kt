@@ -1,4 +1,4 @@
-package com.maxrzhe.app
+package com.maxrzhe.contactsapp
 
 import android.app.Application
 import com.maxrzhe.data.di.dataModule

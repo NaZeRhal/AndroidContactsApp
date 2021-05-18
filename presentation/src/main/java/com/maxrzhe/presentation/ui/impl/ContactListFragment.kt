@@ -17,7 +17,7 @@ import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
-import kotlin.reflect.KClass
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class ContactListFragment :
     BaseFragment<FragmentContactListBinding, ContactListViewModel>(),
@@ -45,7 +45,7 @@ class ContactListFragment :
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
 
-    override val viewModelClass: KClass<ContactListViewModel> = ContactListViewModel::class
+    override val viewModel: ContactListViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

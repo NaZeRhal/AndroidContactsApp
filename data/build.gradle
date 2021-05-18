@@ -67,6 +67,7 @@ dependencies {
     implementation 'im.dino:dbinspector:3.4.1@aar'
 
     implementation project(':domain')
+    implementation project(':data_api')
     implementation project(':common')
 
     testImplementation 'junit:junit:4.13.2'
