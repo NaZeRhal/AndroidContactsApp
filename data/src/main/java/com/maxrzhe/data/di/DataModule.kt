@@ -28,11 +28,11 @@ val dataModule = module {
     single<ContactDatabase> { ContactDatabaseImpl(get()) }
     single<ContactRepository> { ContactRepositoryImpl(get(), get()) }
 
-    single { GetContactsUseCase(get()) }
-    single { FindByIdUseCase(get()) }
-    single { AddContactUseCase(get()) }
-    single { UpdateContactUseCase(get()) }
-    single { DeleteContactUseCase(get()) }
+    factory { GetContactsUseCase(get()) }
+    factory { FindByIdUseCase(get()) }
+    factory { AddContactUseCase(get()) }
+    factory { UpdateContactUseCase(get()) }
+    factory { DeleteContactUseCase(get()) }
 }
 
 fun createContactService(): ContactService {
