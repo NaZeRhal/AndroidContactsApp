@@ -3,7 +3,6 @@ package com.maxrzhe.presentation.viewmodel.impl
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.*

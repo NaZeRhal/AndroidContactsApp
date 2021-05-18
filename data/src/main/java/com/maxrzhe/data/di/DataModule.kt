@@ -2,6 +2,7 @@ package com.maxrzhe.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.data_api.repositories.ContactRepository
 import com.maxrzhe.common.util.Constants
 import com.maxrzhe.data.local.ContactDatabase
 import com.maxrzhe.data.local.ContactDatabaseImpl
@@ -11,7 +12,6 @@ import com.maxrzhe.data.remote.ContactApi
 import com.maxrzhe.data.remote.ContactApiImpl
 import com.maxrzhe.data.remote.ContactService
 import com.maxrzhe.data.repository.ContactRepositoryImpl
-import com.example.data_api.repositories.ContactRepository
 import com.maxrzhe.domain.usecases.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

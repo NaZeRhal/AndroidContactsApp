@@ -6,6 +6,7 @@ import android.database.SQLException
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.data_api.model.Contact
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_DATE
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_EMAIL
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_FAVORITE
@@ -14,7 +15,6 @@ import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_IMAGE
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_NAME
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_PHONE
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.TABLE_CONTACTS
-import com.example.data_api.model.Contact
 
 class ContactProviderHandler(private val context: Context) {
 

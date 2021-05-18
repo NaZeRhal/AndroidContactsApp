@@ -9,7 +9,6 @@ import androidx.databinding.InverseBindingListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.data_api.model.Contact
 import com.maxrzhe.presentation.R
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
