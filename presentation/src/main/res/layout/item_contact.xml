@@ -6,7 +6,7 @@
 
         <variable
             name="contact"
-            type="com.maxrzhe.domain.model.Contact" />
+            type="com.example.data_api.model.Contact" />
     </data>
 
     <androidx.cardview.widget.CardView

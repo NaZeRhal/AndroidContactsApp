@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.maxrzhe.presentation.viewmodel.VolumeSettingViewModel" />
+            type="com.maxrzhe.presentation.viewmodel.impl.VolumeSettingViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

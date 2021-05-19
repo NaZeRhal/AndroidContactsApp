@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.maxrzhe.presentation.databinding.ActivityVolumeSettingBinding
-import com.maxrzhe.presentation.viewmodel.VolumeSettingViewModel
+import com.maxrzhe.presentation.viewmodel.impl.VolumeSettingViewModel
 
 class VolumeSettingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityVolumeSettingBinding

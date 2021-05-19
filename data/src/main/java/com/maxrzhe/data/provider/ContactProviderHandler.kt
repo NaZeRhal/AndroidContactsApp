@@ -6,7 +6,7 @@ import android.database.SQLException
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.maxrzhe.domain.model.Contact
+import com.example.data_api.model.Contact
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_DATE
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_EMAIL
 import com.maxrzhe.data.local.sql.DatabaseHandler.Companion.KEY_FAVORITE

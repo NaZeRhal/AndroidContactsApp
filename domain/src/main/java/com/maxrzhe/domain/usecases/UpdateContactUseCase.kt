@@ -1,8 +1,8 @@
 package com.maxrzhe.domain.usecases
 
+import com.example.data_api.model.Contact
+import com.example.data_api.repositories.ContactRepository
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.domain.model.Contact
-import com.maxrzhe.domain.repositories.ContactRepository
 import kotlinx.coroutines.flow.Flow
 
 class UpdateContactUseCase(private val contactRepository: ContactRepository) :

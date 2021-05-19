@@ -1,6 +1,6 @@
 package com.maxrzhe.data.entities
 
-import com.maxrzhe.domain.model.Contact
+import com.example.data_api.model.Contact
 import com.maxrzhe.data.entities.api.ContactResponseItem
 import com.maxrzhe.data.entities.room.ContactRoom
 
@@ -52,9 +52,10 @@ abstract class ContactMapping {
             } else null
         }
 
-        fun contactToContactRest(contact: Contact): ContactResponseItem = with(contact) {
-            ContactResponseItem(name, email, phone, image, birthDate, isFavorite)
-        }
+        fun contactToContactRest(contact: Contact): ContactResponseItem =
+            with(contact) {
+                ContactResponseItem(name, email, phone, image, birthDate, isFavorite)
+            }
 
         fun contactRoomToContactRest(contactRoom: ContactRoom): ContactResponseItem =
             with(contactRoom) {

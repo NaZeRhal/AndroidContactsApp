@@ -10,13 +10,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
-import com.maxrzhe.presentation.viewmodel.factory.BaseViewModelFactory
+import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.presentation.viewmodel.impl.ContactDetailViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
-import com.maxrzhe.presentation.ui.base.BaseFragment
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -29,19 +28,16 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
 
+    override val viewModel: ContactDetailViewModel by viewModel()
+
     private val onSaveContactListener: OnSaveContactListener?
         get() = (context as? OnSaveContactListener)
 
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
 
-    override val viewModelFactory: ViewModelProvider.Factory
-        get() = BaseViewModelFactory(requireActivity().application)
-
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
         FragmentContactDetailBinding::inflate
-
-    override fun getViewModelClass() = ContactDetailViewModel::class.java
 
     override fun bindView() {
         binding.viewModel = viewModel
@@ -65,16 +61,25 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
     private fun subscribeUi() {
         viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
             if (msg != null) {
-                showErrorMessage(msg)
+                showErrorSnackBar(msg)
+            }
+        })
+        viewModel.validationMessage.observe(viewLifecycleOwner, { msg ->
+            if (msg != null) {
+                showValidationToast(msg)
             }
         })
     }
 
-    private fun showErrorMessage(msg: String) {
+    private fun showErrorSnackBar(msg: String) {
         view?.let {
             Snackbar.make(it, msg, Snackbar.LENGTH_INDEFINITE).setAction("DISMISS") {
             }.show()
         }
+    }
+
+    private fun showValidationToast(msg: String) {
+        Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
     }
 
     fun setupImage(contentUri: Uri) {

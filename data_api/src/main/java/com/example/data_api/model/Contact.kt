@@ -1,4 +1,4 @@
-package com.maxrzhe.domain.model
+package com.example.data_api.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

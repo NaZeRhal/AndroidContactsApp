@@ -1,14 +1,11 @@
 package com.maxrzhe.presentation.viewmodel.impl
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.example.data_api.model.Contact
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.data.repository.ContactRepositoryImpl
-import com.maxrzhe.domain.model.Contact
-import com.maxrzhe.domain.repositories.ContactRepository
 import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
@@ -16,12 +13,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class ContactListViewModel(app: Application) : BaseViewModel(app) {
-
-    private val repository: ContactRepository = ContactRepositoryImpl.getInstance(app)
-
-    private val getContactsUseCase = GetContactsUseCase(repository)
-    private val deleteContactUseCase = DeleteContactUseCase(repository)
+class ContactListViewModel internal constructor(
+    private val getContactsUseCase: GetContactsUseCase,
+    private val deleteContactUseCase: DeleteContactUseCase
+) : BaseViewModel() {
 
     var isFavoritesPage: Boolean = false
 

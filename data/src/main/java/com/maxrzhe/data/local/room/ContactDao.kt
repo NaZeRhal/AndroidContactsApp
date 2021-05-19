@@ -28,4 +28,16 @@ interface ContactDao {
     @Query("SELECT * FROM contacts_table")
     fun findAll(): Flow<List<ContactRoom>>
 
+    @Transaction
+    suspend fun refreshAll(contacts: List<ContactRoom>) {
+        deleteAll()
+        addAll(contacts)
+    }
+
+    @Transaction
+    suspend fun refreshByIds(ids: List<String>, contacts: List<ContactRoom>) {
+        deleteByFbIds(ids)
+        addAll(contacts)
+    }
+
 }

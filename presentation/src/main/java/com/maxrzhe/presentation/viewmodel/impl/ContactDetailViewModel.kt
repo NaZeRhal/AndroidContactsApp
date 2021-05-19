@@ -2,20 +2,17 @@ package com.maxrzhe.presentation.viewmodel.impl
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.app.Application
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.*
+import com.example.data_api.model.Contact
 import com.maxrzhe.common.util.Resource
-import com.maxrzhe.data.repository.ContactRepositoryImpl
-import com.maxrzhe.domain.model.Contact
-import com.maxrzhe.domain.repositories.ContactRepository
 import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
 import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -23,14 +20,13 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ContactDetailViewModel(private val app: Application) :
-    BaseViewModel(app) {
-
-    private val repository: ContactRepository = ContactRepositoryImpl.getInstance(app)
-
-    private val findByIdUseCase = FindByIdUseCase(repository)
-    private val addContactUseCase = AddContactUseCase(repository)
-    private val updateContactUseCase = UpdateContactUseCase(repository)
+class ContactDetailViewModel internal constructor(
+    private val appResources: AppResources,
+    private val findByIdUseCase: FindByIdUseCase,
+    private val addContactUseCase: AddContactUseCase,
+    private val updateContactUseCase: UpdateContactUseCase
+) :
+    BaseViewModel() {
 
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
@@ -66,6 +62,10 @@ class ContactDetailViewModel(private val app: Application) :
         MutableLiveData(null)
     val errorMessage: LiveData<String?> = _errorMessage
 
+    private val _validationMessage: MutableLiveData<String?> =
+        MutableLiveData(null)
+    val validationMessage: LiveData<String?> = _validationMessage
+
     val name = ObservableField<String?>()
     val email = ObservableField<String?>()
     val phone = ObservableField<String?>()
@@ -78,7 +78,7 @@ class ContactDetailViewModel(private val app: Application) :
 
     val imageTextRes = ObservableInt(R.string.detail_tv_add_image_text)
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
-    val tint = ObservableInt(ContextCompat.getColor(app, R.color.favorite_false_color))
+    val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
     fun setSelectedId(selectedId: String?) {
         _fbId.value = selectedId
@@ -158,9 +158,9 @@ class ContactDetailViewModel(private val app: Application) :
 
     private fun toggleTint() {
         if (!isFavorite) {
-            tint.set(ContextCompat.getColor(app, R.color.favorite_false_color))
+            tint.set(appResources.getColor(R.color.favorite_false_color))
         } else {
-            tint.set(ContextCompat.getColor(app, R.color.favorite_true_color))
+            tint.set(appResources.getColor(R.color.favorite_true_color))
         }
     }
 
@@ -235,27 +235,15 @@ class ContactDetailViewModel(private val app: Application) :
     private fun validateInput(): Boolean {
         return when {
             name.get().isNullOrEmpty() -> {
-                android.widget.Toast.makeText(
-                    app.applicationContext,
-                    "Please enter a name",
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
+                _validationMessage.value = "Please enter a name"
                 false
             }
             !android.util.Patterns.PHONE.matcher(phone.get().toString()).matches() -> {
-                android.widget.Toast.makeText(
-                    app.applicationContext,
-                    "Please enter correct phone number",
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
+                _validationMessage.value = "Please enter correct phone number"
                 false
             }
             !android.util.Patterns.EMAIL_ADDRESS.matcher(email.get().toString()).matches() -> {
-                android.widget.Toast.makeText(
-                    app.applicationContext,
-                    "Please enter correct email",
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
+                _validationMessage.value = "Please enter correct email"
                 false
             }
             else -> true

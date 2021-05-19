@@ -33,7 +33,7 @@ import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
 import com.maxrzhe.presentation.ui.impl.ContactDetailFragment
 import com.maxrzhe.presentation.ui.impl.ContactDetailFragment.*
 import com.maxrzhe.presentation.ui.impl.ContactListFragment.*
-import com.maxrzhe.presentation.viewmodel.SearchViewModel
+import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
 
 class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
     OnSelectContactListener, OnTakeImageListener, HomeFragment.OnAddContactListener,
