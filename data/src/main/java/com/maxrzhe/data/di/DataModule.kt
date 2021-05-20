@@ -12,7 +12,6 @@ import com.maxrzhe.data.remote.ContactApi
 import com.maxrzhe.data.remote.ContactApiImpl
 import com.maxrzhe.data.remote.ContactService
 import com.maxrzhe.data.repository.ContactRepositoryImpl
-import com.maxrzhe.domain.usecases.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -27,12 +26,6 @@ val dataModule = module {
     single<ContactApi> { ContactApiImpl(get()) }
     single<ContactDatabase> { ContactDatabaseImpl(get()) }
     single<ContactRepository> { ContactRepositoryImpl(get(), get()) }
-
-    factory { GetContactsUseCase(get()) }
-    factory { FindByIdUseCase(get()) }
-    factory { AddContactUseCase(get()) }
-    factory { UpdateContactUseCase(get()) }
-    factory { DeleteContactUseCase(get()) }
 }
 
 fun createContactService(): ContactService {

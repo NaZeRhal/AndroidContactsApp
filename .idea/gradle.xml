@@ -16,7 +16,6 @@
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/data_api" />
             <option value="$PROJECT_DIR$/domain" />
-            <option value="$PROJECT_DIR$/newcontactsapp" />
             <option value="$PROJECT_DIR$/presentation" />
             <option value="$PROJECT_DIR$/volumeslider" />
           </set>

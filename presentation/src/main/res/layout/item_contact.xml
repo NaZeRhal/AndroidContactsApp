@@ -5,7 +5,7 @@
     <data>
 
         <variable
-            name="contact"
+            name="data"
             type="com.example.data_api.model.Contact" />
     </data>
 
@@ -32,15 +32,15 @@
                 android:fontFamily="@font/alegreya_sans_sc"
                 android:gravity="center"
                 android:textSize="@dimen/item_contact_tv_name_textSize"
-                tools:text="@{contact.name}" />
+                tools:text="@{data.name}" />
 
             <ImageView
                 android:id="@+id/iv_contact_image"
+                circleImageUri="@{data.image}"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/item_contact_iv_height"
                 android:layout_gravity="center"
                 android:layout_weight="20"
-                circleImageUri="@{contact.image}"
                 android:contentDescription="@string/item_contact_iv_description"
                 android:padding="@dimen/item_contact_iv_padding"
                 android:src="@mipmap/ic_launcher_round" />
