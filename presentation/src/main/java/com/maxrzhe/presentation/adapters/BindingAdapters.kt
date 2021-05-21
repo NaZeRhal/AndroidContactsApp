@@ -9,8 +9,8 @@ import androidx.databinding.InverseBindingListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.data_api.model.Contact
 import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
 
@@ -41,19 +41,19 @@ fun circleImageUri(view: ImageView, imageUriString: String?) {
 }
 
 @BindingAdapter("bindAdapter")
-fun RecyclerView.bindAdapter(contactsAdapter: ContactsAdapter) {
+fun RecyclerView.bindAdapter(baseAdapter: BaseBindingAdapter<*>) {
     this.run {
         hasFixedSize()
         layoutManager = LinearLayoutManager(this.context)
-        adapter = contactsAdapter
+        adapter = baseAdapter
     }
 }
 
 @BindingAdapter("data")
-fun setData(rv: RecyclerView, contactsList: List<Contact>?) {
-    if (rv.adapter is ContactsAdapter) {
+fun setData(rv: RecyclerView, contactsList: List<ContactItemViewModel>?) {
+    if (rv.adapter is BaseBindingAdapter<*>) {
         contactsList?.let {
-            (rv.adapter as? ContactsAdapter)?.setList(it)
+            (rv.adapter as BaseBindingAdapter<*>).setItems(it)
         }
     }
 }

@@ -7,13 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.example.data_api.model.Contact
 import com.google.android.material.snackbar.Snackbar
-import com.maxrzhe.presentation.R
-import com.maxrzhe.presentation.adapters.ContactsAdapter
-import com.maxrzhe.presentation.adapters.GenericBindingAdapter
+import com.maxrzhe.presentation.adapters.BaseBindingAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
+import com.maxrzhe.presentation.databinding.ItemContactBinding
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
 import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
@@ -22,8 +20,9 @@ import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class ContactListFragment :
-    BaseFragment<FragmentContactListBinding, ContactListViewModel>(),
-    ContactsAdapter.OnSearchResultListener {
+    BaseFragment<FragmentContactListBinding, ContactListViewModel>()
+//    ContactsAdapter.OnSearchResultListener
+{
 
     companion object {
         private const val IS_FAVORITES = "is_favorites"
@@ -36,7 +35,7 @@ class ContactListFragment :
             }
     }
 
-    private var contactsAdapter: ContactsAdapter? = null
+    private var contactsAdapter: BaseBindingAdapter<ItemContactBinding>? = null
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
     private val searchViewModel by activityViewModels<SearchViewModel>()
@@ -60,16 +59,13 @@ class ContactListFragment :
     }
 
     override fun initView() {
-        contactsAdapter = ContactsAdapter()
-        contactsAdapter?.addOnItemClickListener(object :
-            GenericBindingAdapter.OnItemClickListener<Contact> {
-            override fun onClickItem(data: Contact) {
-                sharedViewModel.select(data.fbId)
-                onSelectContactListener?.onSelect()
-                binding.tvSearchResult.visibility = View.GONE
-            }
-
+        contactsAdapter = BaseBindingAdapter()
+        viewModel.fbId.observe(viewLifecycleOwner, {
+            sharedViewModel.select(it)
+            onSelectContactListener?.onSelect()
+            binding.tvSearchResult.visibility = View.GONE
         })
+
         contactsAdapter?.let {
             binding.rvContactList.bindAdapter(it)
         }
@@ -77,17 +73,17 @@ class ContactListFragment :
         val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val contact = contactsAdapter?.getItemAt(position)
-                contact?.let {
-                    viewModel.delete(contact)
-                }
+//                val contact = contactsAdapter?.getItemAt(position)
+//                contact?.let {
+//                    viewModel.delete(contact)
+//                }
             }
         }
 
         ItemTouchHelper(swipeToDeleteCallback).apply {
             attachToRecyclerView(binding.rvContactList)
         }
-        contactsAdapter?.setOnSearchResultListener(this)
+//        contactsAdapter?.setOnSearchResultListener(this)
 
         viewModel.errorMessage.observe(viewLifecycleOwner,
             { msg ->
@@ -96,29 +92,29 @@ class ContactListFragment :
                 }
             })
 
-        searchViewModel.query.observe(viewLifecycleOwner,
-            { query ->
-                if (query != null) {
-                    contactsAdapter?.filter = query
-                }
-            })
+//        searchViewModel.query.observe(viewLifecycleOwner,
+//            { query ->
+//                if (query != null) {
+////                    contactsAdapter?.filter = query
+//                }
+//            })
     }
 
-    override fun onSearchResult(resultCount: Int) {
-        if (resultCount >= 0) {
-            binding.tvSearchResult.visibility = View.VISIBLE
-            val result =
-                resources.getQuantityString(
-                    R.plurals.search_result_plurals,
-                    resultCount,
-                    resultCount
-                )
-            binding.tvSearchResult.text = result
-        } else {
-            binding.tvSearchResult.visibility = View.GONE
-            binding.tvSearchResult.text = ""
-        }
-    }
+//    override fun onSearchResult(resultCount: Int) {
+//        if (resultCount >= 0) {
+//            binding.tvSearchResult.visibility = View.VISIBLE
+//            val result =
+//                resources.getQuantityString(
+//                    R.plurals.search_result_plurals,
+//                    resultCount,
+//                    resultCount
+//                )
+//            binding.tvSearchResult.text = result
+//        } else {
+//            binding.tvSearchResult.visibility = View.GONE
+//            binding.tvSearchResult.text = ""
+//        }
+//    }
 
     private fun showErrorMessage(msg: String) {
         view?.let {

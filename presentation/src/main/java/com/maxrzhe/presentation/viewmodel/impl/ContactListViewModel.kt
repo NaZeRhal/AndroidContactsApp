@@ -8,6 +8,7 @@ import com.example.data_api.model.Contact
 import com.maxrzhe.common.util.Resource
 import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
+import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -19,6 +20,10 @@ class ContactListViewModel internal constructor(
 ) : BaseViewModel() {
 
     var isFavoritesPage: Boolean = false
+
+    private val _fbId: MutableLiveData<String> =
+        MutableLiveData()
+    val fbId: LiveData<String> = _fbId
 
     private val _errorMessage: MutableLiveData<String> =
         MutableLiveData()
@@ -35,23 +40,34 @@ class ContactListViewModel internal constructor(
                     emit(false)
                 }
                 is Resource.Success.Data -> {
-                    _allContacts = it.data
+                    val items = it.data.map { item ->
+                        ContactItemViewModel(
+                            contact = item,
+                            onItemClick = ::onItemClick
+                        )
+                    }
+                    _allContacts = items
                     emit(false)
                 }
             }
         }
     }
 
-    private var _allContacts: List<Contact> = emptyList()
+    private var _allContacts: List<ContactItemViewModel> = emptyList()
         set(value) {
             field = value
-            allContacts.value = value.filter { if (isFavoritesPage) it.isFavorite else true }
+            allContacts.value =
+                value.filter { if (isFavoritesPage) it.contact.isFavorite else true }
         }
-    val allContacts: MutableLiveData<List<Contact>> = MutableLiveData(emptyList())
+    val allContacts: MutableLiveData<List<ContactItemViewModel>> = MutableLiveData(emptyList())
 
     fun delete(contact: Contact) {
         viewModelScope.launch {
             deleteContactUseCase.execute(contact)
         }
+    }
+
+    private fun onItemClick(item: ContactItemViewModel) {
+        _fbId.value = item.contact.fbId
     }
 }
