@@ -10,6 +10,7 @@ import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
 import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -62,7 +63,7 @@ class ContactListViewModel internal constructor(
     val allContacts: MutableLiveData<List<ContactItemViewModel>> = MutableLiveData(emptyList())
 
     fun delete(contact: Contact) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deleteContactUseCase.execute(contact)
         }
     }

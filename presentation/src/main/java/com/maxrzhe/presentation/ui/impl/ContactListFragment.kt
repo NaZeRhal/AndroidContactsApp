@@ -12,6 +12,7 @@ import com.maxrzhe.presentation.adapters.BaseBindingAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
 import com.maxrzhe.presentation.databinding.ItemContactBinding
+import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
 import com.maxrzhe.presentation.ui.base.BaseFragment
 import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
@@ -73,10 +74,10 @@ class ContactListFragment :
         val swipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-//                val contact = contactsAdapter?.getItemAt(position)
-//                contact?.let {
-//                    viewModel.delete(contact)
-//                }
+                val contactItem = contactsAdapter?.getItemAt(position) as? ContactItemViewModel
+                contactItem?.let {
+                    viewModel.delete(contactItem.contact)
+                }
             }
         }
 

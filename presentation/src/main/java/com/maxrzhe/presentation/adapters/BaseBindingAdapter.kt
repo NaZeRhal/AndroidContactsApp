@@ -29,6 +29,8 @@ class BaseBindingAdapter<T : ViewDataBinding> :
     override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) =
         holder.bind(items[position])
 
+    fun getItemAt(position: Int): BaseItemViewModel = items[position]
+
     fun setItems(newItems: List<BaseItemViewModel>) {
         val diffResult = DiffUtil.calculateDiff(DiffHelper(newItems, items))
         items.clear()
