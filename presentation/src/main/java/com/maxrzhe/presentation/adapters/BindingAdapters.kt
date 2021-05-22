@@ -3,6 +3,7 @@ package com.maxrzhe.presentation.adapters
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
@@ -54,6 +55,25 @@ fun setData(rv: RecyclerView, contactsList: List<ContactItemViewModel>?) {
     if (rv.adapter is BaseBindingAdapter<*>) {
         contactsList?.let {
             (rv.adapter as BaseBindingAdapter<*>).setItems(it)
+        }
+    }
+}
+
+@BindingAdapter("searchResult")
+fun setSearchResult(v: TextView, resultCount: Int?) {
+    if (resultCount != null) {
+        if (resultCount >= 0) {
+            v.visibility = View.VISIBLE
+            val result =
+                v.resources.getQuantityString(
+                    R.plurals.search_result_plurals,
+                    resultCount,
+                    resultCount
+                )
+            v.text = result
+        } else {
+            v.visibility = View.GONE
+            v.text = ""
         }
     }
 }

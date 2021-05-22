@@ -26,6 +26,7 @@
 
         <TextView
             android:id="@+id/tv_search_result"
+            searchResult="@{listViewModel.searchResult}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

@@ -187,7 +187,6 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
                 menuItemSearch?.isVisible = true
                 toolbar?.setDisplayHomeAsUpEnabled(false)
                 onBackPressed()
-//                binding.tvSearchResult?.visibility = View.VISIBLE
             }
             R.id.menu_item_volume -> {
                 startActivity(Intent(this, VolumeSettingActivity::class.java))
@@ -220,7 +219,7 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
         }
 
         if (!isLandscape) {
-            supportFragmentManager.popBackStackImmediate()
+            supportFragmentManager.popBackStack()
         }
         Toast.makeText(this, "Contact saved", Toast.LENGTH_SHORT).show()
     }

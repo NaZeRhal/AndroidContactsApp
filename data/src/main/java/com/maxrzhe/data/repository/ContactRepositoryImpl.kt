@@ -109,13 +109,16 @@ internal class ContactRepositoryImpl(
             }
         }.flowOn(Dispatchers.IO)
 
-    override suspend fun delete(contact: Contact) {
+    override fun delete(contact: Contact): Flow<Resource<Contact>> = flow {
         val result = getResponse(
             request = { contactApi.deleteContact(contact.fbId) },
             defaultErrorMessage = "Error deleting contact ${contact.fbId}"
         )
-        if (result is Resource.Success) {
+        if (result is Resource.Success.Completed) {
             contactDatabase.deleteByFbIds(listOf(contact.fbId))
+            emit(Resource.Success.Completed<Contact>())
+        } else {
+            emit(Resource.Error<Contact>(Throwable("Error deleting contact in remote source")))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }
