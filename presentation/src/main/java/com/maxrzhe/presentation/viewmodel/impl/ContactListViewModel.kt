@@ -52,7 +52,7 @@ class ContactListViewModel internal constructor(
                     val items = it.data.map { item ->
                         ContactItemViewModel(
                             contact = item,
-                            onItemClick = ::onItemClick
+                            clicker = { _fbId.value = item.fbId }
                         )
                     }
                     _allContacts = items
@@ -81,10 +81,6 @@ class ContactListViewModel internal constructor(
                 }
             }
         }
-    }
-
-    private fun onItemClick(item: ContactItemViewModel) {
-        _fbId.value = item.contact.fbId
     }
 
     fun performFiltering() {

@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.databinding.BindingConversion
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,8 +13,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.model.ContactItemViewModel
+import com.maxrzhe.presentation.util.Clicker
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
+
+@BindingConversion
+fun convertLambdaToClickListener(clicker: Clicker?): View.OnClickListener? =
+    if (clicker != null) {
+        View.OnClickListener { clicker() }
+    } else {
+        null
+    }
 
 @BindingAdapter("imageUri")
 fun imageUri(view: ImageView, imageUriString: String?) {
