@@ -5,8 +5,8 @@
     <data>
 
         <variable
-            name="contact"
-            type="com.example.data_api.model.Contact" />
+            name="item"
+            type="com.maxrzhe.presentation.model.ContactItemViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -15,7 +15,8 @@
         android:layout_marginStart="@dimen/item_contact_cv_marginStart"
         android:layout_marginTop="@dimen/item_contact_cv_marginTop"
         android:layout_marginEnd="@dimen/item_contact_cv_marginEnd"
-        android:elevation="@dimen/item_contact_cv_elevation">
+        android:elevation="@dimen/item_contact_cv_elevation"
+        android:onClick="@{item.clickListener}">
 
         <LinearLayout
             android:id="@+id/ll_contact_card"
@@ -32,15 +33,15 @@
                 android:fontFamily="@font/alegreya_sans_sc"
                 android:gravity="center"
                 android:textSize="@dimen/item_contact_tv_name_textSize"
-                tools:text="@{contact.name}" />
+                tools:text="@{item.contact.name}" />
 
             <ImageView
                 android:id="@+id/iv_contact_image"
+                circleImageUri="@{item.contact.image}"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/item_contact_iv_height"
                 android:layout_gravity="center"
                 android:layout_weight="20"
-                circleImageUri="@{contact.image}"
                 android:contentDescription="@string/item_contact_iv_description"
                 android:padding="@dimen/item_contact_iv_padding"
                 android:src="@mipmap/ic_launcher_round" />

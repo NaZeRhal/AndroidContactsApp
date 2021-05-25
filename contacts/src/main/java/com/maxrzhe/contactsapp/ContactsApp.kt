@@ -2,6 +2,7 @@ package com.maxrzhe.contactsapp
 
 import android.app.Application
 import com.maxrzhe.data.di.dataModule
+import com.maxrzhe.domain.di.domainModule
 import com.maxrzhe.presentation.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -14,7 +15,7 @@ class ContactsApp : Application() {
         startKoin {
             androidLogger()
             androidContext(this@ContactsApp)
-            modules(listOf(dataModule, viewModelModule))
+            modules(listOf(dataModule, viewModelModule, domainModule))
         }
     }
 }

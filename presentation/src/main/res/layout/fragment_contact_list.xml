@@ -26,6 +26,7 @@
 
         <TextView
             android:id="@+id/tv_search_result"
+            setTextOrHide="@{listViewModel.searchText}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -40,7 +41,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_contact_list"
-            data="@{listViewModel.allContacts}"
+            data="@{listViewModel.filteredContacts}"
             toggleVisibility="@{!listViewModel.isLoading}"
             android:layout_width="match_parent"
             android:layout_height="0dp"

@@ -14,5 +14,5 @@ interface ContactRepository {
 
     fun update(contact: Contact): Flow<Resource<Contact>>
 
-    suspend fun delete(contact: Contact)
+    fun delete(contact: Contact): Flow<Resource<Contact>>
 }

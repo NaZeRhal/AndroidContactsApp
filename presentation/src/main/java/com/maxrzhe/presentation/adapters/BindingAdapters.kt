@@ -3,15 +3,27 @@ package com.maxrzhe.presentation.adapters
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.databinding.BindingConversion
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.model.BaseItemViewModel
+import com.maxrzhe.presentation.util.ClickListener
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
+
+@BindingConversion
+fun convertLambdaToClickListener(clickListener: ClickListener?): View.OnClickListener? =
+    if (clickListener != null) {
+        View.OnClickListener { clickListener() }
+    } else {
+        null
+    }
 
 @BindingAdapter("imageUri")
 fun imageUri(view: ImageView, imageUriString: String?) {
@@ -40,22 +52,31 @@ fun circleImageUri(view: ImageView, imageUriString: String?) {
 }
 
 @BindingAdapter("bindAdapter")
-fun RecyclerView.bindAdapter(contactAdapter: ContactAdapter?) {
+fun RecyclerView.bindAdapter(baseAdapter: BaseBindingAdapter<*>) {
     this.run {
         hasFixedSize()
         layoutManager = LinearLayoutManager(this.context)
-        contactAdapter?.let {
-            adapter = contactAdapter
-        }
+        adapter = baseAdapter
     }
 }
 
 @BindingAdapter("data")
-fun setData(rv: RecyclerView, contactsList: List<com.example.data_api.model.Contact>?) {
-    if (rv.adapter is ContactAdapter) {
+fun setData(rv: RecyclerView, contactsList: List<BaseItemViewModel>?) {
+    if (rv.adapter is BaseBindingAdapter<*>) {
         contactsList?.let {
-            (rv.adapter as? ContactAdapter)?.itemList = it
+            (rv.adapter as BaseBindingAdapter<*>).setItems(it)
         }
+    }
+}
+
+@BindingAdapter("setTextOrHide")
+fun TextView.setTextOrHide(text: String?) {
+    if (text != null) {
+        this.visibility = View.VISIBLE
+        this.text = text
+    } else {
+        this.visibility = View.GONE
+        this.text = ""
     }
 }
 
