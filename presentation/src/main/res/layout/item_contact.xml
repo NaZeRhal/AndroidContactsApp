@@ -16,7 +16,7 @@
         android:layout_marginTop="@dimen/item_contact_cv_marginTop"
         android:layout_marginEnd="@dimen/item_contact_cv_marginEnd"
         android:elevation="@dimen/item_contact_cv_elevation"
-        android:onClick="@{item.clicker}">
+        android:onClick="@{item.clickListener}">
 
         <LinearLayout
             android:id="@+id/ll_contact_card"

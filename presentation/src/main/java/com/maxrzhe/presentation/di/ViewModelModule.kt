@@ -11,7 +11,7 @@ import org.koin.dsl.module
 val viewModelModule = module {
     single<AppResources> { AppResourcesImpl(androidContext()) }
 
-    viewModel<ContactListViewModel> { ContactListViewModel(get(), get()) }
+    viewModel<ContactListViewModel> { ContactListViewModel(get(), get(), get()) }
     viewModel<ContactDetailViewModel> { ContactDetailViewModel(get(), get(), get(), get()) }
 
 }

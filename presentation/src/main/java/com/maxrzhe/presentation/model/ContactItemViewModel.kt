@@ -2,11 +2,11 @@ package com.maxrzhe.presentation.model
 
 import com.example.data_api.model.Contact
 import com.maxrzhe.presentation.R
-import com.maxrzhe.presentation.util.Clicker
+import com.maxrzhe.presentation.util.ClickListener
 
 data class ContactItemViewModel(
     val contact: Contact,
-    val clicker: Clicker
+    val clickListener: ClickListener
 ) : BaseItemViewModel() {
 
     override val id: Long get() = this.contact.hashCode().toLong()

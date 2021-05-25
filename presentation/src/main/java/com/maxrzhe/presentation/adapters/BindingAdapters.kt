@@ -12,15 +12,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.maxrzhe.presentation.R
-import com.maxrzhe.presentation.model.ContactItemViewModel
-import com.maxrzhe.presentation.util.Clicker
+import com.maxrzhe.presentation.model.BaseItemViewModel
+import com.maxrzhe.presentation.util.ClickListener
 import com.maxrzhe.volumeslider.ui.VolumeSlider
 import java.io.File
 
 @BindingConversion
-fun convertLambdaToClickListener(clicker: Clicker?): View.OnClickListener? =
-    if (clicker != null) {
-        View.OnClickListener { clicker() }
+fun convertLambdaToClickListener(clickListener: ClickListener?): View.OnClickListener? =
+    if (clickListener != null) {
+        View.OnClickListener { clickListener() }
     } else {
         null
     }
@@ -61,7 +61,7 @@ fun RecyclerView.bindAdapter(baseAdapter: BaseBindingAdapter<*>) {
 }
 
 @BindingAdapter("data")
-fun setData(rv: RecyclerView, contactsList: List<ContactItemViewModel>?) {
+fun setData(rv: RecyclerView, contactsList: List<BaseItemViewModel>?) {
     if (rv.adapter is BaseBindingAdapter<*>) {
         contactsList?.let {
             (rv.adapter as BaseBindingAdapter<*>).setItems(it)
@@ -69,22 +69,14 @@ fun setData(rv: RecyclerView, contactsList: List<ContactItemViewModel>?) {
     }
 }
 
-@BindingAdapter("searchResult")
-fun setSearchResult(v: TextView, resultCount: Int?) {
-    if (resultCount != null) {
-        if (resultCount >= 0) {
-            v.visibility = View.VISIBLE
-            val result =
-                v.resources.getQuantityString(
-                    R.plurals.search_result_plurals,
-                    resultCount,
-                    resultCount
-                )
-            v.text = result
-        } else {
-            v.visibility = View.GONE
-            v.text = ""
-        }
+@BindingAdapter("setTextOrHide")
+fun TextView.setTextOrHide(text: String?) {
+    if (text != null) {
+        this.visibility = View.VISIBLE
+        this.text = text
+    } else {
+        this.visibility = View.GONE
+        this.text = ""
     }
 }
 
