@@ -13,11 +13,11 @@ abstract class BaseViewModel : ViewModel() {
 
     val navigationEvent: MutableLiveData<SingleEvent<NavController.() -> Any>> = MutableLiveData()
 
-    fun navigateTo(route: RouteSection, args: Bundle?) {
+    fun navigateTo(route: RouteSection, args: Bundle? = null) {
         withNavController { navigate(route.graph, args, defaultNavOptions) }
     }
 
-    fun navigateTo(route: RouteDestination, args: Bundle?, clearStack: Boolean) {
+    fun navigateTo(route: RouteDestination, args: Bundle? = null, clearStack: Boolean = false) {
         when {
             route is RouteDestination.Back -> withNavController { popBackStack() }
             clearStack -> withNavController { popBackStack(route.destination, false) }
@@ -29,5 +29,5 @@ abstract class BaseViewModel : ViewModel() {
         navigationEvent.postValue(SingleEvent(block))
     }
 
-    open fun onBackPressed() {}
+    abstract fun onBackPressed()
 }

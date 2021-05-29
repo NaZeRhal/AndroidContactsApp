@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.maxrzhe.presentation.ui.impl.SettingsFragment"
+        android:name="com.maxrzhe.presentation.ui.impl.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" >
         <action

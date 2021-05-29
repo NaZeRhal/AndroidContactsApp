@@ -1,5 +1,6 @@
-package com.maxrzhe.presentation.viewmodel.impl
+package com.maxrzhe.presentation.viewmodel.impl.contacts
 
+import androidx.core.os.bundleOf
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,8 @@ import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.model.ContactItemViewModel
+import com.maxrzhe.presentation.navigation.RouteDestination
+import com.maxrzhe.presentation.ui.impl.contacts.ContactListFragment
 import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
@@ -34,9 +37,6 @@ class ContactListViewModel internal constructor(
     }
 
     val searchText = ObservableField<String?>()
-
-    private val _fbId = MutableLiveData<String>()
-    val fbId: LiveData<String> = _fbId
 
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
@@ -66,6 +66,8 @@ class ContactListViewModel internal constructor(
 
         }
     val filteredContacts: MutableLiveData<List<ContactItemViewModel>> = MutableLiveData(emptyList())
+
+    override fun onBackPressed() {}
 
     fun delete(contactItem: ContactItemViewModel) {
         viewModelScope.launch {
@@ -108,7 +110,7 @@ class ContactListViewModel internal constructor(
         filteredContacts.value = filteredByQuery.map { item ->
             ContactItemViewModel(
                 contact = item,
-                clickListener = { _fbId.value = item.fbId }
+                clickListener = { onSelectItemNavigation(item.fbId) }
             )
         }
     }
@@ -119,5 +121,10 @@ class ContactListViewModel internal constructor(
                     email.toLowerCase(Locale.getDefault()).contains(pattern) ||
                     phone.toLowerCase(Locale.getDefault()).contains(pattern)
         }
+    }
+
+    private fun onSelectItemNavigation(id: String) {
+        val args = bundleOf(ContactListFragment.FB_ID_CONTACT to id)
+        navigateTo(RouteDestination.Contacts.Detail, args, false)
     }
 }

@@ -17,4 +17,6 @@ class VolumeSettingViewModel : BaseViewModel() {
         volumeValue.set(value)
     }
 
+    override fun onBackPressed() {}
+
 }

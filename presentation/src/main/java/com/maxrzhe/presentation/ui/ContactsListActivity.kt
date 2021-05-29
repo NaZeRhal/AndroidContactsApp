@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
@@ -22,35 +21,31 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.commit
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
-import com.maxrzhe.presentation.ui.impl.ContactDetailFragment
-import com.maxrzhe.presentation.ui.impl.ContactDetailFragment.*
-import com.maxrzhe.presentation.ui.impl.ContactListFragment.*
-import com.maxrzhe.presentation.ui.impl.HomeFragment
-import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
+import com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment
+import com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment.*
+import com.maxrzhe.presentation.ui.impl.contacts.ContactListFragment.*
+import com.maxrzhe.presentation.ui.impl.contacts.HomeFragment
+import com.maxrzhe.presentation.viewmodel.impl.contacts.SearchViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 
-class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
-    OnSelectContactListener, OnTakeImageListener, HomeFragment.OnAddContactListener,
+class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
     HomeFragment.OnChangeCurrentPositionListener {
     private lateinit var binding: ActivityListContactsBinding
 
-    private val searchViewModel by viewModels<SearchViewModel>()
+    private val searchViewModel: SearchViewModel by viewModel()
 
-    private var isLandscape: Boolean = false
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
     private var currentPosition = 0
 
     companion object {
         private const val DETAILS_TAG = "storage"
-        private const val HOME_TAG = "contacts_home"
         private const val CURRENT_POSITION = "current_position"
     }
 
@@ -109,34 +104,6 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
         title = null
         toolbar = supportActionBar
 
-        isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-        val homeFragment =
-            supportFragmentManager.findFragmentByTag(HOME_TAG) as? HomeFragment ?: HomeFragment()
-        val detailFragment =
-            supportFragmentManager.findFragmentByTag(DETAILS_TAG) as? ContactDetailFragment
-
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                add(R.id.fl_container, homeFragment, HOME_TAG)
-            }
-        } else {
-            currentPosition = savedInstanceState.getInt(CURRENT_POSITION)
-        }
-
-        if (isLandscape) {
-            supportFragmentManager.apply {
-                popBackStackImmediate()
-                commit {
-                    replace(R.id.fl_container, homeFragment, HOME_TAG)
-
-                    detailFragment?.let {
-                        replace(R.id.fl_details, it, DETAILS_TAG)
-                    }
-                    setReorderingAllowed(true)
-                }
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -211,46 +178,6 @@ class ContactsListActivity : AppCompatActivity(), OnSaveContactListener,
         super.onPause()
         unregisterReceiver(batteryBroadcastReceiver)
         unregisterReceiver(wifiBroadcastReceiver)
-    }
-
-    override fun onSave() {
-        if (!isLandscape) {
-            menuItemSearch?.isVisible = true
-            toolbar?.setDisplayHomeAsUpEnabled(false)
-        }
-
-        if (!isLandscape) {
-            supportFragmentManager.popBackStack()
-        }
-        Toast.makeText(this, "Contact saved", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onAdd() {
-        onSelect()
-    }
-
-    override fun onSelect() {
-        if (!isLandscape) {
-            menuItemSearch?.isVisible = false
-            toolbar?.setDisplayHomeAsUpEnabled(true)
-        }
-
-        val detailFragment = ContactDetailFragment()
-        supportFragmentManager.commit {
-            setCustomAnimations(
-                R.anim.slide_in,
-                R.anim.fade_out,
-                R.anim.fade_in,
-                R.anim.slide_out
-            )
-            if (isLandscape) {
-                replace(R.id.fl_details, detailFragment, DETAILS_TAG)
-            } else {
-                add(R.id.fl_container, detailFragment, DETAILS_TAG)
-                addToBackStack(null)
-            }
-            setReorderingAllowed(true)
-        }
     }
 
     private fun checkForStoragePermission() {

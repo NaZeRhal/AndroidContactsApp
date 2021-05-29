@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.viewmodel.impl
+package com.maxrzhe.presentation.viewmodel.impl.settings
 
 import androidx.lifecycle.MutableLiveData
 import com.maxrzhe.presentation.R
@@ -43,4 +43,6 @@ class SettingsListViewModel : BaseViewModel() {
     private fun navigateToFeedback() {
         navigateTo(RouteDestination.Settings.Feedback, null, false)
     }
+
+    override fun onBackPressed() {}
 }

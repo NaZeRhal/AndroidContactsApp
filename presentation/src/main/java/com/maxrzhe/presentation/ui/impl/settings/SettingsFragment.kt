@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.ui.impl
+package com.maxrzhe.presentation.ui.impl.settings
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentSettingsBinding
 import com.maxrzhe.presentation.databinding.ItemSettingsBinding
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SettingsListViewModel
+import com.maxrzhe.presentation.viewmodel.impl.settings.SettingsListViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class SettingsFragment :

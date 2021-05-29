@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.ui.impl
+package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -12,8 +12,7 @@ import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
-import com.maxrzhe.presentation.viewmodel.impl.ContactDetailViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactDetailViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
@@ -26,12 +25,7 @@ class ContactDetailFragment :
 
     private var imageUri: String? = null
 
-    private val sharedViewModel: SharedViewModel by viewModel()
-
     override val viewModel: ContactDetailViewModel by viewModel()
-
-    private val onSaveContactListener: OnSaveContactListener?
-        get() = (context as? OnSaveContactListener)
 
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
@@ -45,16 +39,8 @@ class ContactDetailFragment :
     }
 
     override fun initView() {
-        sharedViewModel.contactId.observe(viewLifecycleOwner, {
-            viewModel.setSelectedId(it)
-            subscribeUi()
-        })
-        viewModel.savedMarker.observe(viewLifecycleOwner, {
-            if (it) {
-                viewModel.resetMarker()
-                onSaveContactListener?.onSave()
-            }
-        })
+        viewModel.setSelectedId(arguments?.getString(ContactListFragment.FB_ID_CONTACT))
+        subscribeUi()
         binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
     }
 
@@ -130,10 +116,6 @@ class ContactDetailFragment :
             e.printStackTrace()
         }
         return Uri.parse(file.absolutePath)
-    }
-
-    interface OnSaveContactListener {
-        fun onSave()
     }
 
     interface OnTakeImageListener {

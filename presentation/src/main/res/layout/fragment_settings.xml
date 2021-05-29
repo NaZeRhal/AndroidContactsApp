@@ -7,13 +7,13 @@
 
         <variable
             name="settingsViewModel"
-            type="com.maxrzhe.presentation.viewmodel.impl.SettingsListViewModel" />
+            type="com.maxrzhe.presentation.viewmodel.impl.settings.SettingsListViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.impl.SettingsFragment">
+        tools:context=".ui.impl.settings.SettingsFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_settings_list"

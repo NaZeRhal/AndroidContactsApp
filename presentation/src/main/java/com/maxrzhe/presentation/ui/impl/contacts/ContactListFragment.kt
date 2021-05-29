@@ -1,8 +1,7 @@
-package com.maxrzhe.presentation.ui.impl
+package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -14,9 +13,9 @@ import com.maxrzhe.presentation.databinding.ItemContactBinding
 import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
-import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactListViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.SearchViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class ContactListFragment :
@@ -24,6 +23,7 @@ class ContactListFragment :
 
     companion object {
         private const val IS_FAVORITES = "is_favorites"
+        const val FB_ID_CONTACT = "fb_id_contact"
 
         fun createInstance(isFavorite: Boolean): ContactListFragment =
             ContactListFragment().apply {
@@ -35,13 +35,9 @@ class ContactListFragment :
 
     private var contactsAdapter: BaseBindingAdapter<ItemContactBinding>? = null
 
-    private val sharedViewModel: SharedViewModel by viewModel()
-    private val searchViewModel: SearchViewModel by viewModel()
+    private val searchViewModel: SearchViewModel by sharedViewModel()
 
     override val viewModel: ContactListViewModel by viewModel()
-
-    private val onSelectContactListener: OnSelectContactListener?
-        get() = (context as? OnSelectContactListener)
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
@@ -58,11 +54,6 @@ class ContactListFragment :
 
     override fun initView() {
         contactsAdapter = BaseBindingAdapter()
-        viewModel.fbId.observe(viewLifecycleOwner, {
-            sharedViewModel.select(it)
-            onSelectContactListener?.onSelect()
-            binding.tvSearchResult.visibility = View.GONE
-        })
 
         contactsAdapter?.let {
             binding.rvContactList.bindAdapter(it)
@@ -99,10 +90,6 @@ class ContactListFragment :
             Snackbar.make(it, msg, Snackbar.LENGTH_INDEFINITE).setAction("DISMISS") {
             }.show()
         }
-    }
-
-    interface OnSelectContactListener {
-        fun onSelect()
     }
 
     override fun onResume() {

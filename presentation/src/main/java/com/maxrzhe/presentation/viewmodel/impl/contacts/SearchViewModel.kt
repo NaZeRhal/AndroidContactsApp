@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.viewmodel.impl
+package com.maxrzhe.presentation.viewmodel.impl.contacts
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,4 +13,5 @@ class SearchViewModel : BaseViewModel() {
         _query.value = query
     }
 
+    override fun onBackPressed() {}
 }

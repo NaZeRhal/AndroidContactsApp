@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.viewmodel.impl
+package com.maxrzhe.presentation.viewmodel.impl.contacts
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -12,6 +12,7 @@ import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
 import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.navigation.RouteDestination
 import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
@@ -29,9 +30,6 @@ class ContactDetailViewModel internal constructor(
     BaseViewModel() {
 
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-
-    private var _savedMarker = MutableLiveData(false)
-    val savedMarker: LiveData<Boolean> = _savedMarker
 
     private var calendar = Calendar.getInstance()
     private var isFavorite = false
@@ -80,8 +78,16 @@ class ContactDetailViewModel internal constructor(
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
+    override fun onBackPressed() {
+        navigateTo(RouteDestination.Contacts.HomeViewPager)
+    }
+
     fun setSelectedId(selectedId: String?) {
         _fbId.value = selectedId
+    }
+
+    private fun onSaveItemClickNavigation() {
+        navigateTo(RouteDestination.Contacts.HomeViewPager)
     }
 
     private fun setupFields(contact: Contact?) {
@@ -107,10 +113,6 @@ class ContactDetailViewModel internal constructor(
             imageTextRes.set(R.string.detail_tv_change_image_text)
             buttonTextRes.set(R.string.detail_button_save_changes_text)
         }
-    }
-
-    fun resetMarker() {
-        _savedMarker.value = false
     }
 
     fun manageImageUri(imageUri: String) {
@@ -169,9 +171,10 @@ class ContactDetailViewModel internal constructor(
             addContactUseCase.execute(contact)
                 .collect {
                     if (it is Resource.Success) {
-                        _savedMarker.value = true
+                        onSaveItemClickNavigation()
                     } else if (it is Resource.Error) {
                         _errorMessage.value = it.error.message
+                        onSaveItemClickNavigation()
                     }
                 }
         }
@@ -182,9 +185,10 @@ class ContactDetailViewModel internal constructor(
             updateContactUseCase.execute(contact)
                 .collect {
                     if (it is Resource.Success) {
-                        _savedMarker.value = true
+                        onSaveItemClickNavigation()
                     } else if (it is Resource.Error) {
                         _errorMessage.value = it.error.message
+                        onSaveItemClickNavigation()
                     }
                 }
         }

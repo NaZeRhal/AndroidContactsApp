@@ -1,9 +1,12 @@
-package com.maxrzhe.presentation.ui.impl
+package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.content.Intent
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.ContactViewPagerAdapter
@@ -11,19 +14,13 @@ import com.maxrzhe.presentation.adapters.ZoomOutPageTransformer
 import com.maxrzhe.presentation.databinding.FragmentHomeBinding
 import com.maxrzhe.presentation.ui.SettingsActivity
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
-import com.maxrzhe.presentation.viewmodel.impl.HomeFragmentViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.HomeFragmentViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class HomeFragment : BaseFragmentWithViewModel<FragmentHomeBinding, HomeFragmentViewModel>() {
 
-    private val onAddContactListener: OnAddContactListener?
-        get() = (context as? OnAddContactListener)
-
     private val onChangeCurrentPositionListener: OnChangeCurrentPositionListener?
         get() = (context as? OnChangeCurrentPositionListener)
-
-    private val sharedViewModel: SharedViewModel by viewModel()
 
     override val viewModel: HomeFragmentViewModel by viewModel()
 
@@ -55,7 +52,6 @@ class HomeFragment : BaseFragmentWithViewModel<FragmentHomeBinding, HomeFragment
                     viewPager.currentItem = 1
                 }
                 R.id.bottom_menu_settings ->
-//                    viewModel.openSettings()
                     startActivity(
                         Intent(
                             requireContext(),
@@ -65,20 +61,42 @@ class HomeFragment : BaseFragmentWithViewModel<FragmentHomeBinding, HomeFragment
             }
             true
         }
-
-        binding.fabAdd.setOnClickListener(addContact())
     }
 
-    override fun bindView() {}
-
-    private fun addContact() = View.OnClickListener {
-        sharedViewModel.select(null)
-        onAddContactListener?.onAdd()
+    override fun onResume() {
+        super.onResume()
+        showSystemUI()
     }
 
-    interface OnAddContactListener {
-        fun onAdd()
+
+    private fun showSystemUI() {
+        (requireActivity() as AppCompatActivity).supportActionBar?.show()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().window.apply {
+                setDecorFitsSystemWindows(true)
+                insetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+            }
+        } else {
+            @Suppress("DEPRECATION") 
+            requireActivity().window.decorView.systemUiVisibility =
+                (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+
+        }
     }
+
+
+    override fun bindView() {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = requireActivity()
+    }
+
+    override fun onReturnToPreviousScreen() {
+        requireActivity().finish()
+    }
+
 
     interface OnChangeCurrentPositionListener {
         fun onChange(position: Int)

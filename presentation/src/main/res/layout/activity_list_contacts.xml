@@ -28,15 +28,16 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
-    <FrameLayout
-        android:id="@+id/fl_container"
+    <fragment
+        android:id="@+id/fragment_nav_host"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="visible"
+        app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tb_main"
-        tools:visibility="visible" />
+        app:navGraph="@navigation/contacts_nav" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
