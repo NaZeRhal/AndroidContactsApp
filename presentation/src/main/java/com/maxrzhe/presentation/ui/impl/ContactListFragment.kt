@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -36,16 +35,16 @@ class ContactListFragment :
 
     private var contactsAdapter: BaseBindingAdapter<ItemContactBinding>? = null
 
-    private val sharedViewModel by activityViewModels<SharedViewModel>()
-    private val searchViewModel by activityViewModels<SearchViewModel>()
+    private val sharedViewModel: SharedViewModel by viewModel()
+    private val searchViewModel: SearchViewModel by viewModel()
+
+    override val viewModel: ContactListViewModel by viewModel()
 
     private val onSelectContactListener: OnSelectContactListener?
         get() = (context as? OnSelectContactListener)
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
         FragmentContactListBinding::inflate
-
-    override val viewModel: ContactListViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -4,8 +4,6 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.viewpager.widget.ViewPager
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.ContactViewPagerAdapter
@@ -15,6 +13,7 @@ import com.maxrzhe.presentation.ui.SettingsActivity
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
 import com.maxrzhe.presentation.viewmodel.impl.HomeFragmentViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class HomeFragment : BaseFragmentWithViewModel<FragmentHomeBinding, HomeFragmentViewModel>() {
 
@@ -24,8 +23,9 @@ class HomeFragment : BaseFragmentWithViewModel<FragmentHomeBinding, HomeFragment
     private val onChangeCurrentPositionListener: OnChangeCurrentPositionListener?
         get() = (context as? OnChangeCurrentPositionListener)
 
-    private val sharedViewModel by activityViewModels<SharedViewModel>()
-    override val viewModel by viewModels<HomeFragmentViewModel>()
+    private val sharedViewModel: SharedViewModel by viewModel()
+
+    override val viewModel: HomeFragmentViewModel by viewModel()
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHomeBinding
         get() = FragmentHomeBinding::inflate
@@ -57,11 +57,11 @@ class HomeFragment : BaseFragmentWithViewModel<FragmentHomeBinding, HomeFragment
                 R.id.bottom_menu_settings ->
 //                    viewModel.openSettings()
                     startActivity(
-                    Intent(
-                        requireContext(),
-                        SettingsActivity::class.java
+                        Intent(
+                            requireContext(),
+                            SettingsActivity::class.java
+                        )
                     )
-                )
             }
             true
         }

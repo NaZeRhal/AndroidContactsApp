@@ -9,7 +9,6 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
@@ -22,11 +21,12 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.*
 
-class ContactDetailFragment : BaseFragmentWithViewModel<FragmentContactDetailBinding, ContactDetailViewModel>() {
+class ContactDetailFragment :
+    BaseFragmentWithViewModel<FragmentContactDetailBinding, ContactDetailViewModel>() {
 
     private var imageUri: String? = null
 
-    private val sharedViewModel by activityViewModels<SharedViewModel>()
+    private val sharedViewModel: SharedViewModel by viewModel()
 
     override val viewModel: ContactDetailViewModel by viewModel()
 
