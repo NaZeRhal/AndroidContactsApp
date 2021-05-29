@@ -1,9 +1,9 @@
 package com.maxrzhe.presentation.viewmodel.impl
 
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.Navigation
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.model.SettingsItemViewModel
+import com.maxrzhe.presentation.navigation.RouteDestination
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
 class SettingsListViewModel : BaseViewModel() {
@@ -17,21 +17,30 @@ class SettingsListViewModel : BaseViewModel() {
     private fun getItems(): List<SettingsItemViewModel> = listOf(
         SettingsItemViewModel(
             iconId = R.drawable.ic_baseline_person_24,
-            pathId = R.id.action_settingsFragment_to_profileFragment,
             title = "Profile",
-            Navigation.createNavigateOnClickListener(R.id.action_settingsFragment_to_profileFragment)
+            clickListener = { navigateToProfile() }
         ),
         SettingsItemViewModel(
             iconId = R.drawable.ic_baseline_guide_24,
-            pathId = R.id.action_settingsFragment_to_guideFragment,
             title = "Guide",
-            Navigation.createNavigateOnClickListener(R.id.action_settingsFragment_to_guideFragment)
+            clickListener = { navigateToGuide() }
         ),
         SettingsItemViewModel(
             iconId = R.drawable.ic_baseline_feedback_24,
-            pathId = R.id.action_settingsFragment_to_feedbackFragment,
             title = "Feedback",
-            Navigation.createNavigateOnClickListener(R.id.action_settingsFragment_to_feedbackFragment)
+            clickListener = { navigateToFeedback() }
         ),
     )
+
+    private fun navigateToProfile() {
+        navigateTo(RouteDestination.Settings.Profile, null, false)
+    }
+
+    private fun navigateToGuide() {
+        navigateTo(RouteDestination.Settings.Guide, null, false)
+    }
+
+    private fun navigateToFeedback() {
+        navigateTo(RouteDestination.Settings.Feedback, null, false)
+    }
 }

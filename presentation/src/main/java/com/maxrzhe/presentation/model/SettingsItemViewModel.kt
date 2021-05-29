@@ -2,11 +2,12 @@ package com.maxrzhe.presentation.model
 
 import androidx.annotation.DrawableRes
 import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.util.ClickListener
 
 class SettingsItemViewModel(
     @DrawableRes val iconId: Int,
-    val pathId: Int,
-    val title: String
+    val title: String,
+    val clickListener: ClickListener
 ) : BaseItemViewModel() {
 
 

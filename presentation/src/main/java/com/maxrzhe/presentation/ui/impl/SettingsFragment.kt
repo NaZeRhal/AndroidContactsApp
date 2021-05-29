@@ -3,8 +3,6 @@ package com.maxrzhe.presentation.ui.impl
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.Navigation
-import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.BaseBindingAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentSettingsBinding
