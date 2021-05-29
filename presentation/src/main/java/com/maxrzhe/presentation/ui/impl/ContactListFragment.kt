@@ -14,14 +14,14 @@ import com.maxrzhe.presentation.databinding.FragmentContactListBinding
 import com.maxrzhe.presentation.databinding.ItemContactBinding
 import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
-import com.maxrzhe.presentation.ui.base.BaseFragment
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
 import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class ContactListFragment :
-    BaseFragment<FragmentContactListBinding, ContactListViewModel>() {
+    BaseFragmentWithViewModel<FragmentContactListBinding, ContactListViewModel>() {
 
     companion object {
         private const val IS_FAVORITES = "is_favorites"

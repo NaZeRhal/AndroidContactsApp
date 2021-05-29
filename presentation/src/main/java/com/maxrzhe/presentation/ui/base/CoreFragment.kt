@@ -6,11 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
-abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
-
-    protected abstract val viewModel: VM
+abstract class CoreFragment<VB : ViewBinding> : Fragment() {
 
     private var _binding: ViewBinding? = null
 

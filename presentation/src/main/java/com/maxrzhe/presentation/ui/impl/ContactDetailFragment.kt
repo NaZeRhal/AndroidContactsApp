@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
-import com.maxrzhe.presentation.ui.base.BaseFragment
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
 import com.maxrzhe.presentation.viewmodel.impl.ContactDetailViewModel
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -22,7 +22,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.*
 
-class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
+class ContactDetailFragment : BaseFragmentWithViewModel<FragmentContactDetailBinding, ContactDetailViewModel>() {
 
     private var imageUri: String? = null
 

@@ -1,21 +1,20 @@
-package com.maxrzhe.presentation.ui
+package com.maxrzhe.presentation.ui.impl
 
-import android.os.Bundle
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.ContactViewPagerAdapter
 import com.maxrzhe.presentation.adapters.ZoomOutPageTransformer
 import com.maxrzhe.presentation.databinding.FragmentHomeBinding
+import com.maxrzhe.presentation.ui.SettingsActivity
+import com.maxrzhe.presentation.ui.base.CoreFragment
 import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
 
-class HomeFragment : Fragment() {
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding
+class HomeFragment : CoreFragment<FragmentHomeBinding>() {
 
     private val onAddContactListener: OnAddContactListener?
         get() = (context as? OnAddContactListener)
@@ -25,45 +24,47 @@ class HomeFragment : Fragment() {
 
     private val sharedViewModel by activityViewModels<SharedViewModel>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHomeBinding
+        get() = FragmentHomeBinding::inflate
 
-        val bottomNavigationView = binding?.bnvMain
+    override fun initView() {
+        val bottomNavigationView = binding.bnvMain
         val adapter = ContactViewPagerAdapter(childFragmentManager)
-        val viewPager = binding?.vpHome
-        viewPager?.setPageTransformer(true, ZoomOutPageTransformer())
+        val viewPager = binding.vpHome
+        viewPager.setPageTransformer(true, ZoomOutPageTransformer())
 
-        viewPager?.let {
+        viewPager.let {
             it.adapter = adapter
             it.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
                 override fun onPageSelected(position: Int) {
-                    bottomNavigationView?.menu?.getItem(position)?.isChecked = true
+                    bottomNavigationView.menu.getItem(position)?.isChecked = true
                     onChangeCurrentPositionListener?.onChange(position)
                 }
             })
         }
 
-        bottomNavigationView?.setOnNavigationItemSelectedListener {
+        bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.bottom_menu_home -> {
-                    viewPager?.currentItem = 0
+                    viewPager.currentItem = 0
                 }
                 R.id.bottom_menu_fav -> {
-                    viewPager?.currentItem = 1
+                    viewPager.currentItem = 1
                 }
-                else -> {
-                }
+                R.id.bottom_menu_settings -> startActivity(
+                    Intent(
+                        requireContext(),
+                        SettingsActivity::class.java
+                    )
+                )
             }
             true
         }
 
-        binding?.fabAdd?.setOnClickListener(addContact())
-        return binding?.root
+        binding.fabAdd.setOnClickListener(addContact())
     }
+
+    override fun bindView() {}
 
     private fun addContact() = View.OnClickListener {
         sharedViewModel.select(null)
