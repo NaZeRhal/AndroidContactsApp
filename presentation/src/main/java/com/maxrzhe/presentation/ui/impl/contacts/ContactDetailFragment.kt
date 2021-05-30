@@ -4,13 +4,16 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
+import com.maxrzhe.presentation.navigation.listenToRouter
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactDetailViewModel
 import org.koin.android.viewmodel.ext.android.viewModel

@@ -12,7 +12,8 @@ import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
 import com.maxrzhe.presentation.R
-import com.maxrzhe.presentation.navigation.RouteDestination
+import com.maxrzhe.presentation.navigation.RouteFragmentDestination
+import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
@@ -25,9 +26,10 @@ class ContactDetailViewModel internal constructor(
     private val appResources: AppResources,
     private val findByIdUseCase: FindByIdUseCase,
     private val addContactUseCase: AddContactUseCase,
-    private val updateContactUseCase: UpdateContactUseCase
+    private val updateContactUseCase: UpdateContactUseCase,
+    router: Router
 ) :
-    BaseViewModel() {
+    BaseViewModel(router) {
 
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
@@ -78,16 +80,16 @@ class ContactDetailViewModel internal constructor(
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
-    override fun onBackPressed() {
-        navigateTo(RouteDestination.Contacts.HomeViewPager)
-    }
+//    override fun onBackPressed() {
+//        navigateTo(RouteDestination.Contacts.HomeViewPager)
+//    }
 
     fun setSelectedId(selectedId: String?) {
         _fbId.value = selectedId
     }
 
     private fun onSaveItemClickNavigation() {
-        navigateTo(RouteDestination.Contacts.HomeViewPager)
+       router.navigateTo(RouteFragmentDestination.Contacts.HomeViewPager)
     }
 
     private fun setupFields(contact: Contact?) {

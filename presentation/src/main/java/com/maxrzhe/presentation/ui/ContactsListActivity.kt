@@ -27,10 +27,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
+import com.maxrzhe.presentation.navigation.listenToRouterOnNavHost
 import com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment
 import com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment.*
 import com.maxrzhe.presentation.ui.impl.contacts.ContactListFragment.*
 import com.maxrzhe.presentation.ui.impl.contacts.HomeFragment
+import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactsActivityViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.SearchViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -39,6 +41,7 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
     private lateinit var binding: ActivityListContactsBinding
 
     private val searchViewModel: SearchViewModel by viewModel()
+    private val viewModel: ContactsActivityViewModel by viewModel()
 
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
@@ -104,6 +107,7 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
         title = null
         toolbar = supportActionBar
 
+        listenToRouterOnNavHost(viewModel.router)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -157,7 +161,10 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
                 onBackPressed()
             }
             R.id.menu_item_volume -> {
-                startActivity(Intent(this, VolumeSettingActivity::class.java))
+                viewModel.openVolumeSettings()
+            }
+            R.id.menu_item_settings -> {
+                viewModel.openSettingsSection()
             }
         }
         return super.onOptionsItemSelected(item)

@@ -1,13 +1,12 @@
 package com.maxrzhe.presentation.viewmodel.impl.contacts
 
-import com.maxrzhe.presentation.navigation.RouteDestination
+import com.maxrzhe.presentation.navigation.RouteFragmentDestination
+import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
-class SplashViewModel : BaseViewModel() {
+class SplashViewModel(router: Router) : BaseViewModel(router) {
 
     fun navigateToHomeFragment() {
-        navigateTo(RouteDestination.Contacts.HomeViewPager, null, false)
+        router.navigateTo(RouteFragmentDestination.Contacts.HomeViewPager, null, false)
     }
-
-    override fun onBackPressed() { }
 }

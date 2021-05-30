@@ -12,7 +12,8 @@ import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.model.ContactItemViewModel
-import com.maxrzhe.presentation.navigation.RouteDestination
+import com.maxrzhe.presentation.navigation.RouteFragmentDestination
+import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.ui.impl.contacts.ContactListFragment
 import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
@@ -24,8 +25,9 @@ import java.util.*
 class ContactListViewModel internal constructor(
     private val appResources: AppResources,
     private val getContactsUseCase: GetContactsUseCase,
-    private val deleteContactUseCase: DeleteContactUseCase
-) : BaseViewModel() {
+    private val deleteContactUseCase: DeleteContactUseCase,
+    router: Router
+) : BaseViewModel(router) {
 
     var isFavoritesPage: Boolean = false
 
@@ -66,8 +68,6 @@ class ContactListViewModel internal constructor(
 
         }
     val filteredContacts: MutableLiveData<List<ContactItemViewModel>> = MutableLiveData(emptyList())
-
-    override fun onBackPressed() {}
 
     fun delete(contactItem: ContactItemViewModel) {
         viewModelScope.launch {
@@ -125,6 +125,6 @@ class ContactListViewModel internal constructor(
 
     private fun onSelectItemNavigation(id: String) {
         val args = bundleOf(ContactListFragment.FB_ID_CONTACT to id)
-        navigateTo(RouteDestination.Contacts.Detail, args, false)
+        router.navigateTo(RouteFragmentDestination.Contacts.Detail, args, false)
     }
 }

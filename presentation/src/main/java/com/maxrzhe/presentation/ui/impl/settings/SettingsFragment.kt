@@ -27,4 +27,8 @@ class SettingsFragment :
         binding.settingsViewModel = viewModel
         binding.lifecycleOwner = requireActivity()
     }
+
+    override fun onReturnToPreviousScreen() {
+        viewModel.openContactsSection()
+    }
 }

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.maxrzhe.presentation.ProfileFragment"
+        android:name="com.maxrzhe.presentation.ui.impl.settings.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/guideFragment"
-        android:name="com.maxrzhe.presentation.GuideFragment"
+        android:name="com.maxrzhe.presentation.ui.impl.settings.GuideFragment"
         android:label="fragment_guide"
         tools:layout="@layout/fragment_guide" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/feedbackFragment"
-        android:name="com.maxrzhe.presentation.FeedbackFragment"
+        android:name="com.maxrzhe.presentation.ui.impl.settings.FeedbackFragment"
         android:label="fragment_feedback"
         tools:layout="@layout/fragment_feedback" >
         <action

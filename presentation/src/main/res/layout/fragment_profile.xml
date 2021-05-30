@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/holo_green_light"
-    tools:context=".ProfileFragment">
+    tools:context=".ui.impl.settings.ProfileFragment">
 
     <TextView
         android:id="@+id/tv_profile"

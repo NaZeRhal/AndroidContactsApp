@@ -21,6 +21,4 @@ abstract class CoreFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
     }
-
-
 }

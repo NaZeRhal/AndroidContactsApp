@@ -9,9 +9,14 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always" />
     <item
+        android:id="@+id/menu_item_settings"
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:title="@string/settings"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/menu_item_volume"
         android:icon="@drawable/ic_baseline_volume_up_24"
         android:title="Volume Settings"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
 </menu>
