@@ -27,7 +27,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
-import com.maxrzhe.presentation.navigation.listenToRouterOnNavHost
+import com.maxrzhe.presentation.navigation.listenToRouter
 import com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment
 import com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment.*
 import com.maxrzhe.presentation.ui.impl.contacts.ContactListFragment.*
@@ -107,7 +107,7 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
         title = null
         toolbar = supportActionBar
 
-        listenToRouterOnNavHost(viewModel.router)
+        listenToRouter(viewModel.router)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

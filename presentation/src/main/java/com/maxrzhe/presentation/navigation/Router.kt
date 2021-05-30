@@ -48,13 +48,11 @@ class Router {
         }
     }
 
-    protected fun withActivity(block: Activity.() -> Any) {
+    private fun withActivity(block: Activity.() -> Any) {
         activityNavigationEvent.postValue(SingleEvent(block))
     }
 
-    protected fun withNavController(block: NavController.() -> Any) {
+    private fun withNavController(block: NavController.() -> Any) {
         fragmentNavigationEvent.postValue(SingleEvent(block))
     }
-
-    open fun onBackPressed() {}
 }

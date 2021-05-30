@@ -2,7 +2,6 @@ package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +11,6 @@ import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
 import com.maxrzhe.presentation.databinding.ItemContactBinding
 import com.maxrzhe.presentation.model.ContactItemViewModel
-import com.maxrzhe.presentation.navigation.listenToRouter
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactListViewModel

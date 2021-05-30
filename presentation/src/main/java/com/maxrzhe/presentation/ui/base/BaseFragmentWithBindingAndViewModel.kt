@@ -26,11 +26,6 @@ abstract class BaseFragmentWithBindingAndViewModel<VB : ViewBinding, VM : BaseVi
             })
     }
 
-//    protected fun onBackPressed() {
-//        viewModel.router.onBackPressed()
-//        onReturnToPreviousScreen()
-//    }
-
     protected open fun onReturnToPreviousScreen() {
         findNavController().popBackStack()
     }

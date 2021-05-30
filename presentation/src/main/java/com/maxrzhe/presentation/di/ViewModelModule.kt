@@ -14,7 +14,6 @@ val viewModelModule = module {
     single<AppResources> { AppResourcesImpl(androidContext()) }
     single<Router> { Router() }
 
-    viewModel<SplashViewModel> { SplashViewModel(get()) }
     viewModel<SearchViewModel> { SearchViewModel(get()) }
     viewModel<ContactListViewModel> { ContactListViewModel(get(), get(), get(), get()) }
     viewModel<ContactDetailViewModel> { ContactDetailViewModel(get(), get(), get(), get(), get()) }

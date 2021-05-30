@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.maxrzhe.presentation.ui.base.CoreFragment
 
-fun FragmentActivity.listenToRouterOnNavHost(router: Router) {
+fun FragmentActivity.listenToRouter(router: Router) {
     router.activityNavigationEvent.observe(this, { navEvent ->
         val consume = navEvent?.consume()
         consume?.invoke(this)

@@ -25,7 +25,6 @@ sealed class RouteFragmentDestination(@IdRes val destination: Int) {
 
     sealed class Contacts(@IdRes destination: Int) : RouteFragmentDestination(destination) {
 
-        object Splash : Contacts(R.id.splashFragment)
         object HomeViewPager : Contacts(R.id.homeFragment)
         object Detail : Contacts(R.id.contactDetailFragment)
     }

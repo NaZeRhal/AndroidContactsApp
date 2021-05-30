@@ -80,7 +80,8 @@ class HomeFragment :
     }
 
     override fun onReturnToPreviousScreen() {
-        requireActivity().finish()
+        super.onReturnToPreviousScreen()
+        viewModel.onExitApp()
     }
 
 

@@ -35,7 +35,7 @@ class SettingsListViewModel(router: Router) : BaseViewModel(router) {
     )
 
     fun openContactsSection() {
-        router.navigateTo(RouteSection.Contacts, null, true)
+        router.navigateTo(RouteSection.Contacts)
     }
 
     private fun navigateToProfile() {
