@@ -3,9 +3,9 @@ package com.maxrzhe.presentation
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.maxrzhe.presentation.databinding.FragmentGuideBinding
-import com.maxrzhe.presentation.ui.base.CoreFragment
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBinding
 
-class GuideFragment : CoreFragment<FragmentGuideBinding>() {
+class GuideFragment : BaseFragmentWithBinding<FragmentGuideBinding>() {
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentGuideBinding
         get() = FragmentGuideBinding::inflate
 

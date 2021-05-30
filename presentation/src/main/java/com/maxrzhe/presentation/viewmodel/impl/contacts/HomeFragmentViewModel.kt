@@ -1,7 +1,6 @@
 package com.maxrzhe.presentation.viewmodel.impl.contacts
 
 import com.maxrzhe.presentation.navigation.RouteDestination
-import com.maxrzhe.presentation.navigation.RouteSection
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
 class HomeFragmentViewModel : BaseViewModel() {

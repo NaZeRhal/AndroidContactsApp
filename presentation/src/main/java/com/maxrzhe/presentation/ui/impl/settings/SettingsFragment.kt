@@ -6,12 +6,12 @@ import com.maxrzhe.presentation.adapters.BaseBindingAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentSettingsBinding
 import com.maxrzhe.presentation.databinding.ItemSettingsBinding
-import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.settings.SettingsListViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class SettingsFragment :
-    BaseFragmentWithViewModel<FragmentSettingsBinding, SettingsListViewModel>() {
+    BaseFragmentWithBindingAndViewModel<FragmentSettingsBinding, SettingsListViewModel>() {
 
     override val viewModel: SettingsListViewModel by viewModel()
 

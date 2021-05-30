@@ -4,7 +4,7 @@ import android.os.Build
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import com.maxrzhe.presentation.databinding.FragmentSplashBinding
-import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.SplashViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.viewmodel.ext.android.viewModel
 
 
-class SplashFragment : BaseFragmentWithViewModel<FragmentSplashBinding, SplashViewModel>() {
+class SplashFragment : BaseFragmentWithBindingAndViewModel<FragmentSplashBinding, SplashViewModel>() {
 
     override val viewModel: SplashViewModel by viewModel()
 

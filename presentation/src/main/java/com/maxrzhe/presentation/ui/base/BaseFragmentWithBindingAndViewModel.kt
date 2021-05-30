@@ -8,8 +8,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
-abstract class BaseFragmentWithViewModel<VB : ViewBinding, VM : BaseViewModel> :
-    CoreFragment<VB>() {
+abstract class BaseFragmentWithBindingAndViewModel<VB : ViewBinding, VM : BaseViewModel> :
+    BaseFragmentWithBinding<VB>() {
     protected abstract val viewModel: VM
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

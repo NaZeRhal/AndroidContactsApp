@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
-import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactDetailViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.File
@@ -21,7 +21,7 @@ import java.io.OutputStream
 import java.util.*
 
 class ContactDetailFragment :
-    BaseFragmentWithViewModel<FragmentContactDetailBinding, ContactDetailViewModel>() {
+    BaseFragmentWithBindingAndViewModel<FragmentContactDetailBinding, ContactDetailViewModel>() {
 
     private var imageUri: String? = null
 

@@ -13,11 +13,11 @@ import com.maxrzhe.presentation.adapters.ContactViewPagerAdapter
 import com.maxrzhe.presentation.adapters.ZoomOutPageTransformer
 import com.maxrzhe.presentation.databinding.FragmentHomeBinding
 import com.maxrzhe.presentation.ui.SettingsActivity
-import com.maxrzhe.presentation.ui.base.BaseFragmentWithViewModel
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.HomeFragmentViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class HomeFragment : BaseFragmentWithViewModel<FragmentHomeBinding, HomeFragmentViewModel>() {
+class HomeFragment : BaseFragmentWithBindingAndViewModel<FragmentHomeBinding, HomeFragmentViewModel>() {
 
     private val onChangeCurrentPositionListener: OnChangeCurrentPositionListener?
         get() = (context as? OnChangeCurrentPositionListener)

@@ -5,38 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.viewbinding.ViewBinding
 
-abstract class CoreFragment<VB : ViewBinding> : Fragment() {
+abstract class CoreFragment : Fragment() {
 
-    private var _binding: ViewBinding? = null
-
-    @Suppress("UNCHECKED_CAST")
-    protected val binding: VB
-        get() = _binding as VB
-
-    protected abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
-
-    protected abstract fun initView()
-    protected abstract fun bindView()
+    protected open fun initView() = Unit
+    protected open fun layoutId(): Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        _binding = bindingInflater(inflater, container, false)
-        return requireNotNull(_binding).root
-    }
+        savedInstanceState: Bundle?
+    ): View? = inflater.inflate(layoutId(), container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindView()
         initView()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+
 }

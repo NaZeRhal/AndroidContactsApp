@@ -3,9 +3,9 @@ package com.maxrzhe.presentation
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.maxrzhe.presentation.databinding.FragmentFeedbackBinding
-import com.maxrzhe.presentation.ui.base.CoreFragment
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBinding
 
-class FeedbackFragment : CoreFragment<FragmentFeedbackBinding>() {
+class FeedbackFragment : BaseFragmentWithBinding<FragmentFeedbackBinding>() {
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentFeedbackBinding
         get() = FragmentFeedbackBinding::inflate
 
