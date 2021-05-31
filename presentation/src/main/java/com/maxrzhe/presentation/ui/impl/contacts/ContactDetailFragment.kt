@@ -6,10 +6,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
+import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactDetailViewModel
@@ -30,9 +29,6 @@ class ContactDetailFragment :
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
 
-    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
-        FragmentContactDetailBinding::inflate
-
     override fun bindView() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = requireActivity()
@@ -43,6 +39,8 @@ class ContactDetailFragment :
         subscribeUi()
         binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
     }
+
+    override fun layoutId(): Int = R.layout.fragment_contact_detail
 
     private fun subscribeUi() {
         viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
@@ -124,5 +122,7 @@ class ContactDetailFragment :
 
     companion object {
         private const val IMAGE_DIRECTORY = "imageDir"
+
+        fun createInstance(): ContactDetailFragment = ContactDetailFragment()
     }
 }

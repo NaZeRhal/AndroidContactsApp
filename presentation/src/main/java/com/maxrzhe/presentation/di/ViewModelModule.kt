@@ -14,13 +14,28 @@ val viewModelModule = module {
     single<AppResources> { AppResourcesImpl(androidContext()) }
     single<Router> { Router() }
 
-    viewModel<SearchViewModel> { SearchViewModel(get()) }
-    viewModel<ContactListViewModel> { ContactListViewModel(get(), get(), get(), get()) }
-    viewModel<ContactDetailViewModel> { ContactDetailViewModel(get(), get(), get(), get(), get()) }
-    viewModel<HomeFragmentViewModel> { HomeFragmentViewModel(get()) }
-    viewModel<ContactsActivityViewModel> { ContactsActivityViewModel(get()) }
+    viewModel<SearchViewModel> { SearchViewModel(router = get()) }
+    viewModel<ContactListViewModel> {
+        ContactListViewModel(
+            appResources = get(),
+            getContactsUseCase = get(),
+            deleteContactUseCase = get(),
+            router = get()
+        )
+    }
+    viewModel<ContactDetailViewModel> {
+        ContactDetailViewModel(
+            appResources = get(),
+            findByIdUseCase = get(),
+            addContactUseCase = get(),
+            updateContactUseCase = get(),
+            router = get()
+        )
+    }
+    viewModel<HomeFragmentViewModel> { HomeFragmentViewModel(router = get()) }
+    viewModel<ContactsActivityViewModel> { ContactsActivityViewModel(router = get()) }
 
-    viewModel<SettingsListViewModel> { SettingsListViewModel(get()) }
+    viewModel<SettingsListViewModel> { SettingsListViewModel(appResources = get(), router = get()) }
 
-    viewModel<VolumeSettingViewModel> { VolumeSettingViewModel(get()) }
+    viewModel<VolumeSettingViewModel> { VolumeSettingViewModel(router = get()) }
 }

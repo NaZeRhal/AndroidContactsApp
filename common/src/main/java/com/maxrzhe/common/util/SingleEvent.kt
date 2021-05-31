@@ -2,7 +2,7 @@ package com.maxrzhe.common.util
 
 open class SingleEvent<out T>(private val content: T) {
 
-    var consumed = false
+    var consumed: Boolean = false
         private set
 
     fun consume(): T? {

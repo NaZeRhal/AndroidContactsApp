@@ -7,7 +7,7 @@ class CoronavirusFragment : CoreFragment() {
     override fun layoutId(): Int = R.layout.fragment_coronavirus
 
     companion object {
-        @JvmStatic
+
         fun createInstance() = CoronavirusFragment()
     }
 }

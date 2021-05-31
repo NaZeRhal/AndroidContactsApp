@@ -43,11 +43,10 @@ class ContactDetailViewModel internal constructor(
             if (id != null) {
                 val flow: Flow<Resource<Contact>> = findByIdUseCase.execute(id)
                 flow.collect {
-                    if (it is Resource.Success) {
-                        setupFields(it.data)
-                    }
-                    if (it is Resource.Error) {
-                        _errorMessage.value = it.error.message
+                    when (it) {
+                        is Resource.Success -> setupFields(it.data)
+                        is Resource.Error -> _errorMessage.value = it.error.message
+                        is Resource.Loading -> emit(true)
                     }
                     emit(false)
                 }
@@ -80,16 +79,12 @@ class ContactDetailViewModel internal constructor(
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
-//    override fun onBackPressed() {
-//        navigateTo(RouteDestination.Contacts.HomeViewPager)
-//    }
-
     fun setSelectedId(selectedId: String?) {
         _fbId.value = selectedId
     }
 
     private fun onSaveItemClickNavigation() {
-       router.navigateTo(RouteFragmentDestination.Contacts.HomeViewPager)
+        router.navigateTo(RouteFragmentDestination.Contacts.HomeViewPager)
     }
 
     private fun setupFields(contact: Contact?) {

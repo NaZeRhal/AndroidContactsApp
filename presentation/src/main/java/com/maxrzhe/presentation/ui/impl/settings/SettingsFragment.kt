@@ -1,7 +1,6 @@
 package com.maxrzhe.presentation.ui.impl.settings
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.BaseBindingAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentSettingsBinding
@@ -15,13 +14,12 @@ class SettingsFragment :
 
     override val viewModel: SettingsListViewModel by viewModel()
 
-    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSettingsBinding
-        get() = FragmentSettingsBinding::inflate
-
     override fun initView() {
         val settingsAdapter: BaseBindingAdapter<ItemSettingsBinding> = BaseBindingAdapter()
         binding.rvSettingsList.bindAdapter(settingsAdapter)
     }
+
+    override fun layoutId(): Int = R.layout.fragment_settings
 
     override fun bindView() {
         binding.settingsViewModel = viewModel
@@ -30,5 +28,10 @@ class SettingsFragment :
 
     override fun onReturnToPreviousScreen() {
         viewModel.openContactsSection()
+    }
+
+    companion object {
+
+        fun createInstance(): SettingsFragment = SettingsFragment()
     }
 }

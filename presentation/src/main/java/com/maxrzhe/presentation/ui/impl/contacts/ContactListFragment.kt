@@ -1,11 +1,10 @@
 package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.BaseBindingAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
@@ -38,9 +37,6 @@ class ContactListFragment :
     private val searchViewModel: SearchViewModel by sharedViewModel()
 
     override val viewModel: ContactListViewModel by viewModel()
-
-    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
-        FragmentContactListBinding::inflate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +80,7 @@ class ContactListFragment :
         })
     }
 
+    override fun layoutId(): Int = R.layout.fragment_contact_list
 
     private fun showErrorMessage(msg: String) {
         view?.let {

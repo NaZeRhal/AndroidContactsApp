@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 abstract class CoreFragment : Fragment() {
 
     protected open fun initView() = Unit
-    protected open fun layoutId(): Int = 0
+    protected abstract fun layoutId(): Int
 
     override fun onCreateView(
         inflater: LayoutInflater,

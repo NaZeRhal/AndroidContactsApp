@@ -1,8 +1,6 @@
 package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.os.Build
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
@@ -21,9 +19,6 @@ class HomeFragment :
         get() = (context as? OnChangeCurrentPositionListener)
 
     override val viewModel: HomeFragmentViewModel by viewModel()
-
-    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHomeBinding
-        get() = FragmentHomeBinding::inflate
 
     override fun initView() {
         val bottomNavigationView = binding.bnvMain
@@ -56,11 +51,12 @@ class HomeFragment :
         }
     }
 
+    override fun layoutId(): Int = R.layout.fragment_home
+
     override fun onResume() {
         super.onResume()
         showSystemUI()
     }
-
 
     private fun showSystemUI() {
         (requireActivity() as AppCompatActivity).supportActionBar?.show()
@@ -73,7 +69,6 @@ class HomeFragment :
         }
     }
 
-
     override fun bindView() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = requireActivity()
@@ -84,8 +79,12 @@ class HomeFragment :
         viewModel.onExitApp()
     }
 
-
     interface OnChangeCurrentPositionListener {
         fun onChange(position: Int)
+    }
+
+    companion object {
+
+        fun createInstance() = HomeFragment()
     }
 }
