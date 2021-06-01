@@ -1,6 +1,5 @@
 package com.maxrzhe.presentation.viewmodel.impl.contacts
 
-import androidx.core.os.bundleOf
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,9 +13,8 @@ import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.presentation.navigation.RouteFragmentDestination
 import com.maxrzhe.presentation.navigation.Router
-import com.maxrzhe.presentation.ui.impl.contacts.ContactListFragment
 import com.maxrzhe.presentation.util.AppResources
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
+import com.maxrzhe.presentation.viewmodel.base.ViewModelWithRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -27,7 +25,7 @@ class ContactListViewModel internal constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val deleteContactUseCase: DeleteContactUseCase,
     router: Router
-) : BaseViewModel(router) {
+) : ViewModelWithRouter(router) {
 
     var isFavoritesPage: Boolean = false
 
@@ -37,6 +35,9 @@ class ContactListViewModel internal constructor(
             performFiltering(value)
         }
     }
+
+    private val _fbId = MutableLiveData<String>()
+    val fbId: LiveData<String> = _fbId
 
     val searchText = ObservableField<String?>()
 
@@ -124,7 +125,8 @@ class ContactListViewModel internal constructor(
     }
 
     private fun onSelectItemNavigation(id: String) {
-        val args = bundleOf(ContactListFragment.FB_ID_CONTACT to id)
-        router.navigateTo(RouteFragmentDestination.Contacts.Detail, args, false)
+        _fbId.value = id
+        router.navigateTo(RouteFragmentDestination.Contacts.Detail, false)
     }
+
 }

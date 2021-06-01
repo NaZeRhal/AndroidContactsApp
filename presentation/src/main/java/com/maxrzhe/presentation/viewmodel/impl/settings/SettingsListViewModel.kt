@@ -7,10 +7,10 @@ import com.maxrzhe.presentation.navigation.RouteFragmentDestination
 import com.maxrzhe.presentation.navigation.RouteSection
 import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.util.AppResources
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
+import com.maxrzhe.presentation.viewmodel.base.ViewModelWithRouter
 
 class SettingsListViewModel(private val appResources: AppResources, router: Router) :
-    BaseViewModel(router) {
+    ViewModelWithRouter(router) {
 
     val settingItems: MutableLiveData<List<SettingsItemViewModel>> = MutableLiveData()
 
@@ -31,7 +31,7 @@ class SettingsListViewModel(private val appResources: AppResources, router: Rout
         ),
         SettingsItemViewModel(
             iconId = R.drawable.ic_baseline_feedback_24,
-            title = context.getString(R.string.settings_feedback),
+            title = appResources.getString(R.string.settings_feedback),
             clickListener = { navigateToFeedback() }
         ),
     )
@@ -41,14 +41,14 @@ class SettingsListViewModel(private val appResources: AppResources, router: Rout
     }
 
     private fun navigateToProfile() {
-        router.navigateTo(RouteFragmentDestination.Settings.Profile, null, false)
+        router.navigateTo(RouteFragmentDestination.Settings.Profile, false)
     }
 
     private fun navigateToGuide() {
-        router.navigateTo(RouteFragmentDestination.Settings.Guide, null, false)
+        router.navigateTo(RouteFragmentDestination.Settings.Guide, false)
     }
 
     private fun navigateToFeedback() {
-        router.navigateTo(RouteFragmentDestination.Settings.Feedback, null, false)
+        router.navigateTo(RouteFragmentDestination.Settings.Feedback, false)
     }
 }

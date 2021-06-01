@@ -5,7 +5,7 @@ import androidx.databinding.ObservableInt
 import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
-class VolumeSettingViewModel(router: Router) : BaseViewModel(router) {
+class VolumeSettingViewModel : BaseViewModel() {
 
     val volumeValue = ObservableInt(0)
     val currentVolume = object : ObservableField<String>(volumeValue) {

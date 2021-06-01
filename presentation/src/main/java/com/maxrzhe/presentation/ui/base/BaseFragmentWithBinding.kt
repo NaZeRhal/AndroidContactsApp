@@ -15,7 +15,6 @@ abstract class BaseFragmentWithBinding<VB : ViewBinding> : CoreFragment() {
     protected val binding: VB
         get() = _binding as VB
 
-//    protected abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
 
     protected abstract fun bindView()
 
@@ -24,7 +23,6 @@ abstract class BaseFragmentWithBinding<VB : ViewBinding> : CoreFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-//        _binding = bindingInflater(inflater, container, false)
         _binding = DataBindingUtil.inflate(inflater, layoutId(), container, false)
         return requireNotNull(_binding).root
     }

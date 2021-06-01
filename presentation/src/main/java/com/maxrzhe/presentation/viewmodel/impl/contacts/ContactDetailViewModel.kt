@@ -16,6 +16,7 @@ import com.maxrzhe.presentation.navigation.RouteFragmentDestination
 import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
+import com.maxrzhe.presentation.viewmodel.base.ViewModelWithRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ class ContactDetailViewModel internal constructor(
     private val updateContactUseCase: UpdateContactUseCase,
     router: Router
 ) :
-    BaseViewModel(router) {
+    ViewModelWithRouter(router) {
 
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 

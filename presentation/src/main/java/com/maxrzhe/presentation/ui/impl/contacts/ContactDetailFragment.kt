@@ -12,6 +12,8 @@ import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactDetailViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.SharedViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
@@ -26,6 +28,8 @@ class ContactDetailFragment :
 
     override val viewModel: ContactDetailViewModel by viewModel()
 
+    private val sharedViewModel: SharedViewModel by sharedViewModel()
+
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
 
@@ -35,7 +39,10 @@ class ContactDetailFragment :
     }
 
     override fun initView() {
-        viewModel.setSelectedId(arguments?.getString(ContactListFragment.FB_ID_CONTACT))
+        sharedViewModel.contactId.observe(viewLifecycleOwner, {
+            viewModel.setSelectedId(it)
+        })
+
         subscribeUi()
         binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
     }

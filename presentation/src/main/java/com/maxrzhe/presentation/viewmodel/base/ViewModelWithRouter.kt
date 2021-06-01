@@ -1,6 +1,5 @@
 package com.maxrzhe.presentation.viewmodel.base
 
-import androidx.lifecycle.ViewModel
 import com.maxrzhe.presentation.navigation.Router
 
-abstract class BaseViewModel : ViewModel()
+abstract class ViewModelWithRouter(val router: Router) : BaseViewModel()

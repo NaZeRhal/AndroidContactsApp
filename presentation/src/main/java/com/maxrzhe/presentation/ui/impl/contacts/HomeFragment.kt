@@ -10,6 +10,8 @@ import com.maxrzhe.presentation.adapters.ZoomOutPageTransformer
 import com.maxrzhe.presentation.databinding.FragmentHomeBinding
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.HomeFragmentViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.SharedViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class HomeFragment :
@@ -18,6 +20,7 @@ class HomeFragment :
     private val onChangeCurrentPositionListener: OnChangeCurrentPositionListener?
         get() = (context as? OnChangeCurrentPositionListener)
 
+    private val sharedViewModel: SharedViewModel by sharedViewModel()
     override val viewModel: HomeFragmentViewModel by viewModel()
 
     override fun initView() {
@@ -49,6 +52,10 @@ class HomeFragment :
             }
             true
         }
+        binding.fabAdd.setOnClickListener {
+            sharedViewModel.select(null)
+            viewModel.addContactClick()
+        }
     }
 
     override fun layoutId(): Int = R.layout.fragment_home
@@ -69,10 +76,7 @@ class HomeFragment :
         }
     }
 
-    override fun bindView() {
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = requireActivity()
-    }
+    override fun bindView() {}
 
     override fun onReturnToPreviousScreen() {
         super.onReturnToPreviousScreen()

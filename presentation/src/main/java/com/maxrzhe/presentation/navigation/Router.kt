@@ -16,13 +16,12 @@ class Router {
 
     fun navigateTo(
         route: RouteFragmentDestination,
-        args: Bundle? = null,
         clearStack: Boolean = false
     ) {
         when {
             route is RouteFragmentDestination.Back -> withNavController { popBackStack() }
             clearStack -> withNavController { popBackStack(route.destination, false) }
-            else -> withNavController { navigate(route.destination, args, defaultNavOptions) }
+            else -> withNavController { navigate(route.destination, null, defaultNavOptions) }
         }
     }
 
