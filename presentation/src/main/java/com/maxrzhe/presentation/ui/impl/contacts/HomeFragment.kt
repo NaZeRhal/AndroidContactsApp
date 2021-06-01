@@ -1,6 +1,7 @@
 package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.os.Build
+import android.util.Log
 import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
@@ -79,7 +80,6 @@ class HomeFragment :
     override fun bindView() {}
 
     override fun onReturnToPreviousScreen() {
-        super.onReturnToPreviousScreen()
         viewModel.onExitApp()
     }
 

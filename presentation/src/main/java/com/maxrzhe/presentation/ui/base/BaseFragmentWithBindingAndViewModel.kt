@@ -1,6 +1,7 @@
 package com.maxrzhe.presentation.ui.base
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
@@ -15,8 +16,6 @@ abstract class BaseFragmentWithBindingAndViewModel<VB : ViewBinding, VM : ViewMo
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        listenToRouter(viewModel.router)
-
         requireActivity()
             .onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -24,6 +23,7 @@ abstract class BaseFragmentWithBindingAndViewModel<VB : ViewBinding, VM : ViewMo
                     onReturnToPreviousScreen()
                 }
             })
+        listenToRouter(viewModel.router)
     }
 
     protected open fun onReturnToPreviousScreen() {

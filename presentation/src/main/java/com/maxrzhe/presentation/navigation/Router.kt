@@ -2,7 +2,6 @@ package com.maxrzhe.presentation.navigation
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.maxrzhe.common.util.SingleEvent

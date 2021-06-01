@@ -12,7 +12,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     single<AppResources> { AppResourcesImpl(androidContext()) }
-    factory<Router> { Router() }
+    single<Router> { Router() }
 
     viewModel<SearchViewModel> { SearchViewModel(router = get()) }
     viewModel<SharedViewModel> { SharedViewModel() }
