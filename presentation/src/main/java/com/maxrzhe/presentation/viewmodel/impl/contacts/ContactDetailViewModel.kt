@@ -15,7 +15,6 @@ import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.navigation.RouteFragmentDestination
 import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.util.AppResources
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 import com.maxrzhe.presentation.viewmodel.base.ViewModelWithRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -24,6 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ContactDetailViewModel internal constructor(
+    private val fbId: String?,
     private val appResources: AppResources,
     private val findByIdUseCase: FindByIdUseCase,
     private val addContactUseCase: AddContactUseCase,
@@ -36,7 +36,7 @@ class ContactDetailViewModel internal constructor(
 
     private var calendar = Calendar.getInstance()
     private var isFavorite = false
-    private var _fbId = MutableLiveData<String?>(null)
+    private val _fbId: MutableLiveData<String?> by lazy { MutableLiveData(fbId) }
 
     val isLoading = _fbId.distinctUntilChanged().switchMap { id ->
         liveData {
@@ -80,12 +80,8 @@ class ContactDetailViewModel internal constructor(
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
-    fun setSelectedId(selectedId: String?) {
-        _fbId.value = selectedId
-    }
-
     private fun onSaveItemClickNavigation() {
-        router.navigateTo(RouteFragmentDestination.Contacts.HomeViewPager)
+        router.navigateTo(RouteFragmentDestination.Contacts.ToHomeViewPager, true)
     }
 
     private fun setupFields(contact: Contact?) {

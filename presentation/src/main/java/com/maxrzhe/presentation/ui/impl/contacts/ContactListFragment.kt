@@ -14,7 +14,6 @@ import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactListViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.SearchViewModel
-import com.maxrzhe.presentation.viewmodel.impl.contacts.SharedViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -35,7 +34,6 @@ class ContactListFragment :
     private var contactsAdapter: BaseBindingAdapter<ItemContactBinding>? = null
 
     private val searchViewModel: SearchViewModel by sharedViewModel()
-    private val sharedViewModel: SharedViewModel by sharedViewModel()
 
     override val viewModel: ContactListViewModel by viewModel()
 
@@ -69,8 +67,6 @@ class ContactListFragment :
         ItemTouchHelper(swipeToDeleteCallback).apply {
             attachToRecyclerView(binding.rvContactList)
         }
-
-        viewModel.fbId.observe(viewLifecycleOwner, { sharedViewModel.select(it) })
 
         viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
             if (msg != null) {

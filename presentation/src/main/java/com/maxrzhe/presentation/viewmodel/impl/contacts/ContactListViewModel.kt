@@ -36,9 +36,6 @@ class ContactListViewModel internal constructor(
         }
     }
 
-    private val _fbId = MutableLiveData<String>()
-    val fbId: LiveData<String> = _fbId
-
     val searchText = ObservableField<String?>()
 
     private val _errorMessage = MutableLiveData<String>()
@@ -77,7 +74,6 @@ class ContactListViewModel internal constructor(
                     performFiltering()
                 } else if (it is Resource.Error) {
                     _errorMessage.value = it.error.message
-
                 }
             }
         }
@@ -125,8 +121,7 @@ class ContactListViewModel internal constructor(
     }
 
     private fun onSelectItemNavigation(id: String) {
-        _fbId.value = id
-        router.navigateTo(RouteFragmentDestination.Contacts.Detail, false)
+        router.navigateTo(RouteFragmentDestination.Contacts.ToDetail(id), false)
     }
 
 }

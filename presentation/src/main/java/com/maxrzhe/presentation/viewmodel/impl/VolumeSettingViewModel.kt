@@ -2,7 +2,6 @@ package com.maxrzhe.presentation.viewmodel.impl
 
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
 class VolumeSettingViewModel : BaseViewModel() {

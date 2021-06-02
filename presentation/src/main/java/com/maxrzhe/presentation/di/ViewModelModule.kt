@@ -15,7 +15,6 @@ val viewModelModule = module {
     single<Router> { Router() }
 
     viewModel<SearchViewModel> { SearchViewModel(router = get()) }
-    viewModel<SharedViewModel> { SharedViewModel() }
     viewModel<ContactListViewModel> {
         ContactListViewModel(
             appResources = get(),
@@ -24,8 +23,9 @@ val viewModelModule = module {
             router = get()
         )
     }
-    viewModel<ContactDetailViewModel> {
+    viewModel<ContactDetailViewModel> { (fbId: String?) ->
         ContactDetailViewModel(
+            fbId = fbId,
             appResources = get(),
             findByIdUseCase = get(),
             addContactUseCase = get(),

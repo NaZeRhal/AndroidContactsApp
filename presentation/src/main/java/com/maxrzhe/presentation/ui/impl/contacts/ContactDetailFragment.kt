@@ -7,14 +7,14 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
 import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
 import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactDetailViewModel
-import com.maxrzhe.presentation.viewmodel.impl.contacts.SharedViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -25,10 +25,10 @@ class ContactDetailFragment :
     BaseFragmentWithBindingAndViewModel<FragmentContactDetailBinding, ContactDetailViewModel>() {
 
     private var imageUri: String? = null
+    private val args: ContactDetailFragmentArgs by navArgs()
+    private val fbId: String? by lazy { args.fbId }
 
-    override val viewModel: ContactDetailViewModel by viewModel()
-
-    private val sharedViewModel: SharedViewModel by sharedViewModel()
+    override val viewModel: ContactDetailViewModel by viewModel { parametersOf(fbId) }
 
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
@@ -39,10 +39,6 @@ class ContactDetailFragment :
     }
 
     override fun initView() {
-        sharedViewModel.contactId.observe(viewLifecycleOwner, {
-            viewModel.setSelectedId(it)
-        })
-
         subscribeUi()
         binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
     }

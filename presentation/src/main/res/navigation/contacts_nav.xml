@@ -9,7 +9,7 @@
         android:name="com.maxrzhe.presentation.ui.impl.contacts.HomeFragment"
         android:label="HomeFragment" >
         <action
-            android:id="@+id/action_homeFragment_to_contactDetailFragment"
+            android:id="@+id/navigateToDetailFragment"
             app:destination="@id/contactDetailFragment" />
     </fragment>
     <fragment
@@ -17,7 +17,11 @@
         android:name="com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment"
         android:label="ContactDetailFragment" >
         <action
-            android:id="@+id/action_contactDetailFragment_to_homeFragment"
+            android:id="@+id/navigateToHomeFragment"
             app:destination="@id/homeFragment" />
+        <argument
+            android:name="fbId"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

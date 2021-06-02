@@ -19,8 +19,8 @@ class Router {
     ) {
         when {
             route is RouteFragmentDestination.Back -> withNavController { popBackStack() }
-            clearStack -> withNavController { popBackStack(route.destination, false) }
-            else -> withNavController { navigate(route.destination, null, defaultNavOptions) }
+            clearStack -> withNavController { popBackStack(route.direction!!.actionId, false) }
+            else -> withNavController { navigate(route.direction!!, defaultNavOptions) }
         }
     }
 

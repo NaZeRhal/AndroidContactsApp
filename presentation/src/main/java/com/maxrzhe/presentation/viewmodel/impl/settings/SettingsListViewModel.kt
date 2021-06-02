@@ -41,14 +41,14 @@ class SettingsListViewModel(private val appResources: AppResources, router: Rout
     }
 
     private fun navigateToProfile() {
-        router.navigateTo(RouteFragmentDestination.Settings.Profile, false)
+        router.navigateTo(RouteFragmentDestination.Settings.ToProfile, false)
     }
 
     private fun navigateToGuide() {
-        router.navigateTo(RouteFragmentDestination.Settings.Guide, false)
+        router.navigateTo(RouteFragmentDestination.Settings.ToGuide, false)
     }
 
     private fun navigateToFeedback() {
-        router.navigateTo(RouteFragmentDestination.Settings.Feedback, false)
+        router.navigateTo(RouteFragmentDestination.Settings.ToFeedback, false)
     }
 }
