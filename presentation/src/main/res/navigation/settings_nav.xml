@@ -9,7 +9,7 @@
         android:id="@+id/profileFragment"
         android:name="com.maxrzhe.presentation.ui.impl.settings.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" >
+        tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/navigateProfileToSettingsFragment"
             app:destination="@id/settingsFragment" />
@@ -18,7 +18,7 @@
         android:id="@+id/guideFragment"
         android:name="com.maxrzhe.presentation.ui.impl.settings.GuideFragment"
         android:label="fragment_guide"
-        tools:layout="@layout/fragment_guide" >
+        tools:layout="@layout/fragment_guide">
         <action
             android:id="@+id/navigateGuideToSettingsFragment"
             app:destination="@id/settingsFragment" />
@@ -35,8 +35,7 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.maxrzhe.presentation.ui.impl.settings.SettingsFragment"
-        android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" >
+        android:label="fragment_settings">
         <action
             android:id="@+id/navigateToProfileFragment"
             app:destination="@id/profileFragment"

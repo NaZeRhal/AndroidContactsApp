@@ -18,12 +18,12 @@ sealed class RouteSection(val activityClass: Class<*>?) {
     object VolumeSetting : RouteSection(VolumeSettingActivity::class.java)
 }
 
-sealed class RouteFragmentDestination {
-    abstract val direction: NavDirections?
+sealed class RouteBack{
+    object Back: RouteBack()
+}
 
-    object Back : RouteFragmentDestination() {
-        override val direction: NavDirections? = null
-    }
+sealed class RouteFragmentDestination {
+    abstract val direction: NavDirections
 
     sealed class Settings : RouteFragmentDestination() {
 
