@@ -12,7 +12,7 @@ import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
 import com.maxrzhe.presentation.R
-import com.maxrzhe.presentation.navigation.RouteFragmentDestination
+import com.maxrzhe.presentation.navigation.RouteBack
 import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.util.AppResources
 import com.maxrzhe.presentation.viewmodel.base.ViewModelWithRouter
@@ -81,7 +81,7 @@ class ContactDetailViewModel internal constructor(
     val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
     private fun onSaveItemClickNavigation() {
-        router.navigateTo(RouteFragmentDestination.Contacts.ToHomeViewPager, true)
+        router.navigateTo(RouteBack.Back)
     }
 
     private fun setupFields(contact: Contact?) {
