@@ -23,7 +23,7 @@ class Router {
         }
     }
 
-    fun navigateBack(
+    fun navigateTo(
         route: RouteBack,
     ) {
         when (route) {
