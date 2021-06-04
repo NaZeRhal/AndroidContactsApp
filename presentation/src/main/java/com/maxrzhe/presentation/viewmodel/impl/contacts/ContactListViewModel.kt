@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.viewmodel.impl
+package com.maxrzhe.presentation.viewmodel.impl.contacts
 
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
@@ -11,8 +11,10 @@ import com.maxrzhe.domain.usecases.DeleteContactUseCase
 import com.maxrzhe.domain.usecases.GetContactsUseCase
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.model.ContactItemViewModel
+import com.maxrzhe.presentation.navigation.RouteFragmentDestination
+import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.util.AppResources
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
+import com.maxrzhe.presentation.viewmodel.base.ViewModelWithRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -21,8 +23,9 @@ import java.util.*
 class ContactListViewModel internal constructor(
     private val appResources: AppResources,
     private val getContactsUseCase: GetContactsUseCase,
-    private val deleteContactUseCase: DeleteContactUseCase
-) : BaseViewModel() {
+    private val deleteContactUseCase: DeleteContactUseCase,
+    router: Router
+) : ViewModelWithRouter(router) {
 
     var isFavoritesPage: Boolean = false
 
@@ -34,9 +37,6 @@ class ContactListViewModel internal constructor(
     }
 
     val searchText = ObservableField<String?>()
-
-    private val _fbId = MutableLiveData<String>()
-    val fbId: LiveData<String> = _fbId
 
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
@@ -74,7 +74,6 @@ class ContactListViewModel internal constructor(
                     performFiltering()
                 } else if (it is Resource.Error) {
                     _errorMessage.value = it.error.message
-
                 }
             }
         }
@@ -108,7 +107,7 @@ class ContactListViewModel internal constructor(
         filteredContacts.value = filteredByQuery.map { item ->
             ContactItemViewModel(
                 contact = item,
-                clickListener = { _fbId.value = item.fbId }
+                clickListener = { onSelectItemNavigation(item.fbId) }
             )
         }
     }
@@ -120,4 +119,9 @@ class ContactListViewModel internal constructor(
                     phone.toLowerCase(Locale.getDefault()).contains(pattern)
         }
     }
+
+    private fun onSelectItemNavigation(id: String) {
+        router.navigateTo(RouteFragmentDestination.Contacts.ToDetail(id), false)
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.viewmodel.impl
+package com.maxrzhe.presentation.viewmodel.impl.contacts
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -12,8 +12,10 @@ import com.maxrzhe.domain.usecases.AddContactUseCase
 import com.maxrzhe.domain.usecases.FindByIdUseCase
 import com.maxrzhe.domain.usecases.UpdateContactUseCase
 import com.maxrzhe.presentation.R
+import com.maxrzhe.presentation.navigation.RouteFragmentDestination
+import com.maxrzhe.presentation.navigation.Router
 import com.maxrzhe.presentation.util.AppResources
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
+import com.maxrzhe.presentation.viewmodel.base.ViewModelWithRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -21,21 +23,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ContactDetailViewModel internal constructor(
+    private val fbId: String?,
     private val appResources: AppResources,
     private val findByIdUseCase: FindByIdUseCase,
     private val addContactUseCase: AddContactUseCase,
-    private val updateContactUseCase: UpdateContactUseCase
+    private val updateContactUseCase: UpdateContactUseCase,
+    router: Router
 ) :
-    BaseViewModel() {
+    ViewModelWithRouter(router) {
 
     private val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
-    private var _savedMarker = MutableLiveData(false)
-    val savedMarker: LiveData<Boolean> = _savedMarker
-
     private var calendar = Calendar.getInstance()
     private var isFavorite = false
-    private var _fbId = MutableLiveData<String?>(null)
+    private val _fbId: MutableLiveData<String?> by lazy { MutableLiveData(fbId) }
 
     val isLoading = _fbId.distinctUntilChanged().switchMap { id ->
         liveData {
@@ -43,11 +44,10 @@ class ContactDetailViewModel internal constructor(
             if (id != null) {
                 val flow: Flow<Resource<Contact>> = findByIdUseCase.execute(id)
                 flow.collect {
-                    if (it is Resource.Success) {
-                        setupFields(it.data)
-                    }
-                    if (it is Resource.Error) {
-                        _errorMessage.value = it.error.message
+                    when (it) {
+                        is Resource.Success -> setupFields(it.data)
+                        is Resource.Error -> _errorMessage.value = it.error.message
+                        is Resource.Loading -> emit(true)
                     }
                     emit(false)
                 }
@@ -80,8 +80,8 @@ class ContactDetailViewModel internal constructor(
     val buttonTextRes = ObservableInt(R.string.detail_button_add_text)
     val tint = ObservableInt(appResources.getColor(R.color.favorite_false_color))
 
-    fun setSelectedId(selectedId: String?) {
-        _fbId.value = selectedId
+    private fun onSaveItemClickNavigation() {
+        router.navigateTo(RouteFragmentDestination.Contacts.ToHomeViewPager, true)
     }
 
     private fun setupFields(contact: Contact?) {
@@ -107,10 +107,6 @@ class ContactDetailViewModel internal constructor(
             imageTextRes.set(R.string.detail_tv_change_image_text)
             buttonTextRes.set(R.string.detail_button_save_changes_text)
         }
-    }
-
-    fun resetMarker() {
-        _savedMarker.value = false
     }
 
     fun manageImageUri(imageUri: String) {
@@ -169,9 +165,10 @@ class ContactDetailViewModel internal constructor(
             addContactUseCase.execute(contact)
                 .collect {
                     if (it is Resource.Success) {
-                        _savedMarker.value = true
+                        onSaveItemClickNavigation()
                     } else if (it is Resource.Error) {
                         _errorMessage.value = it.error.message
+                        onSaveItemClickNavigation()
                     }
                 }
         }
@@ -182,9 +179,10 @@ class ContactDetailViewModel internal constructor(
             updateContactUseCase.execute(contact)
                 .collect {
                     if (it is Resource.Success) {
-                        _savedMarker.value = true
+                        onSaveItemClickNavigation()
                     } else if (it is Resource.Error) {
                         _errorMessage.value = it.error.message
+                        onSaveItemClickNavigation()
                     }
                 }
         }

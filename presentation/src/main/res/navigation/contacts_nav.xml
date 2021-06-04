@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/contacts_nav"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.maxrzhe.presentation.ui.impl.contacts.HomeFragment"
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/navigateToDetailFragment"
+            app:destination="@id/contactDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/contactDetailFragment"
+        android:name="com.maxrzhe.presentation.ui.impl.contacts.ContactDetailFragment"
+        android:label="ContactDetailFragment" >
+        <action
+            android:id="@+id/navigateToHomeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="fbId"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+</navigation>

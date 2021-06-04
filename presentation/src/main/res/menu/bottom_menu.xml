@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_baseline_favorite_24"
         android:title="Favorites" />
     <item
-        android:id="@+id/bottom_menu_settings"
-        android:icon="@drawable/ic_baseline_settings_24"
-        android:title="Settings" />
+        android:id="@+id/bottom_menu_coronavirus"
+        android:icon="@drawable/ic_baseline_coronavirus_24"
+        android:title="Coronavirus" />
 </menu>

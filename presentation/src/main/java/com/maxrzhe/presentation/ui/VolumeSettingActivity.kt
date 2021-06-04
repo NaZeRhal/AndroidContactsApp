@@ -1,14 +1,14 @@
 package com.maxrzhe.presentation.ui
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.maxrzhe.presentation.databinding.ActivityVolumeSettingBinding
 import com.maxrzhe.presentation.viewmodel.impl.VolumeSettingViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class VolumeSettingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityVolumeSettingBinding
-    private val viewModel by viewModels<VolumeSettingViewModel>()
+    private val viewModel: VolumeSettingViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -4,13 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.databinding.DataBindingUtil
 import androidx.viewbinding.ViewBinding
-import com.maxrzhe.presentation.viewmodel.base.BaseViewModel
 
-abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
-
-    protected abstract val viewModel: VM
+abstract class BaseFragmentWithBinding<VB : ViewBinding> : CoreFragment() {
 
     private var _binding: ViewBinding? = null
 
@@ -18,9 +15,7 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
     protected val binding: VB
         get() = _binding as VB
 
-    protected abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
 
-    protected abstract fun initView()
     protected abstract fun bindView()
 
     override fun onCreateView(
@@ -28,7 +23,7 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel> : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        _binding = bindingInflater(inflater, container, false)
+        _binding = DataBindingUtil.inflate(inflater, layoutId(), container, false)
         return requireNotNull(_binding).root
     }
 

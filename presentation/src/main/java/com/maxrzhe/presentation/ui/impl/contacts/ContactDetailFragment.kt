@@ -1,4 +1,4 @@
-package com.maxrzhe.presentation.ui.impl
+package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -6,38 +6,32 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
+import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.FragmentContactDetailBinding
-import com.maxrzhe.presentation.ui.base.BaseFragment
-import com.maxrzhe.presentation.viewmodel.impl.ContactDetailViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactDetailViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.util.*
 
-class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, ContactDetailViewModel>() {
+class ContactDetailFragment :
+    BaseFragmentWithBindingAndViewModel<FragmentContactDetailBinding, ContactDetailViewModel>() {
 
     private var imageUri: String? = null
+    private val args: ContactDetailFragmentArgs by navArgs()
+    private val fbId: String? by lazy { args.fbId }
 
-    private val sharedViewModel by activityViewModels<SharedViewModel>()
-
-    override val viewModel: ContactDetailViewModel by viewModel()
-
-    private val onSaveContactListener: OnSaveContactListener?
-        get() = (context as? OnSaveContactListener)
+    override val viewModel: ContactDetailViewModel by viewModel { parametersOf(fbId) }
 
     private val onTakeImageListener: OnTakeImageListener?
         get() = (context as? OnTakeImageListener)
-
-    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactDetailBinding =
-        FragmentContactDetailBinding::inflate
 
     override fun bindView() {
         binding.viewModel = viewModel
@@ -45,18 +39,11 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
     }
 
     override fun initView() {
-        sharedViewModel.contactId.observe(viewLifecycleOwner, {
-            viewModel.setSelectedId(it)
-            subscribeUi()
-        })
-        viewModel.savedMarker.observe(viewLifecycleOwner, {
-            if (it) {
-                viewModel.resetMarker()
-                onSaveContactListener?.onSave()
-            }
-        })
+        subscribeUi()
         binding.tvAddImage.setOnClickListener { onTakeImageListener?.onTakeImage() }
     }
+
+    override fun layoutId(): Int = R.layout.fragment_contact_detail
 
     private fun subscribeUi() {
         viewModel.errorMessage.observe(viewLifecycleOwner, { msg ->
@@ -132,15 +119,13 @@ class ContactDetailFragment : BaseFragment<FragmentContactDetailBinding, Contact
         return Uri.parse(file.absolutePath)
     }
 
-    interface OnSaveContactListener {
-        fun onSave()
-    }
-
     interface OnTakeImageListener {
         fun onTakeImage()
     }
 
     companion object {
         private const val IMAGE_DIRECTORY = "imageDir"
+
+        fun createInstance(): ContactDetailFragment = ContactDetailFragment()
     }
 }

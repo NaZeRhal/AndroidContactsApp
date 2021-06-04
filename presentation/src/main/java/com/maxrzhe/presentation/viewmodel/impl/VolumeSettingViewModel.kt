@@ -16,5 +16,4 @@ class VolumeSettingViewModel : BaseViewModel() {
     fun setVolumeValue(value: Int) {
         volumeValue.set(value)
     }
-
 }

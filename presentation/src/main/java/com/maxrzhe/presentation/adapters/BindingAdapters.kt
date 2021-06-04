@@ -4,6 +4,7 @@ import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.databinding.BindingAdapter
 import androidx.databinding.BindingConversion
 import androidx.databinding.InverseBindingAdapter
@@ -25,12 +26,19 @@ fun convertLambdaToClickListener(clickListener: ClickListener?): View.OnClickLis
         null
     }
 
-@BindingAdapter("imageUri")
-fun imageUri(view: ImageView, imageUriString: String?) {
+@BindingAdapter("imageUriFromFile")
+fun imageUriFromFile(view: ImageView, imageUriString: String?) {
     if (imageUriString == null || imageUriString.isEmpty()) {
         view.setImageResource(R.drawable.person_placeholder)
     } else {
         view.setImageURI(Uri.fromFile(File(imageUriString)))
+    }
+}
+
+@BindingAdapter("srcDrawable")
+fun srcDrawable(view: ImageView, @DrawableRes res: Int?) {
+    res?.let {
+        view.setImageResource(it)
     }
 }
 
@@ -61,9 +69,9 @@ fun RecyclerView.bindAdapter(baseAdapter: BaseBindingAdapter<*>) {
 }
 
 @BindingAdapter("data")
-fun setData(rv: RecyclerView, contactsList: List<BaseItemViewModel>?) {
+fun setData(rv: RecyclerView, itemsList: List<BaseItemViewModel>?) {
     if (rv.adapter is BaseBindingAdapter<*>) {
-        contactsList?.let {
+        itemsList?.let {
             (rv.adapter as BaseBindingAdapter<*>).setItems(it)
         }
     }

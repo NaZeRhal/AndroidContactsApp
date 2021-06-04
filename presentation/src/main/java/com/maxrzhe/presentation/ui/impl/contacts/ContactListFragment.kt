@@ -1,27 +1,24 @@
-package com.maxrzhe.presentation.ui.impl
+package com.maxrzhe.presentation.ui.impl.contacts
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.adapters.BaseBindingAdapter
 import com.maxrzhe.presentation.adapters.bindAdapter
 import com.maxrzhe.presentation.databinding.FragmentContactListBinding
 import com.maxrzhe.presentation.databinding.ItemContactBinding
 import com.maxrzhe.presentation.model.ContactItemViewModel
 import com.maxrzhe.presentation.ui.SwipeToDeleteCallback
-import com.maxrzhe.presentation.ui.base.BaseFragment
-import com.maxrzhe.presentation.viewmodel.impl.ContactListViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SearchViewModel
-import com.maxrzhe.presentation.viewmodel.impl.SharedViewModel
+import com.maxrzhe.presentation.ui.base.BaseFragmentWithBindingAndViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.ContactListViewModel
+import com.maxrzhe.presentation.viewmodel.impl.contacts.SearchViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class ContactListFragment :
-    BaseFragment<FragmentContactListBinding, ContactListViewModel>() {
+    BaseFragmentWithBindingAndViewModel<FragmentContactListBinding, ContactListViewModel>() {
 
     companion object {
         private const val IS_FAVORITES = "is_favorites"
@@ -36,14 +33,7 @@ class ContactListFragment :
 
     private var contactsAdapter: BaseBindingAdapter<ItemContactBinding>? = null
 
-    private val sharedViewModel by activityViewModels<SharedViewModel>()
-    private val searchViewModel by activityViewModels<SearchViewModel>()
-
-    private val onSelectContactListener: OnSelectContactListener?
-        get() = (context as? OnSelectContactListener)
-
-    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentContactListBinding =
-        FragmentContactListBinding::inflate
+    private val searchViewModel: SearchViewModel by sharedViewModel()
 
     override val viewModel: ContactListViewModel by viewModel()
 
@@ -59,11 +49,6 @@ class ContactListFragment :
 
     override fun initView() {
         contactsAdapter = BaseBindingAdapter()
-        viewModel.fbId.observe(viewLifecycleOwner, {
-            sharedViewModel.select(it)
-            onSelectContactListener?.onSelect()
-            binding.tvSearchResult.visibility = View.GONE
-        })
 
         contactsAdapter?.let {
             binding.rvContactList.bindAdapter(it)
@@ -94,16 +79,13 @@ class ContactListFragment :
         })
     }
 
+    override fun layoutId(): Int = R.layout.fragment_contact_list
 
     private fun showErrorMessage(msg: String) {
         view?.let {
             Snackbar.make(it, msg, Snackbar.LENGTH_INDEFINITE).setAction("DISMISS") {
             }.show()
         }
-    }
-
-    interface OnSelectContactListener {
-        fun onSelect()
     }
 
     override fun onResume() {
