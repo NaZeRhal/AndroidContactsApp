@@ -25,6 +25,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import com.maxrzhe.common.util.Constants
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
 import com.maxrzhe.presentation.navigation.listenToRouter
@@ -151,6 +152,14 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
                 })
         }
         return true
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        val fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
+        if (fbId != null) {
+            viewModel.openDetailFragment(fbId)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

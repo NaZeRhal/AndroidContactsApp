@@ -50,6 +50,7 @@ dependencies {
     implementation project(':domain')
     implementation project(':presentation')
     implementation project(':data_api')
+    implementation project(':common')
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

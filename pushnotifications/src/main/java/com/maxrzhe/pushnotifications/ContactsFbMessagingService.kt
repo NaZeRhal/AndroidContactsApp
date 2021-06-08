@@ -10,19 +10,24 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.MutableLiveData
+import com.example.data_api.model.Contact
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.maxrzhe.common.util.Constants
+import com.maxrzhe.common.util.Resource
 import com.maxrzhe.domain.usecases.AddContactUseCase
-import com.maxrzhe.presentation.navigation.RouteSection
 import com.maxrzhe.presentation.ui.ContactsListActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class ContactsFbMessagingService : FirebaseMessagingService() {
 
     private val addUseCase: AddContactUseCase by inject()
+    private val fbId = MutableLiveData<String?>()
 
     override fun onNewToken(refreshedToken: String) {
         Log.i("DBG", "Refreshed token: $refreshedToken")
@@ -30,16 +35,43 @@ class ContactsFbMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         CoroutineScope(Dispatchers.IO).launch {
-            Log.i("DBG", "${remoteMessage.data}")
-
-            if (remoteMessage.data.isNotEmpty()) {
-                val contact =
-            }
-
             remoteMessage.notification?.let {
-                createNotification(it.title, it.body)
-                Log.i("DBG", "Message title: ${it.title}")
-                Log.i("DBG", "Message title: ${it.body}")
+                if (remoteMessage.data.isNotEmpty()) {
+                    saveDataToDb(remoteMessage.data)
+                    createNotification(it.title, it.body)
+                } else {
+                    createNotification(it.title, it.body)
+                }
+            }
+        }
+    }
+
+    private suspend fun saveDataToDb(data: Map<String, String>) {
+        val fbId = data["fbId"] ?: ""
+        val name = data["name"]
+        val email = data["email"]
+        val phone = data["phone"]
+        val image = data["image"] ?: ""
+        val birthDate = data["birthDate"]
+        val isFavorite = data["isFavorite"].toBoolean()
+
+        if (!name.isNullOrEmpty() && !email.isNullOrEmpty() && !phone.isNullOrEmpty() && !birthDate.isNullOrEmpty()) {
+            val contact = Contact(
+                fbId = fbId,
+                name = name,
+                email = email,
+                phone = phone,
+                image = image,
+                birthDate = birthDate,
+                isFavorite = isFavorite
+            )
+
+            addUseCase.execute(contact).collect {
+                if (it is Resource.Success) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        this@ContactsFbMessagingService.fbId.value = it.data?.fbId
+                    }
+                }
             }
         }
     }
@@ -48,10 +80,12 @@ class ContactsFbMessagingService : FirebaseMessagingService() {
         createNotificationChannel()
 
         val intent = Intent(this, ContactsListActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(Constants.FB_ID_FCM, this@ContactsFbMessagingService.fbId.value)
         }
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, intent, 0)
 
         val notification =
             NotificationCompat.Builder(this, getString(R.string.default_notification_channel_id))
@@ -70,7 +104,6 @@ class ContactsFbMessagingService : FirebaseMessagingService() {
             notify(1, notification)
         }
     }
-
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -5,5 +5,6 @@ class Constants {
         const val BASE_URL =
             "https://contacts-app-ef170-default-rtdb.europe-west1.firebasedatabase.app/"
         const val DATABASE_NAME = "contacts_db"
+        const val FB_ID_FCM = "fb_id_fcm"
     }
 }
