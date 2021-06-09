@@ -54,8 +54,7 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
     private var fbId: String? = null
 
     companion object {
-        const val TAG = "DBG"
-
+        private const val TAG = "DBG"
         private const val DETAILS_TAG = "storage"
         private const val CURRENT_POSITION = "current_position"
         const val CHANNEL_ID = "CHANNEL_FCM_ID"
@@ -169,7 +168,6 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
-        Log.i(TAG, "onNewIntent: $fbId")
         if (fbId != null) {
             viewModel.openDetailFragment(fbId)
         }
@@ -203,7 +201,6 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
         registerReceiver(batteryBroadcastReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         registerReceiver(wifiBroadcastReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
 
-        Log.i(TAG, "onResume: id=$fbId")
         if (fbId != null) {
             viewModel.openDetailFragment(fbId)
         }

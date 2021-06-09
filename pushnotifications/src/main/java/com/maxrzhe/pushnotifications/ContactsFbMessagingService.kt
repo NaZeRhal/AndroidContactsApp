@@ -58,7 +58,6 @@ class ContactsFbMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendNotification(title: String?, message: String?) {
-        Log.i("DBG", "sendNotification: ${fbId.value}")
         val intent = Intent(this, ContactsListActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(Constants.FB_ID_FCM, fbId.value)
