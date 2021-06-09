@@ -16,7 +16,7 @@ class ContactNotificationManager(private val context: Context) {
 
     fun createNotification(title: String?, message: String?, intent: Intent?) {
         val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, 0)
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val notification =
             NotificationCompat.Builder(context, ContactsListActivity.CHANNEL_ID)
