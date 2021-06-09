@@ -3,6 +3,8 @@ package com.maxrzhe.presentation.ui
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -15,6 +17,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
@@ -25,6 +28,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import com.google.firebase.messaging.FirebaseMessaging
 import com.maxrzhe.common.util.Constants
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
@@ -47,10 +51,14 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
     private var currentPosition = 0
+    private var fbId: String? = null
 
     companion object {
+        const val TAG = "DBG"
+
         private const val DETAILS_TAG = "storage"
         private const val CURRENT_POSITION = "current_position"
+        const val CHANNEL_ID = "CHANNEL_FCM_ID"
     }
 
     private val batteryBroadcastReceiver = object : BroadcastReceiver() {
@@ -107,8 +115,12 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
         setSupportActionBar(binding.tbMain)
         title = null
         toolbar = supportActionBar
+        fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
 
         listenToRouter(viewModel.router)
+
+        createNotificationChannel()
+        logCurrentToken()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -156,7 +168,8 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        val fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
+        fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
+        Log.i(TAG, "onNewIntent: $fbId")
         if (fbId != null) {
             viewModel.openDetailFragment(fbId)
         }
@@ -186,14 +199,46 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
 
     override fun onResume() {
         super.onResume()
+
         registerReceiver(batteryBroadcastReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         registerReceiver(wifiBroadcastReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
+
+        Log.i(TAG, "onResume: id=$fbId")
+        if (fbId != null) {
+            viewModel.openDetailFragment(fbId)
+        }
     }
 
     override fun onPause() {
         super.onPause()
         unregisterReceiver(batteryBroadcastReceiver)
         unregisterReceiver(wifiBroadcastReceiver)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val desc = getString(R.string.channel_desc)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = desc
+            }
+
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun logCurrentToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.i(TAG, "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            Log.i(TAG, "Current token: $token")
+        }
     }
 
     private fun checkForStoragePermission() {

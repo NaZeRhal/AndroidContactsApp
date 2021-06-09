@@ -6,6 +6,7 @@ plugins {
 
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 30
@@ -69,6 +70,8 @@ dependencies {
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-viewmodel:$koin_version"
     testImplementation "org.koin:koin-test:$koin_version"
+
+    implementation 'com.google.firebase:firebase-messaging-ktx:22.0.0'
 
     implementation project(':domain')
     implementation project(':data_api')

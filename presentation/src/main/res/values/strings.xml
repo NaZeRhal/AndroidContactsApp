@@ -28,6 +28,8 @@
     <string name="settings_profile">Profile</string>
     <string name="settings_guide">Guide</string>
     <string name="settings_feedback">Feedback</string>
+    <string name="channel_name">CHANNEL_FCM</string>
+    <string name="channel_desc">notification channel</string>
 
 
 </resources>
