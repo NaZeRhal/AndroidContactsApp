@@ -34,7 +34,12 @@ val viewModelModule = module {
         )
     }
     viewModel<HomeFragmentViewModel> { HomeFragmentViewModel(router = get()) }
-    viewModel<ContactsActivityViewModel> { ContactsActivityViewModel(router = get()) }
+    viewModel<ContactsActivityViewModel> {
+        ContactsActivityViewModel(
+            addContactAfterPushNotificationUseCase = get(),
+            router = get()
+        )
+    }
 
     viewModel<SettingsListViewModel> { SettingsListViewModel(appResources = get(), router = get()) }
 

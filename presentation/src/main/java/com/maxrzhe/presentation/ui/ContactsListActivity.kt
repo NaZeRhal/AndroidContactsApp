@@ -116,10 +116,22 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
         toolbar = supportActionBar
         fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
 
+        intent?.extras?.let {
+            addContactFromPushDataIfExist(it)
+        }
+
         listenToRouter(viewModel.router)
 
         createNotificationChannel()
         logCurrentToken()
+    }
+
+    private fun addContactFromPushDataIfExist(bundle: Bundle) {
+        val data = mutableMapOf<String, String>()
+        for (key in bundle.keySet()) {
+            data[key] = bundle[key].toString()
+        }
+        viewModel.addContactFromPushData(data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
