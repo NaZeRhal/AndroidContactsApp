@@ -28,6 +28,8 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import com.google.firebase.messaging.FirebaseMessaging
 import com.maxrzhe.common.util.Constants
 import com.maxrzhe.presentation.R
@@ -275,6 +277,14 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
             } else {
                 choosePhotoFromGallery()
             }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (findNavController(R.id.fragment_nav_host).currentDestination?.id == R.id.homeFragment) {
+            viewModel.exitApp()
+        } else {
+            super.onBackPressed()
         }
     }
 

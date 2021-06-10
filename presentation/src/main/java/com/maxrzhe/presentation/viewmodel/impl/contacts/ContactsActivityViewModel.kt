@@ -29,6 +29,10 @@ class ContactsActivityViewModel(
         }
     }
 
+    fun exitApp() {
+        router.navigateTo(RouteSection.ExitApp)
+    }
+
     fun addContactFromPushData(data: Map<String, String>) {
         viewModelScope.launch {
             addContactAfterPushNotificationUseCase.execute(data).collect {
