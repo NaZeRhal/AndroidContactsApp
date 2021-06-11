@@ -9,4 +9,5 @@ val domainModule = module {
     factory { AddContactUseCase(get()) }
     factory { UpdateContactUseCase(get()) }
     factory { DeleteContactUseCase(get()) }
+    factory { AddContactAfterPushNotificationUseCase(get()) }
 }

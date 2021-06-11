@@ -3,6 +3,8 @@ package com.maxrzhe.presentation.ui
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -15,6 +17,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
@@ -25,6 +28,10 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import com.google.firebase.messaging.FirebaseMessaging
+import com.maxrzhe.common.util.Constants
 import com.maxrzhe.presentation.R
 import com.maxrzhe.presentation.databinding.ActivityListContactsBinding
 import com.maxrzhe.presentation.navigation.listenToRouter
@@ -46,10 +53,13 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
     private var toolbar: ActionBar? = null
     private var menuItemSearch: MenuItem? = null
     private var currentPosition = 0
+    private var fbId: String? = null
 
     companion object {
+        private const val TAG = "DBG"
         private const val DETAILS_TAG = "storage"
         private const val CURRENT_POSITION = "current_position"
+        const val CHANNEL_ID = "CHANNEL_FCM_ID"
     }
 
     private val batteryBroadcastReceiver = object : BroadcastReceiver() {
@@ -106,8 +116,24 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
         setSupportActionBar(binding.tbMain)
         title = null
         toolbar = supportActionBar
+        fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
+
+        intent?.extras?.let {
+            addContactFromPushDataIfExist(it)
+        }
 
         listenToRouter(viewModel.router)
+
+        createNotificationChannel()
+        logCurrentToken()
+    }
+
+    private fun addContactFromPushDataIfExist(bundle: Bundle) {
+        val data = mutableMapOf<String, String>()
+        for (key in bundle.keySet()) {
+            data[key] = bundle[key].toString()
+        }
+        viewModel.addContactFromPushData(data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -153,6 +179,14 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
         return true
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        fbId = intent?.getStringExtra(Constants.FB_ID_FCM)
+        if (fbId != null) {
+            viewModel.openDetailFragment(fbId)
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -177,14 +211,45 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
 
     override fun onResume() {
         super.onResume()
+
         registerReceiver(batteryBroadcastReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         registerReceiver(wifiBroadcastReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
+
+        if (fbId != null) {
+            viewModel.openDetailFragment(fbId)
+        }
     }
 
     override fun onPause() {
         super.onPause()
         unregisterReceiver(batteryBroadcastReceiver)
         unregisterReceiver(wifiBroadcastReceiver)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val desc = getString(R.string.channel_desc)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = desc
+            }
+
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun logCurrentToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.i(TAG, "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            Log.i(TAG, "Current token: $token")
+        }
     }
 
     private fun checkForStoragePermission() {
@@ -212,6 +277,14 @@ class ContactsListActivity : AppCompatActivity(), OnTakeImageListener,
             } else {
                 choosePhotoFromGallery()
             }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (findNavController(R.id.fragment_nav_host).currentDestination?.id == R.id.homeFragment) {
+            viewModel.exitApp()
+        } else {
+            super.onBackPressed()
         }
     }
 

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "52752047923",
+    "firebase_url": "https://contacts-app-ef170-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "contacts-app-ef170",
+    "storage_bucket": "contacts-app-ef170.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:52752047923:android:45df5f5a1cd35c6447a846",
+        "android_client_info": {
+          "package_name": "com.maxrzhe.pushnotifications"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "52752047923-88e5h9movau9qjejhknnbtj551bluevv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.maxrzhe.pushnotifications",
+            "certificate_hash": "8978728d0dc5d85ac21231d385263e3d3d788656"
+          }
+        },
+        {
+          "client_id": "52752047923-8krv70i553dv3nksllkeqk09n4othmsf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfQhsC7cGgPZkpoGjfmsmeRjbOOIwM3-I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "52752047923-8krv70i553dv3nksllkeqk09n4othmsf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
